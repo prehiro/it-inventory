@@ -1,0 +1,37 @@
+import { z } from "zod";
+
+// ItemModel (master data)
+export const itemModelSchema = z.object({
+  category: z.enum(["FA", "NCA", "OTHER"]),
+  name: z.string().min(1, "Name required").max(200),
+  brand: z.string().min(1, "Brand required").max(200),
+});
+export type ItemModelInput = z.infer<typeof itemModelSchema>;
+
+// Receive (adds a new physical item)
+export const receiveSchema = z.object({
+  modelId: z.string().uuid("Invalid model"),
+  serialNumber: z.string().min(1).max(200),
+  poNumber: z.string().max(100).optional().or(z.literal("")),
+  location: z.string().max(200).optional().or(z.literal("")),
+  remarks: z.string().max(500).optional().or(z.literal("")),
+});
+export type ReceiveInput = z.infer<typeof receiveSchema>;
+
+// Release (deploy an item to an assignee)
+export const releaseSchema = z.object({
+  itemId: z.string().uuid("Invalid item"),
+  assigneeEmpNumber: z.string().min(1).max(50),
+  assigneeName: z.string().min(1).max(200),
+  assigneeDept: z.string().max(200).optional().or(z.literal("")),
+  remarks: z.string().max(500).optional().or(z.literal("")),
+});
+export type ReleaseInput = z.infer<typeof releaseSchema>;
+
+// Return (item comes back)
+export const returnSchema = z.object({
+  itemId: z.string().uuid("Invalid item"),
+  returningPicName: z.string().min(1).max(200),
+  returnReason: z.string().max(500).optional().or(z.literal("")),
+});
+export type ReturnInput = z.infer<typeof returnSchema>;
