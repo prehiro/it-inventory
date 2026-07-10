@@ -1,0 +1,107 @@
+// IT Inventory Management System — Prisma schema (SQL Server)
+// NOTE: Prisma enums are NOT supported on SQL Server, so all enum-like
+// fields are stored as String and constrained via TS union types in /lib/types.ts
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows"]
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+// 1. System Users (App Login Accounts)
+model SystemUser {
+  id             String  @id @default(uuid())
+  employeeNumber String  @unique
+  name           String
+  department     String?
+  role           String  @default("OPERATOR") // ADMIN | MANAGER | OPERATOR
+  passwordHash   String
+  isDeleted      Boolean @default(false) // Soft delete flag
+  createdAt      DateTime @default(now())
+
+  auditLogs      AuditLog[]
+  transactions   ItemTxn[]
+
+  @@index([role])
+  @@index([isDeleted])
+}
+
+// 2. Dynamic Item Catalog (Master Data managed by Admin)
+model ItemModel {
+  id       String  @id @default(uuid())
+  category String  // FA | NCA | OTHER
+  name     String  // e.g., "ThinkPad T14", "Logitech Mouse"
+  brand    String  // e.g., "Lenovo", "Logitech"
+  isDeleted Boolean @default(false)
+
+  items    Item[]
+
+  @@index([category])
+  @@index([isDeleted])
+}
+
+// 3. Physical Inventory Items (The actual physical assets)
+model Item {
+  id           String   @id @default(uuid())
+  serialNumber String   @unique
+  poNumber     String?
+  status       String   @default("AVAILABLE") // AVAILABLE|DEPLOYED|RETURNED_KEEP|IN_REPAIR|DISPOSED
+  location     String   @default("IT Store") // Default physical location
+  dateReceived DateTime @default(now())
+  remarks      String?
+  isDeleted    Boolean  @default(false) // Soft delete for data entry mistakes
+
+  modelId String
+  model   ItemModel @relation(fields: [modelId], references: [id])
+
+  transactions ItemTxn[]
+
+  @@index([status])
+  @@index([modelId])
+  @@index([isDeleted])
+}
+
+// 4. History & Movement Tracking (Receive, Release, Return events)
+model ItemTxn {
+  id                 String   @id @default(uuid())
+  type               String   // RECEIVE | RELEASE | RETURN
+  date               DateTime @default(now())
+
+  // Fields for Releasing
+  assigneeEmpNumber  String?
+  assigneeName       String?
+  assigneeDept       String?
+
+  // Fields for Returning
+  returningPicName   String?
+  returnReason       String?
+
+  // General
+  remarks            String?
+
+  itemId     String
+  item       Item   @relation(fields: [itemId], references: [id])
+  operatorId String
+  operator   SystemUser @relation(fields: [operatorId], references: [id])
+
+  @@index([type])
+  @@index([itemId])
+  @@index([operatorId])
+}
+
+// 5. System Audit Logs (Admin Dashboard feed)
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // e.g., "CREATED_USER", "DELETED_ITEM_MODEL"
+  details   String   // Text or JSON detailing the exact change
+  timestamp DateTime @default(now())
+
+  userId String
+  user   SystemUser @relation(fields: [userId], references: [id])
+
+  @@index([action])
+  @@index([userId])
+}
