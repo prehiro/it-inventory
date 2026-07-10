@@ -20,6 +20,9 @@ export default async function RootLayout({
 
   const nav = [
     { href: "/", label: "Dashboard" },
+    { href: "/receive", label: "Receive" },
+    { href: "/release", label: "Release" },
+    { href: "/return", label: "Return" },
     ...(role === "ADMIN" ? [{ href: "/master-data", label: "Master Data" }] : []),
     ...(role === "ADMIN" || role === "MANAGER"
       ? [{ href: "/reports", label: "Reports" }]
