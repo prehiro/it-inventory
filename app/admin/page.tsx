@@ -25,13 +25,13 @@ export default async function AdminPage() {
     <div>
       <PageHeader title="Admin" subtitle="User management & audit trail" />
 
-      <h2 className="mb-3 text-lg font-medium text-slate-900">Create User</h2>
+      <h2 className="mb-3 text-lg font-medium text-slate-900 dark:text-slate-100">Create User</h2>
       <CreateUserForm />
 
-      <h2 className="mb-3 mt-8 text-lg font-medium text-slate-900">Users</h2>
-      <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+      <h2 className="mb-3 mt-8 text-lg font-medium text-slate-900 dark:text-slate-100">Users</h2>
+      <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
             <tr>
               <th className="px-5 py-3">Employee #</th>
               <th className="px-5 py-3">Name</th>
@@ -40,12 +40,12 @@ export default async function AdminPage() {
               <th className="px-5 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {users.map((u) => (
               <tr key={u.employeeNumber} className="row-hover">
-                <td className="px-5 py-3 font-medium text-slate-800">{u.employeeNumber}</td>
-                <td className="px-5 py-3 text-slate-700">{u.name}</td>
-                <td className="px-5 py-3 text-slate-500">{u.department ?? "—"}</td>
+                <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{u.employeeNumber}</td>
+                <td className="px-5 py-3 text-slate-700 dark:text-slate-300">{u.name}</td>
+                <td className="px-5 py-3 text-slate-500 dark:text-slate-400">{u.department ?? "—"}</td>
                 <td className="px-5 py-3"><RoleSelect employeeNumber={u.employeeNumber} role={u.role} /></td>
                 <td className="px-5 py-3 text-right"><DeleteUserButton employeeNumber={u.employeeNumber} /></td>
               </tr>
@@ -54,8 +54,8 @@ export default async function AdminPage() {
         </table>
       </div>
 
-      <h2 className="mb-3 mt-8 text-lg font-medium text-slate-900">Audit Trail</h2>
-      <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+      <h2 className="mb-3 mt-8 text-lg font-medium text-slate-900 dark:text-slate-100">Audit Trail</h2>
+      <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:divide-slate-800 dark:bg-slate-900 dark:ring-slate-800">
         {logs.map((l) => {
           const v = auditView(l.action, l.details);
           const Icon = v.icon;
@@ -67,9 +67,9 @@ export default async function AdminPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>{v.label}</span>
-                  <span className="truncate text-sm text-slate-600">{v.summary}</span>
+                  <span className="truncate text-sm text-slate-600 dark:text-slate-300">{v.summary}</span>
                 </div>
-                <p className="mt-0.5 text-xs text-slate-400">{l.user.name} · {l.timestamp.toLocaleString()}</p>
+                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{l.user.name} · {l.timestamp.toLocaleString()}</p>
               </div>
             </li>
           );

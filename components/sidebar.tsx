@@ -62,12 +62,12 @@ export function Sidebar({ role }: { role: Role }) {
   if (role === "ADMIN") items.push({ href: "/admin", label: "Admin", icon: I.admin });
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-slate-200 bg-white">
-      <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-5">
+    <aside className="sidebar-surface fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-5 dark:border-slate-800">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
           IT
         </div>
-        <span className="text-sm font-semibold text-slate-900">Inventory</span>
+        <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">Inventory</span>
       </div>
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {items.map((it) => {
@@ -76,7 +76,7 @@ export function Sidebar({ role }: { role: Role }) {
             <Link
               key={it.href}
               href={it.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 ${
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 ${
                 active ? "nav-link-active" : ""
               }`}
             >
@@ -86,7 +86,7 @@ export function Sidebar({ role }: { role: Role }) {
           );
         })}
       </nav>
-      <div className="border-t border-slate-200 px-5 py-3 text-xs text-slate-400">
+      <div className="border-t border-slate-200 px-5 py-3 text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500">
         v0.1 · Internal
       </div>
     </aside>

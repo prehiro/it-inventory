@@ -16,9 +16,9 @@ export default async function MasterDataPage() {
     <div>
       <PageHeader title="Master Data" subtitle="Item models in your catalog" />
       <CreateModelForm />
-      <div className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+      <div className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
             <tr>
               <th className="px-5 py-3">Name</th>
               <th className="px-5 py-3">Brand</th>
@@ -26,15 +26,15 @@ export default async function MasterDataPage() {
               <th className="px-5 py-3">Items</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {models.map((m) => (
               <tr key={m.id} className="row-hover">
-                <td className="px-5 py-3 font-medium text-slate-800">{m.name}</td>
-                <td className="px-5 py-3 text-slate-600">{m.brand}</td>
+                <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{m.name}</td>
+                <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{m.brand}</td>
                 <td className="px-5 py-3">
-                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{m.category}</span>
+                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">{m.category}</span>
                 </td>
-                <td className="px-5 py-3 text-slate-600">{m._count.items}</td>
+                <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{m._count.items}</td>
               </tr>
             ))}
             {models.length === 0 && (

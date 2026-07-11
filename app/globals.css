@@ -1,38 +1,47 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #f8fafc; /* slate-50 */
-  --color-foreground: #0f172a; /* slate-900 */
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
   --font-sans: var(--font-inter);
 }
 
-/* Inter via next/font is applied on <html>; this is a fallback */
+@custom-variant dark (&:is(.dark *));
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  background: var(--color-background);
+  color: var(--color-foreground);
 }
 
-/* Micro-animations (Section 5) */
+.dark body {
+  background: #020617; /* slate-950 */
+  color: #e2e8f0; /* slate-200 */
+}
+
+/* Sidebar + cards in dark mode: slate-900 surfaces, slate-800 borders */
+.dark .sidebar-surface {
+  background: #0f172a; /* slate-900 */
+  border-color: #1e293b; /* slate-800 */
+}
+
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.animate-fade-in { animation: fade-in 0.18s ease-out; }
+
 @keyframes slide-up {
-  from { opacity: 0; transform: translate(-50%, 16px); }
+  from { opacity: 0; transform: translate(-50%, 12px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
-.animate-fade-in { animation: fade-in 0.25s ease-out both; }
-.animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-up { animation: slide-up 0.22s ease-out; }
 
-/* Sidebar active link */
 .nav-link-active {
-  background: rgb(238 242 255); /* indigo-50 */
-  color: rgb(79 70 229); /* indigo-600 */
+  background: #eef2ff; /* indigo-50 */
+  color: #4338ca; /* indigo-700 */
   font-weight: 500;
 }
-
-/* Smooth row hover */
-.row-hover { transition: background-color 0.15s ease; }
-.row-hover:hover { background: rgb(248 250 252); }
+.dark .nav-link-active {
+  background: rgba(79, 70, 229, 0.15); /* indigo-600/15 */
+  color: #a5b4fc; /* indigo-300 */
+}

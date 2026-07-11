@@ -39,9 +39,9 @@ export default async function ReportsPage({
       <PageHeader title="Reports" subtitle="Movement history with filters & export" />
       <ReportsFilter initial={filter} count={txns.length} />
 
-      <div className="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+      <div className="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
             <tr>
               <th className="px-5 py-3">Date</th>
               <th className="px-5 py-3">Type</th>
@@ -51,15 +51,15 @@ export default async function ReportsPage({
               <th className="px-5 py-3">Details</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {txns.map((t) => (
               <tr key={t.id} className="row-hover">
-                <td className="whitespace-nowrap px-5 py-3 text-slate-500">{t.date.toLocaleDateString()}</td>
-                <td className="px-5 py-3 font-medium text-slate-800">{typeLabel[t.type] ?? t.type}</td>
-                <td className="px-5 py-3 text-slate-700">{t.item.serialNumber}</td>
+                <td className="whitespace-nowrap px-5 py-3 text-slate-500 dark:text-slate-400">{t.date.toLocaleDateString()}</td>
+                <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{typeLabel[t.type] ?? t.type}</td>
+                <td className="px-5 py-3 text-slate-700 dark:text-slate-200">{t.item.serialNumber}</td>
                 <td className="px-5 py-3"><StatusBadge status={t.item.status} /></td>
-                <td className="px-5 py-3 text-slate-600">{t.operator.name}</td>
-                <td className="px-5 py-3 text-slate-400">{t.assigneeName ?? t.returningPicName ?? t.remarks ?? "—"}</td>
+                <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{t.operator.name}</td>
+                <td className="px-5 py-3 text-slate-400 dark:text-slate-500">{t.assigneeName ?? t.returningPicName ?? t.remarks ?? "—"}</td>
               </tr>
             ))}
             {txns.length === 0 && (
