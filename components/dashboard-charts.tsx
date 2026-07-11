@@ -9,8 +9,8 @@ const COLORS = ["#4f46e5", "#0ea5e9", "#f59e0b", "#10b981", "#f43f5e"];
 export function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <h3 className="mb-3 text-sm font-medium text-slate-700">Assets by Category</h3>
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <h3 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">Assets by Category</h3>
       {total === 0 ? (
         <p className="py-8 text-center text-sm text-slate-400">No data</p>
       ) : (
@@ -39,8 +39,8 @@ export function CategoryDonut({ data }: { data: { name: string; value: number }[
 
 export function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <h3 className="mb-3 text-sm font-medium text-slate-700">Deployed by Department</h3>
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <h3 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">Deployed by Department</h3>
       {data.length === 0 ? (
         <p className="py-8 text-center text-sm text-slate-400">No deployed items</p>
       ) : (

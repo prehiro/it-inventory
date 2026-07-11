@@ -93,7 +93,7 @@ export default async function DashboardPage() {
         {cards.map((c) => {
           const ic = CARD_ICONS[c.label];
           return (
-            <div key={c.label} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">
+            <div key={c.label} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md dark:bg-slate-900 dark:ring-slate-800">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{c.label}</p>
                 {ic && (

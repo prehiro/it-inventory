@@ -10,7 +10,7 @@ export function RecentActivity({
     return <p className="text-sm text-slate-400">No activity yet.</p>;
 
   return (
-    <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+    <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:divide-slate-800 dark:bg-slate-900 dark:ring-slate-800">
       {items.map((r) => {
         const v = auditView(r.action, r.details);
         const Icon = v.icon;
@@ -22,9 +22,9 @@ export function RecentActivity({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>{v.label}</span>
-                <span className="truncate text-sm text-slate-600">{v.summary}</span>
+                <span className="truncate text-sm text-slate-600 dark:text-slate-300">{v.summary}</span>
               </div>
-              <p className="mt-0.5 text-xs text-slate-400">{r.user.name} · {r.timestamp.toLocaleString()}</p>
+              <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{r.user.name} · {r.timestamp.toLocaleString()}</p>
             </div>
           </li>
         );

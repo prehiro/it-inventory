@@ -28,29 +28,29 @@ export default async function ItemPage({
     <div className="max-w-3xl">
       <PageHeader title={item.serialNumber} subtitle={`${item.model.brand} ${item.model.name}`} />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <p className="text-xs text-slate-400">Status</p>
           <div className="mt-1"><StatusBadge status={item.status} /></div>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <p className="text-xs text-slate-400">Category</p>
-          <p className="mt-1 text-sm font-medium">{item.model.category}</p>
+          <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-100">{item.model.category}</p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <p className="text-xs text-slate-400">PO Number</p>
-          <p className="mt-1 text-sm font-medium">{item.poNumber ?? "—"}</p>
+          <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-100">{item.poNumber ?? "—"}</p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <p className="text-xs text-slate-400">Location</p>
-          <p className="mt-1 text-sm font-medium">{item.location}</p>
+          <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-100">{item.location}</p>
         </div>
       </div>
 
       <div className="mt-8">
-        <h2 className="mb-3 text-lg font-medium text-slate-900">Movement History</h2>
-        <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        <h2 className="mb-3 text-lg font-medium text-slate-900 dark:text-slate-100">Movement History</h2>
+        <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+            <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
               <tr>
                 <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Type</th>
@@ -58,13 +58,13 @@ export default async function ItemPage({
                 <th className="px-5 py-3">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {item.transactions.map((t) => (
                 <tr key={t.id} className="row-hover">
-                  <td className="whitespace-nowrap px-5 py-3 text-slate-500">{t.date.toLocaleString()}</td>
-                  <td className="px-5 py-3 font-medium">{typeLabel[t.type] ?? t.type}</td>
-                  <td className="px-5 py-3 text-slate-600">{t.operator.name}</td>
-                  <td className="px-5 py-3 text-slate-400">{t.assigneeName ?? t.returningPicName ?? t.remarks ?? "—"}</td>
+                  <td className="whitespace-nowrap px-5 py-3 text-slate-500 dark:text-slate-400">{t.date.toLocaleString()}</td>
+                  <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{typeLabel[t.type] ?? t.type}</td>
+                  <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{t.operator.name}</td>
+                  <td className="px-5 py-3 text-slate-400 dark:text-slate-500">{t.assigneeName ?? t.returningPicName ?? t.remarks ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
