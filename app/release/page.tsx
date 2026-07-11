@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { prisma } from "@/lib/db";
+import { PageHeader } from "@/components/page-header";
 import { ReleaseForm } from "./release-form";
 
 export default async function ReleasePage() {
@@ -11,8 +12,8 @@ export default async function ReleasePage() {
   });
 
   return (
-    <div className="max-w-lg">
-      <h1 className="mb-6 text-2xl font-semibold">Release Item</h1>
+    <div className="max-w-2xl">
+      <PageHeader title="Release Item" subtitle="Assign an available item to a user" />
       {items.length === 0 ? (
         <p className="text-sm text-slate-400">No available items to release.</p>
       ) : (

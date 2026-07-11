@@ -31,63 +31,41 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-        <h1 className="mb-1 text-xl font-semibold text-slate-900">
-          IT Inventory
-        </h1>
-        <p className="mb-6 text-sm text-slate-500">Sign in to continue</p>
+      <div className="w-full max-w-sm animate-fade-in rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <div className="mb-6 flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
+            IT
+          </div>
+          <span className="text-base font-semibold text-slate-900">Inventory</span>
+        </div>
+        <h1 className="mb-1 text-xl font-semibold text-slate-900">Sign in</h1>
+        <p className="mb-6 text-sm text-slate-500">Internal IT asset management</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="employeeNumber"
-              className="mb-1 block text-sm font-medium text-slate-700"
-            >
-              Employee Number
-            </label>
+            <label htmlFor="employeeNumber" className="mb-1.5 block text-sm font-medium text-slate-700">Employee Number</label>
             <input
-              id="employeeNumber"
-              name="employeeNumber"
-              type="text"
-              autoComplete="username"
-              required
-              value={employeeNumber}
-              onChange={(e) => setEmployeeNumber(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-              placeholder="e.g. EMP001"
+              id="employeeNumber" name="employeeNumber" type="text" autoComplete="username" required
+              value={employeeNumber} onChange={(e) => setEmployeeNumber(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              placeholder="e.g. ADM001"
             />
           </div>
-
           <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-slate-700"
-            >
-              Password
-            </label>
+            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
             <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              id="password" name="password" type="password" autoComplete="current-password" required
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               placeholder="••••••••"
             />
           </div>
-
           {error && (
-            <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">
-              {error}
-            </p>
+            <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p>
           )}
-
           <button
-            type="submit"
-            disabled={pending}
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
+            type="submit" disabled={pending}
+            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
           >
             {pending ? "Signing in…" : "Sign in"}
           </button>
