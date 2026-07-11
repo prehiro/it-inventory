@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { prisma } from "@/lib/db";
+import { PageHeader } from "@/components/page-header";
 import { ReceiveForm } from "./receive-form";
 
 export default async function ReceivePage() {
@@ -11,8 +12,8 @@ export default async function ReceivePage() {
   });
 
   return (
-    <div className="max-w-lg">
-      <h1 className="mb-6 text-2xl font-semibold">Receive Item</h1>
+    <div className="max-w-2xl">
+      <PageHeader title="Receive Item" subtitle="Log incoming IT items from logistics" />
       {models.length === 0 ? (
         <p className="text-sm text-slate-400">No models yet. Add one in Master Data first.</p>
       ) : (

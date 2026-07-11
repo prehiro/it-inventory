@@ -1,19 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { returnAction, type ActionResult } from "@/app/actions/inventory";
+import { Toast } from "@/components/toast";
 
 export function ReturnForm({ items }: { items: { id: string; serialNumber: string; assignee: string }[] }) {
-  const [state, formAction, pending] = useActionState<ActionResult, FormData>(
+  const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     async (_prev, formData) => returnAction(Object.fromEntries(formData.entries())),
-    { ok: true },
+    null,
   );
+  const [toast, setToast] = useState<string | null>(null);
+  useEffect(() => { if (state?.ok) setToast("Item returned"); }, [state]);
 
   return (
-    <form action={formAction} className="space-y-4 rounded-xl bg-white p-6 ring-1 ring-slate-200">
+    <form action={formAction} className="max-w-lg space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">Item (Deployed)</label>
-        <select name="itemId" required defaultValue="" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Item (Deployed)</label>
+        <select name="itemId" required defaultValue="" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
           <option value="" disabled>Select item…</option>
           {items.map((i) => (
             <option key={i.id} value={i.id}>{i.serialNumber} — {i.assignee}</option>
@@ -21,18 +24,18 @@ export function ReturnForm({ items }: { items: { id: string; serialNumber: strin
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">Returning PIC</label>
-        <input name="returningPicName" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Returning PIC</label>
+        <input name="returningPicName" required className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">Reason</label>
-        <input name="returnReason" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Reason</label>
+        <input name="returnReason" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
       </div>
-      {!state.ok && <p className="text-sm text-rose-600">{state.error}</p>}
-      {state.ok === true && <p className="text-sm text-emerald-600">Returned.</p>}
-      <button disabled={pending} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60">
+      {state && !state.ok && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{state.error}</p>}
+      <button disabled={pending} className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60">
         {pending ? "Saving…" : "Return Item"}
       </button>
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </form>
   );
 }

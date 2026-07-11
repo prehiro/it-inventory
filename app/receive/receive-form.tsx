@@ -1,19 +1,28 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { receiveAction, type ActionResult } from "@/app/actions/inventory";
+import { Toast } from "@/components/toast";
 
 export function ReceiveForm({ models }: { models: { id: string; name: string; brand: string }[] }) {
-  const [state, formAction, pending] = useActionState<ActionResult, FormData>(
+  const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     async (_prev, formData) => receiveAction(Object.fromEntries(formData.entries())),
-    { ok: true },
+    null,
   );
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (state?.ok) setToast("Item received");
+  }, [state]);
 
   return (
-    <form action={formAction} className="space-y-4 rounded-xl bg-white p-6 ring-1 ring-slate-200">
+    <form
+      action={formAction}
+      className="max-w-lg space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200"
+    >
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">Model</label>
-        <select name="modelId" required defaultValue="" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Model</label>
+        <select name="modelId" required defaultValue="" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
           <option value="" disabled>Select model…</option>
           {models.map((m) => (
             <option key={m.id} value={m.id}>{m.brand} {m.name}</option>
@@ -21,28 +30,33 @@ export function ReceiveForm({ models }: { models: { id: string; name: string; br
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">Serial Number</label>
-        <input name="serialNumber" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="SN-..." />
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Serial Number</label>
+        <input name="serialNumber" required className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="SN-..." />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">PO Number</label>
-          <input name="poNumber" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">PO Number</label>
+          <input name="poNumber" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Location</label>
-          <input name="location" defaultValue="IT Store" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Location</label>
+          <input name="location" defaultValue="IT Store" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">Remarks</label>
-        <input name="remarks" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <label className="mb-1.5 block text-sm font-medium text-slate-700">Remarks</label>
+        <input name="remarks" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
       </div>
-      {!state.ok && <p className="text-sm text-rose-600">{state.error}</p>}
-      {state.ok && state.ok === true && <p className="text-sm text-emerald-600">Received.</p>}
-      <button disabled={pending} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60">
+      {state && !state.ok && (
+        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{state.error}</p>
+      )}
+      <button
+        disabled={pending}
+        className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
+      >
         {pending ? "Saving…" : "Receive Item"}
       </button>
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </form>
   );
 }

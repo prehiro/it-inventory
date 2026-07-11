@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { prisma } from "@/lib/db";
+import { PageHeader } from "@/components/page-header";
 import { ReturnForm } from "./return-form";
 
 export default async function ReturnPage() {
@@ -15,8 +16,8 @@ export default async function ReturnPage() {
   });
 
   return (
-    <div className="max-w-lg">
-      <h1 className="mb-6 text-2xl font-semibold">Return Item</h1>
+    <div className="max-w-2xl">
+      <PageHeader title="Return Item" subtitle="Process items returned by users" />
       {items.length === 0 ? (
         <p className="text-sm text-slate-400">No deployed items to return.</p>
       ) : (
