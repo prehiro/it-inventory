@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/page-header";
 import { CreateUserForm } from "./create-user-form";
 import { RoleSelect, DeleteUserButton } from "./user-controls";
+import { auditView, TONE_CLASS } from "@/lib/audit-format";
 
 export default async function AdminPage() {
   await requireRole(await requireAuth(), ["ADMIN"]);
@@ -55,15 +56,24 @@ export default async function AdminPage() {
 
       <h2 className="mb-3 mt-8 text-lg font-medium text-slate-900">Audit Trail</h2>
       <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-        {logs.map((l) => (
-          <li key={l.id} className="row-hover flex items-center justify-between px-5 py-3 text-sm">
-            <div className="min-w-0">
-              <span className="font-medium text-slate-800">{l.action}</span>
-              <span className="ml-2 truncate text-slate-400">{l.details}</span>
-            </div>
-            <span className="ml-4 shrink-0 text-xs text-slate-400">{l.user.name} · {l.timestamp.toLocaleString()}</span>
-          </li>
-        ))}
+        {logs.map((l) => {
+          const v = auditView(l.action, l.details);
+          const Icon = v.icon;
+          return (
+            <li key={l.id} className="row-hover flex items-center gap-3 px-5 py-3.5">
+              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>
+                <Icon className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>{v.label}</span>
+                  <span className="truncate text-sm text-slate-600">{v.summary}</span>
+                </div>
+                <p className="mt-0.5 text-xs text-slate-400">{l.user.name} · {l.timestamp.toLocaleString()}</p>
+              </div>
+            </li>
+          );
+        })}
         {logs.length === 0 && <li className="px-5 py-6 text-center text-sm text-slate-400">No logs yet.</li>}
       </ul>
     </div>
