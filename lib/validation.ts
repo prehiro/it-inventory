@@ -35,3 +35,13 @@ export const returnSchema = z.object({
   returnReason: z.string().max(500).optional().or(z.literal("")),
 });
 export type ReturnInput = z.infer<typeof returnSchema>;
+
+// User management (Admin)
+export const userSchema = z.object({
+  employeeNumber: z.string().min(1).max(50),
+  name: z.string().min(1).max(200),
+  department: z.string().max(200).optional().or(z.literal("")),
+  role: z.enum(["ADMIN", "MANAGER", "OPERATOR"]),
+  password: z.string().min(6, "Min 6 characters"),
+});
+export type UserInput = z.infer<typeof userSchema>;
