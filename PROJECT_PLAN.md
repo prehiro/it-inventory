@@ -23,7 +23,9 @@
 ### Critical environment facts
 - **Node 22.23.1** must stay (global `node` symlink is Hermes Agent's bundled node — do NOT upgrade to 24 globally).
 - MSSQL adapter does **NOT** URL-decode the password → in `.env` the `@` stays **literal** (`%40` breaks login).
-- Prisma enum unsupported on `sqlserver` → use **String fields + TS union types** (`Role`, `ItemStatus`, `CategoryType`, `TransactionType`).
+- Prisma enum unsupported on `sqlserver` → use **String fields + TS union types** (`Role`, `ItemStatus`, `CategoryType`, `TransactionType`, `ItemType`).
+- `ItemType` union (12 device kinds) lives in `lib/types.ts` as `ITEM_TYPES` — single source of truth for master-data Type dropdown + combobox. Add new kinds there only (no DB migration needed; `ItemModel.type` is a free String column).
+- `CategoryType` = `FA | NCA | GENERAL` (renamed from `OTHER` in Phase 7).
 - Reserved-word models renamed: `User` → `SystemUser`, `Transaction` → `ItemTxn`.
 - Always `binaryTargets = ["native", "windows"]` for cross-OS deploy.
 - `lib/db.ts` & `auth.ts` import `"server-only"` (prevent mssql/tedious leaking to client/edge).
@@ -36,15 +38,20 @@
 | Model | Key fields | Notes |
 |---|---|---|
 | `SystemUser` | employeeNumber (PK string), name, passwordHash, role, isDeleted | soft-delete |
-| `ItemModel` | id, brand, name, category, defaultLocation | catalog of asset types |
-| `Item` | serialNumber (PK), modelId, status, poNumber, location, acquiredAt | one physical asset |
-| `ItemTxn` | id, itemSerial, type, operatorId, assigneeName, returningPicName, remarks, date | movement log |
-| `AuditLog` | id, userId, action, details (JSON string), createdAt | every create/role/delete/op |
+| `ItemModel` | id, type, brand, name, category, isDeleted | catalog of asset types (type = kind of device, brand + name = model) |
+| `Item` | serialNumber (PK), modelId, status, poNumber, location, dateReceived, remarks, isDeleted | one physical asset |
+| `ItemTxn` | id, itemId, type, operatorId, assigneeEmpNumber, assigneeName, assigneeDept, returningPicName, returnReason, remarks, date | movement log |
+| `AuditLog` | id, userId, action, details (JSON string), timestamp | every create/role/delete/op |
 
-Status union: `AVAILABLE | DEPLOYED | IN_REPAIR | DISPOSED`
-Category union: `LAPTOP | MONITOR | PRINTER | OTHER`
-Transaction union: `RECEIVED | RELEASED | RETURNED`
+Status union: `AVAILABLE | DEPLOYED | RETURNED_KEEP | IN_REPAIR | DISPOSED`
+Category union: `FA | NCA | GENERAL`  (was `OTHER` → renamed `GENERAL`)
+ItemType union: `PC | Laptop | Tablet | Mouse | Keyboard | Monitor | Projector | Camera | CCTV | Printer | Kensington | Adaptor` (dropdown in master-data)
+Transaction union: `RECEIVE | RELEASE | RETURN`
 Role union: `ADMIN | MANAGER | OPERATOR`
+
+> ItemModel field `type` added in Phase 7 (DB pushed). `name` holds the model
+> (e.g. "1920g"), `brand` the vendor (e.g. "Honeywell"), `type` the device kind
+> (e.g. "Scanner"). Brand & Model are auto-uppercased on create.
 
 **Race-condition guard:** all state-changing flows run inside
 `prisma.$transaction(async (tx) => { ... })` (interactive) — e.g. receive sets
@@ -128,6 +135,18 @@ a double-action guard so the same serial can't be double-released.
 - [x] Login page reverted to default slate bg (starfield experiment removed)
 - **Commit:** `686bd64`
 
+### ✅ Phase 7 — Receive UX overhaul + Master-data model enhancements
+- [x] **Master-data delete modal**: `master-data-table.tsx` client wrapper, persistent modal (lifted out of row `.map`), 4 states (confirm/blocked/error/success) with keyed `animate-fade-in` crossfade + checklist `check-pop`/`check-draw` (~1s, slow enough to see). Guard: block delete if model still has active items.
+- [x] **Receive Batch Input tab**: `receive-tabs.tsx` sliding-pill (absolute `bg-indigo-600` + `translateX`, cubic-bezier overshoot). `batch-receive-form.tsx` textarea (1 serial/line) + separate PO Number + disabled Location (IT Store). `receiveBatchAction` loops `receiveItem` per serial, per-item `try/catch` (no full rollback); per-item result table (✓/✗ + reason). Runtime-verified 50/52.
+- [x] **ModelCombobox** (`components/model-combobox.tsx`, 0-dep): searchable (type+name+brand), grouped by category, keyboard nav (↑↓/Enter/Esc), outside-click close. Used by single + batch receive.
+- [x] **Location disabled** in both receive forms (value IT Store, grayed, hidden input submits it).
+- [x] **PO Number** separated field (not piped in serial line) + prefilled `PTCAP__` (single `defaultValue`, batch `useState`).
+- [x] **ItemModel.type field** (DB pushed via `prisma db push`): `lib/types.ts` `ITEM_TYPES` (12-value union, single source of truth) + `CategoryType` now `FA|NCA|GENERAL`; `itemModelSchema` + `type`; `create-model-form.tsx` Type dropdown; master-data table shows Type+Model columns; combobox row = `type · brand name`.
+- [x] **Category `OTHER` → `GENERAL`**: code (`types`, `validation`, form, schema) + DB data migrated (1 row). Combobox `CATEGORIES` updated so GENERAL models appear/searchable.
+- [x] **Brand & Model auto-uppercase** on master-data create (`onChange` upper-cases DOM value).
+- [x] Batch form width matched to single (`max-w-lg`).
+- **Commits:** `cf69c4f` (features) · `62869b7` (UI polish: width + PO default)
+
 ---
 
 ## 4. Pending / Next
@@ -145,7 +164,7 @@ Plan:
 ### ⬜ Housekeeping (optional)
 - [ ] Change admin password (ADM001) before production.
 - [ ] Clean test data in `db_itInventory` (SN-TEST-001, ViaActionModel, SN-P3-FLOW, EMP010) — optional.
-- [ ] Add `SS/` (screenshots) to `.gitignore` so they never get committed.
+- [x] `SS/` (screenshots) added to `.gitignore` (commit `1d80143`).
 
 ---
 
