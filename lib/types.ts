@@ -9,7 +9,21 @@ export type ItemStatus =
   | "IN_REPAIR"
   | "DISPOSED";
 
-export type CategoryType = "FA" | "NCA" | "OTHER";
+export type CategoryType = "FA" | "NCA" | "GENERAL";
+
+export type ItemType =
+  | "PC"
+  | "Laptop"
+  | "Tablet"
+  | "Mouse"
+  | "Keyboard"
+  | "Monitor"
+  | "Projector"
+  | "Camera"
+  | "CCTV"
+  | "Printer"
+  | "Kensington"
+  | "Adaptor";
 
 export type TransactionType = "RECEIVE" | "RELEASE" | "RETURN";
 
@@ -21,7 +35,21 @@ export const ITEM_STATUSES: ItemStatus[] = [
   "IN_REPAIR",
   "DISPOSED",
 ];
-export const CATEGORY_TYPES: CategoryType[] = ["FA", "NCA", "OTHER"];
+export const CATEGORY_TYPES: CategoryType[] = ["FA", "NCA", "GENERAL"];
+export const ITEM_TYPES: ItemType[] = [
+  "PC",
+  "Laptop",
+  "Tablet",
+  "Mouse",
+  "Keyboard",
+  "Monitor",
+  "Projector",
+  "Camera",
+  "CCTV",
+  "Printer",
+  "Kensington",
+  "Adaptor",
+];
 export const TRANSACTION_TYPES: TransactionType[] = [
   "RECEIVE",
   "RELEASE",

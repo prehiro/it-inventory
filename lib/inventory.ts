@@ -8,6 +8,37 @@ import type { ReceiveInput, ReleaseInput, ReturnInput } from "@/lib/validation";
  * This prevents two operators from releasing the same item concurrently.
  */
 
+export type BatchResult = { serial: string; ok: boolean; error?: string };
+
+export async function receiveBatch(
+  input: { modelId: string; poNumber?: string; location?: string; remarks?: string; serials: string[] },
+  operatorId: string,
+): Promise<BatchResult[]> {
+  const results: BatchResult[] = [];
+  for (const serial of input.serials) {
+    try {
+      await receiveItem(
+        {
+          modelId: input.modelId,
+          serialNumber: serial,
+          poNumber: input.poNumber,
+          location: input.location,
+          remarks: input.remarks,
+        },
+        operatorId,
+      );
+      results.push({ serial, ok: true });
+    } catch (e) {
+      results.push({
+        serial,
+        ok: false,
+        error: e instanceof Error ? e.message : "Failed",
+      });
+    }
+  }
+  return results;
+}
+
 export async function receiveItem(input: ReceiveInput, operatorId: string) {
   return prisma.$transaction(async (tx) => {
     const model = await tx.itemModel.findFirst({

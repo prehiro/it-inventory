@@ -1,14 +1,14 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/page-header";
-import { ReceiveForm } from "./receive-form";
+import { ReceiveTabs } from "./receive-tabs";
 
 export default async function ReceivePage() {
   await requireAuth();
   const models = await prisma.itemModel.findMany({
     where: { isDeleted: false },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, brand: true },
+    select: { id: true, type: true, name: true, brand: true, category: true },
   });
 
   return (
@@ -17,7 +17,7 @@ export default async function ReceivePage() {
       {models.length === 0 ? (
         <p className="text-sm text-slate-400">No models yet. Add one in Master Data first.</p>
       ) : (
-        <ReceiveForm models={models} />
+        <ReceiveTabs models={models} />
       )}
     </div>
   );
