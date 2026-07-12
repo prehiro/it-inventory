@@ -75,6 +75,15 @@ export async function deleteModelAction(
 ): Promise<MasterDataResult> {
   try {
     const userId = await requireAdmin();
+    const activeItems = await prisma.item.count({
+      where: { modelId: id, isDeleted: false },
+    });
+    if (activeItems > 0) {
+      return {
+        ok: false,
+        error: `Model masih dipakai ${activeItems} item aktif. Hapus/dispose item tersebut dulu.`,
+      };
+    }
     await prisma.itemModel.update({
       where: { id },
       data: { isDeleted: true },
