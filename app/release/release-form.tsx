@@ -24,11 +24,27 @@ export function ReleaseForm() {
   const [lookup, setLookup] = useState<Lookup | null>(null);
   const [lookupErr, setLookupErr] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  const [released, setReleased] = useState(false);
+  const [releasedItem, setReleasedItem] = useState<Lookup | null>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (state?.ok) setToast("Item released");
+    if (state?.ok) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setReleasedItem(lookup);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setReleased(true);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSerial("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLookup(null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLookupErr(null);
+      formRef.current?.reset();
+      setToast("Item released");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   function runLookup(s: string) {
@@ -50,12 +66,14 @@ export function ReleaseForm() {
   function onSerialChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value;
     setSerial(v);
+    setReleased(false);
+    setReleasedItem(null);
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => runLookup(v), 300);
   }
 
   return (
-    <form action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {/* LEFT: inputs */}
       <div className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <input type="hidden" name="itemId" value={lookup?.id ?? ""} />
@@ -71,7 +89,11 @@ export function ReleaseForm() {
           />
           {checking && <p className="mt-1 text-xs text-slate-400">Checking…</p>}
           {lookupErr && <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">{lookupErr}</p>}
-          {lookup && <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item found — ready to release</p>}
+          {released ? (
+            <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item released</p>
+          ) : lookup ? (
+            <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item found — ready to release</p>
+          ) : null}
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -106,14 +128,31 @@ export function ReleaseForm() {
       {/* RIGHT: preview */}
       <div className="rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">ITEM DETAILS</h3>
-        {lookup ? (
+        {released && releasedItem ? (
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-8 w-8" strokeLinecap="round" strokeLinejoin="round">
+                <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="mb-4 text-sm font-medium text-emerald-600 dark:text-emerald-400">Item released</p>
+            <dl className="w-full space-y-3 text-left text-sm">
+              <Row label="Serial" value={releasedItem.serialNumber} />
+              <Row label="Type" value={releasedItem.type} />
+              <Row label="Brand" value={releasedItem.brand} />
+              <Row label="Model" value={releasedItem.model} />
+              <Row label="Location" value={releasedItem.location} />
+              <Row label="Status" value="RELEASED" badge />
+            </dl>
+          </div>
+        ) : lookup ? (
           <dl className="space-y-3 text-sm">
             <Row label="Serial" value={lookup.serialNumber} />
             <Row label="Type" value={lookup.type} />
             <Row label="Brand" value={lookup.brand} />
             <Row label="Model" value={lookup.model} />
             <Row label="Location" value={lookup.location} />
-            <Row label="Status" value={lookup.status} />
+            <Row label="Status" value={lookup.status} badge />
           </dl>
         ) : (
           <p className="text-sm text-slate-400">
@@ -129,11 +168,17 @@ function titleCase(v: string): string {
   return v.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, badge }: { label: string; value: string; badge?: boolean }) {
   return (
     <div className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
       <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="font-medium text-slate-800 dark:text-slate-100">{value}</dd>
+      {badge ? (
+        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400">
+          {value}
+        </span>
+      ) : (
+        <dd className="font-medium text-slate-800 dark:text-slate-100">{value}</dd>
+      )}
     </div>
   );
 }
