@@ -13,7 +13,7 @@ export function BatchReceiveForm({
 }) {
   const [modelId, setModelId] = useState("");
   const location = "IT Store";
-  const [poNumber, setPoNumber] = useState("");
+  const [poNumber, setPoNumber] = useState("PTCAP__");
   const [remarks, setRemarks] = useState("");
   const [raw, setRaw] = useState("");
   const [pending, start] = useTransition();
@@ -54,7 +54,7 @@ export function BatchReceiveForm({
   }
 
   return (
-    <div className="max-w-2xl space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+    <div className="max-w-lg space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
       <div>
         <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
           Item Type / Model
