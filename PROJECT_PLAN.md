@@ -147,6 +147,14 @@ a double-action guard so the same serial can't be double-released.
 - [x] Batch form width matched to single (`max-w-lg`).
 - **Commits:** `cf69c4f` (features) · `62869b7` (UI polish: width + PO default)
 
+### ✅ UI Tune-up 3 — Release/Return detail panels + return disposition UX
+- [x] **Date display in ITEM DETAILS**: release shows `Received` (dateReceived) + success `Released` (txn date); return shows `Deployed` (RELEASE txn date) + success `Returned` (txn date). Format `Day, DD-Month-YYYY` via `formatDate` helper. `lookup`/`lookup-deployed` routes return `receivedAt`/`releasedAt`. `releaseAction` returns `releasedAt`, `returnAction` returns `txnAt`.
+- [x] **Empty-state illustration**: `public/illustrations/list-items.png` shown centered in ITEM DETAILS when SN empty (`min-h-[18rem]`).
+- [x] **Available Items table** (`app/release/available-items-table.tsx`, server component): title "Available Items" / "Items ready to Release"; columns Serial Number · Type · Brand · Model · Category · Status (emerald badge); `max-h-80 overflow-y-auto` scroll + sticky header; `orderBy dateReceived asc` (oldest first). `releaseAction` revalidates `/release`.
+- [x] **Section searchable dropdown** (`components/section-combobox.tsx`, 0-dep): hardcoded `SECTIONS` (26 values, editable in file) + realtime filter + keyboard nav + outside-click; replaces "Department" label → "Section" on release form (Assignee Emp# + Name kept).
+- [x] **Return redesign**: Returning PIC → 2 fields (Assignee Emp# uppercase + Assignee Name titleCase). **3 selectable circle dispositions** (radio): Returned Keep (blue) → `RETURNED_KEEP`, Repair (amber) → `IN_REPAIR`, Dispose (rose) → `DISPOSED`. Each circle: icon + label + sub-text + colored border/bg, **neon-breathing glow** (`@keyframes neon-breath` in globals.css) + soft box-shadow glow on selected card; label text follows tone. `returnSchema` + `disposition: enum(KEEP/REPAIR/DISPOSE)`; `returnItem` sets status from disposition; `returningPicName` = `Emp — Name` injected before `safeParse` (fixed "received undefined" bug). Success panel `Status` badge uses tone (blue/amber/rose) + glow via `Row badgeTone`. Right panel title → "Returned Item Details". Fixed success-status reset bug (DISPOSE was showing RETURNED_KEEP) via `returnedDisposition` snapshot.
+- **Commit:** `48c3da1`
+
 ---
 
 ## 4. Pending / Next
@@ -171,7 +179,7 @@ Plan:
 ## 5. UI/UX Design System (applied)
 - **Layout:** fixed left sidebar (role-based nav) + topbar (centered global search + theme toggle + avatar dropdown).
 - **Font:** Inter (via `next/font`).
-- **Palette:** indigo-600 primary · emerald = AVAILABLE · amber = IN_REPAIR · rose = DISPOSED · slate = neutral.
+- **Palette:** indigo-600 primary · emerald = AVAILABLE (badge + soft glow) · blue = RETURNED_KEEP (disposition) · amber = IN_REPAIR (disposition) · rose = DISPOSED (disposition) · slate = neutral. Return disposition circles: neon-breathing glow + soft box-shadow on selected; label/border/badge follow tone.
 - **Cards:** `rounded-2xl` + subtle shadow + `ring-1`.
 - **Micro-animations:** fade-in on load, slide-up toast, row/button hover.
 - **Dark mode:** full `dark:` support, `class` strategy via next-themes.
