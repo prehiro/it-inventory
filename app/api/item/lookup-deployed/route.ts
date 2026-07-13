@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   const releaseTxn = await prisma.itemTxn.findFirst({
     where: { itemId: item.id, type: "RELEASE" },
     orderBy: { date: "desc" },
-    select: { assigneeEmpNumber: true, assigneeName: true, assigneeDept: true },
+    select: { assigneeEmpNumber: true, assigneeName: true, assigneeDept: true, date: true },
   });
 
   return NextResponse.json({
@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
       assigneeEmpNumber: releaseTxn?.assigneeEmpNumber ?? null,
       assigneeName: releaseTxn?.assigneeName ?? null,
       assigneeDept: releaseTxn?.assigneeDept ?? null,
+      releasedAt: releaseTxn?.date ?? null,
     },
   });
 }

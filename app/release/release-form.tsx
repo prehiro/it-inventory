@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState, useRef } from "react";
 import { releaseAction, type ActionResult } from "@/app/actions/inventory";
 import { Toast } from "@/components/toast";
+import { SectionCombobox } from "@/components/section-combobox";
 
 type Lookup = {
   id: string;
@@ -12,7 +13,22 @@ type Lookup = {
   model: string;
   location: string;
   status: string;
+  receivedAt: string;
+  releasedAt?: string;
 };
+
+function titleCase(v: string): string {
+  return v.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatDate(d: string | null): string {
+  if (!d) return "—";
+  const dt = new Date(d);
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const dd = String(dt.getDate()).padStart(2, "0");
+  return `${days[dt.getDay()]}, ${dd}-${months[dt.getMonth()]}-${dt.getFullYear()}`;
+}
 
 export function ReleaseForm() {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
@@ -26,17 +42,20 @@ export function ReleaseForm() {
   const [checking, setChecking] = useState(false);
   const [released, setReleased] = useState(false);
   const [releasedItem, setReleasedItem] = useState<Lookup | null>(null);
+  const [dept, setDept] = useState("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state?.ok) {
+    if (state?.ok && lookup) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setReleasedItem(lookup);
+      setReleasedItem({ ...lookup, releasedAt: state.releasedAt ?? new Date().toISOString() });
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReleased(true);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSerial("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDept("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -106,8 +125,8 @@ export function ReleaseForm() {
           </div>
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Department</label>
-          <input name="assigneeDept" onChange={(e) => { e.target.value = titleCase(e.target.value); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
+          <SectionCombobox name="assigneeDept" value={dept} onChange={setDept} />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks</label>
@@ -142,6 +161,8 @@ export function ReleaseForm() {
               <Row label="Brand" value={releasedItem.brand} />
               <Row label="Model" value={releasedItem.model} />
               <Row label="Location" value={releasedItem.location} />
+              <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
+              <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
               <Row label="Status" value="RELEASED" badge />
             </dl>
           </div>
@@ -152,28 +173,41 @@ export function ReleaseForm() {
             <Row label="Brand" value={lookup.brand} />
             <Row label="Model" value={lookup.model} />
             <Row label="Location" value={lookup.location} />
+            <Row label="Received" value={formatDate(lookup.receivedAt)} />
             <Row label="Status" value={lookup.status} badge />
           </dl>
         ) : (
-          <p className="text-sm text-slate-400">
-            {lookupErr ? "Item not available for release." : "Enter a serial number to preview item details."}
-          </p>
+          <div className="flex min-h-[18rem] flex-col items-center justify-center py-6 text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/illustrations/list-items.png"
+              alt="Enter a serial number"
+              className="mb-4 h-28 w-auto opacity-80"
+            />
+            <p className="text-sm text-slate-400">
+              {lookupErr ? "Item not available for release." : "Enter a serial number to preview item details."}
+            </p>
+          </div>
         )}
       </div>
     </form>
   );
 }
 
-function titleCase(v: string): string {
-  return v.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function Row({ label, value, badge }: { label: string; value: string; badge?: boolean }) {
+  const isAvail = badge && value === "AVAILABLE";
   return (
     <div className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
       <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
       {badge ? (
-        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400">
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
+            isAvail
+              ? "bg-emerald-50 text-emerald-700 ring-emerald-600/30 dark:bg-emerald-500/15 dark:text-emerald-400"
+              : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
+          }`}
+          style={isAvail ? { boxShadow: "0 0 10px 1px rgba(16,185,129,0.55)" } : undefined}
+        >
           {value}
         </span>
       ) : (

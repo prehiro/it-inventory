@@ -130,9 +130,16 @@ export async function returnItem(input: ReturnInput, operatorId: string) {
     if (item.status !== "DEPLOYED")
       throw new Error(`Item is ${item.status}, cannot return`);
 
+    const status =
+      input.disposition === "REPAIR"
+        ? "IN_REPAIR"
+        : input.disposition === "DISPOSE"
+          ? "DISPOSED"
+          : "RETURNED_KEEP";
+
     await tx.item.update({
       where: { id: item.id },
-      data: { status: "RETURNED_KEEP" },
+      data: { status },
     });
 
     const txn = await tx.itemTxn.create({

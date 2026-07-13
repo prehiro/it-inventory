@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
       model: item.model.name,
       location: item.location,
       status: item.status,
+      receivedAt: item.dateReceived,
     },
   });
 }
