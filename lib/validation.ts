@@ -43,6 +43,7 @@ export type ReleaseInput = z.infer<typeof releaseSchema>;
 // Return (item comes back)
 export const returnSchema = z.object({
   itemId: z.string().uuid("Invalid item"),
+  disposition: z.enum(["KEEP", "REPAIR", "DISPOSE"]),
   returningPicName: z.string().min(1).max(200),
   returnReason: z.string().max(500).optional().or(z.literal("")),
 });

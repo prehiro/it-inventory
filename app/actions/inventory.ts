@@ -16,7 +16,7 @@ import {
   batchReceiveSchema,
 } from "@/lib/validation";
 
-export type ActionResult = { ok: true } | { ok: false; error: string };
+export type ActionResult = { ok: true; releasedAt?: string; txnAt?: string } | { ok: false; error: string };
 export type BatchActionResult =
   | { ok: true; results: BatchResult[] }
   | { ok: false; error: string };
@@ -52,10 +52,11 @@ export async function releaseAction(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
 
   try {
-    await releaseItem(parsed.data, session.user.id);
+    const result = await releaseItem(parsed.data, session.user.id);
     revalidatePath("/");
     revalidatePath("/reports");
-    return { ok: true };
+    revalidatePath("/release");
+    return { ok: true, releasedAt: result.date.toISOString() };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };
   }
@@ -67,15 +68,22 @@ export async function returnAction(
   const session = await auth();
   if (!session?.user) return { ok: false, error: "Unauthorized" };
 
-  const parsed = returnSchema.safeParse(data);
+  const emp = String(data.assigneeEmpNumber ?? "").trim();
+  const name = String(data.assigneeName ?? "").trim();
+  const payload: Record<string, unknown> = {
+    ...data,
+    returningPicName: [emp, name].filter(Boolean).join(" — "),
+  };
+
+  const parsed = returnSchema.safeParse(payload);
   if (!parsed.success)
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
 
   try {
-    await returnItem(parsed.data, session.user.id);
+    const result = await returnItem(parsed.data, session.user.id);
     revalidatePath("/");
     revalidatePath("/reports");
-    return { ok: true };
+    return { ok: true, txnAt: result.date.toISOString() };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };
   }

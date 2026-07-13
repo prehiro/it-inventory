@@ -52,6 +52,12 @@ body {
 }
 .animate-slide-up { animation: slide-up 0.22s ease-out; }
 
+@keyframes neon-breath {
+  0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(99,102,241,0.6)); }
+  50% { box-shadow: 0 0 14px 4px var(--neon, rgba(99,102,241,0.6)); }
+}
+.animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
+
 .nav-link-active {
   background: #eef2ff; /* indigo-50 */
   color: #4338ca; /* indigo-700 */
