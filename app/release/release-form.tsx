@@ -45,6 +45,8 @@ export function ReleaseForm() {
   const [releasedItem, setReleasedItem] = useState<Lookup | null>(null);
   const [dept, setDept] = useState("");
   const [hostname, setHostname] = useState("");
+  const [empNumber, setEmpNumber] = useState("");
+  const [assigneeName, setAssigneeName] = useState("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -60,6 +62,10 @@ export function ReleaseForm() {
       setDept("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setHostname("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEmpNumber("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAssigneeName("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -121,11 +127,11 @@ export function ReleaseForm() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Emp #</label>
-            <input name="assigneeEmpNumber" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input name="assigneeEmpNumber" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); setEmpNumber(e.target.value.toUpperCase()); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Name</label>
-            <input name="assigneeName" required onChange={(e) => { e.target.value = titleCase(e.target.value); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input name="assigneeName" required onChange={(e) => { e.target.value = titleCase(e.target.value); setAssigneeName(e.target.value); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -145,7 +151,7 @@ export function ReleaseForm() {
         {lookup && HOSTNAME_TYPES.includes(lookup.type as (typeof HOSTNAME_TYPES)[number]) && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Hostname <span className="text-rose-500">*</span></label>
-            <input name="hostname" required placeholder="e.g. PC-DIRE-001" value={hostname} onChange={(e) => setHostname(e.target.value)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input name="hostname" required placeholder="e.g. PC-DIRE-001" value={hostname} onChange={(e) => setHostname(e.target.value.toUpperCase())} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
           </div>
         )}
         <div>
@@ -176,16 +182,16 @@ export function ReleaseForm() {
             </div>
             <p className="mb-4 text-sm font-medium text-emerald-600 dark:text-emerald-400">Item released</p>
             <dl className="w-full space-y-3 text-left text-sm">
-              <Row label="Serial" value={releasedItem.serialNumber} />
-              <Row label="Type" value={releasedItem.type} />
-              <Row label="Brand" value={releasedItem.brand} />
-              <Row label="Model" value={releasedItem.model} />
+              <Row label="Item" value={`${releasedItem.type} ${releasedItem.brand} ${releasedItem.model}`.toUpperCase()} />
               {releasedItem.type && HOSTNAME_TYPES.includes(releasedItem.type as (typeof HOSTNAME_TYPES)[number]) && (
                 <Row label="Hostname" value={hostname || "—"} />
               )}
+              <Row label="Serial" value={releasedItem.serialNumber} />
               <Row label="Location" value={releasedItem.location} />
               <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
               <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
+              <Row label="Assignee Emp #" value={empNumber || "—"} />
+              <Row label="Assignee Name" value={assigneeName || "—"} />
               <Row label="Status" value="RELEASED" badge />
             </dl>
           </div>
