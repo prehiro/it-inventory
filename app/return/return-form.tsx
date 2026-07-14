@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState, useRef } from "react";
 import { returnAction, type ActionResult } from "@/app/actions/inventory";
 import { Toast } from "@/components/toast";
+import { SectionCombobox } from "@/components/section-combobox";
 
 type Lookup = {
   id: string;
@@ -48,6 +49,7 @@ export function ReturnForm() {
   const [picName, setPicName] = useState("");
   const [picGid, setPicGid] = useState("");
   const [picEmail, setPicEmail] = useState("");
+  const [picDept, setPicDept] = useState("");
   const [disposition, setDisposition] = useState<"KEEP" | "REPAIR" | "DISPOSE" | "">("");
   const [returnedDisposition, setReturnedDisposition] = useState<"KEEP" | "REPAIR" | "DISPOSE" | "">("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -101,6 +103,7 @@ export function ReturnForm() {
     setPicName("");
     setPicGid("");
     setPicEmail("");
+    setPicDept("");
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => runLookup(v), 300);
   }
@@ -148,7 +151,7 @@ export function ReturnForm() {
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="mt-4 grid grid-cols-2 gap-4">
             <input
               name="gid"
               value={picGid}
@@ -166,6 +169,10 @@ export function ReturnForm() {
               required
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
+            <SectionCombobox name="assigneeDept" value={picDept} onChange={setPicDept} />
           </div>
         </div>
         <div>
@@ -262,6 +269,7 @@ export function ReturnForm() {
               <Row label="Location" value={returnedItem.location} />
               <Row label="Assignee" value={assigneeLabel(returnedItem)} />
               <Row label="Returned by" value={[picEmp, picName].filter(Boolean).join(" — ") || "—"} />
+              <Row label="Section" value={picDept || "—"} />
               <Row label="Deployed" value={formatDate(returnedItem.releasedAt)} />
               <Row label="Returned" value={formatDate(returnedItem.returnedAt ?? null)} />
               <Row
