@@ -59,8 +59,6 @@ export function ReleaseForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSerial("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDept("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
@@ -94,6 +92,7 @@ export function ReleaseForm() {
     setHostname("");
     setEmpNumber("");
     setAssigneeName("");
+    setDept("");
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => runLookup(v), 300);
   }
@@ -187,6 +186,8 @@ export function ReleaseForm() {
               <Row label="Assignee Emp #" value={empNumber || "—"} />
               <Row label="Assignee Name" value={assigneeName || "—"} />
               <Row label="Section" value={dept || "—"} />
+              <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
+              <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
               <Row label="Status" value="RELEASED" badge />
             </dl>
           </div>
