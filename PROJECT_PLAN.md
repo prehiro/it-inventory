@@ -39,8 +39,8 @@
 |---|---|---|
 | `SystemUser` | employeeNumber (PK string), name, passwordHash, role, isDeleted | soft-delete |
 | `ItemModel` | id, type, brand, name, category, isDeleted | catalog of asset types (type = kind of device, brand + name = model) |
-| `Item` | serialNumber (PK), modelId, status, poNumber, location, dateReceived, remarks, isDeleted | one physical asset |
-| `ItemTxn` | id, itemId, type, operatorId, assigneeEmpNumber, assigneeName, assigneeDept, returningPicName, returnReason, remarks, date | movement log |
+| `Item` | serialNumber (PK), modelId, status, poNumber, location, dateReceived, remarks, hostname, isDeleted | one physical asset (hostname = per-device, PC/Laptop/Tablet at release, else N/A) |
+| `ItemTxn` | id, itemId, type, operatorId, assigneeEmpNumber, assigneeName, assigneeDept, gid, email, returningPicName, returnReason, remarks, date | movement log (gid/email captured at release AND return) |
 | `AuditLog` | id, userId, action, details (JSON string), timestamp | every create/role/delete/op |
 
 Status union: `AVAILABLE | DEPLOYED | RETURNED_KEEP | IN_REPAIR | DISPOSED`
@@ -55,7 +55,8 @@ Role union: `ADMIN | MANAGER | OPERATOR`
 
 **Race-condition guard:** all state-changing flows run inside
 `prisma.$transaction(async (tx) => { ... })` (interactive) — e.g. receive sets
-`DEPLOYED`, release sets `AVAILABLE`, return sets `AVAILABLE`/`DISPOSED`, with
+`DEPLOYED`, release sets `AVAILABLE`→`DEPLOYED` (also accepts `RETURNED_KEEP` re-deploy),
+return sets `AVAILABLE`/`DISPOSED`, with
 a double-action guard so the same serial can't be double-released.
 
 ---
@@ -154,6 +155,23 @@ a double-action guard so the same serial can't be double-released.
 - [x] **Section searchable dropdown** (`components/section-combobox.tsx`, 0-dep): hardcoded `SECTIONS` (26 values, editable in file) + realtime filter + keyboard nav + outside-click; replaces "Department" label → "Section" on release form (Assignee Emp# + Name kept).
 - [x] **Return redesign**: Returning PIC → 2 fields (Assignee Emp# uppercase + Assignee Name titleCase). **3 selectable circle dispositions** (radio): Returned Keep (blue) → `RETURNED_KEEP`, Repair (amber) → `IN_REPAIR`, Dispose (rose) → `DISPOSED`. Each circle: icon + label + sub-text + colored border/bg, **neon-breathing glow** (`@keyframes neon-breath` in globals.css) + soft box-shadow glow on selected card; label text follows tone. `returnSchema` + `disposition: enum(KEEP/REPAIR/DISPOSE)`; `returnItem` sets status from disposition; `returningPicName` = `Emp — Name` injected before `safeParse` (fixed "received undefined" bug). Success panel `Status` badge uses tone (blue/amber/rose) + glow via `Row badgeTone`. Right panel title → "Returned Item Details". Fixed success-status reset bug (DISPOSE was showing RETURNED_KEEP) via `returnedDisposition` snapshot.
 - **Commit:** `48c3da1`
+
+### ✅ UI Tune-up 4 — PC Ledger + Hostname/GID/Email capture
+- [x] **DB migrate** (no `db push`, preserve data): `Item.hostname NVARCHAR(200) NOT NULL DEFAULT 'N/A'`, `ItemTxn.gid NVARCHAR(100) NULL`, `ItemTxn.email NVARCHAR(200) NULL` (ALTER + backfill 19 items).
+- [x] `lib/types.ts`: `HOSTNAME_TYPES = ["PC","Laptop","Tablet"]` (single source of truth).
+- [x] **Release**: GID + Email wajib **semua** type; Hostname wajib hanya PC/Laptop/Tablet (else auto "N/A"). `releaseItem` enforces + persists gid/email/hostname ke txn+item.
+- [x] **PC Ledger** (`/pc-ledger`, sidebar link): 12 kolom (Emp# · PIC · GID · Email · Hostname · SN · Type · Brand · Model · Section · Remarks · Status), search box, status badges, sort by Section, AVAILABLE → "Unassigned"/"—". `HOSTNAME_TYPES` scope.
+- [x] **Export Excel** (`/api/pc-ledger/export`, exceljs): bold header + frozen row 1 + auto-width → `pc-ledger-YYYY-MM-DD.xlsx`. (Added `exceljs` dep; `xlsx` still used by reports.)
+- [x] `ItemModel.name` → `model` rename (DB `sp_rename` + 17 files) — done earlier (`bba108e`).
+- [x] **Receive hardening**: Serial auto-UPPERCASE (single + batch); PO `PTCAP__` prefix **locked** (Backspace/Delete/paste blocked inside prefix) but user can append PO number after it (single + batch).
+- [x] **Release form**: Hostname auto-UPPERCASE; success panel combines Type/Brand/Model → one "Item TYPE BRAND MODEL" row (uppercased); Hostname + Assignee Emp# + Assignee Name + Section shown from submitted values (snapshot kept, cleared on new serial). Received/Released rows below Section.
+- **Commits:** `bba108e` (rename) · `9146b62` (ledger+hostname) · `3cd4d74` (SN/PO/hostname/ui) · `fb371e0` (PO lock) · `6b61e32` (success snapshot) · `394b4be` (reorder) · `b7fe396` (section+dates)
+
+### ✅ UI Tune-up 5 — Return detail + RETURNED_KEEP re-deploy (Opsi A)
+- [x] **Return form**: Returning PIC → Emp# + Name + **GID** + **Email** (all required, persist to RETURN txn) + **Section** combobox (persist `assigneeDept`). GID/Email auto-upper/email; spacing `mt-4` between Name→GID/Email and GID/Email→Section.
+- [x] **Returned Item Details** success panel: Item = TYPE BRAND MODEL (1 row, uppercase) → Serial → Location → Assignee → **Returned by** (Emp — Name) → **Section** → Deployed → Returned → Status. PIC snapshot kept for display (cleared on new serial).
+- [x] **Opsi A (re-deploy RETURNED_KEEP)**: lookup route accepts `AVAILABLE` **or** `RETURNED_KEEP` for release (was AVAILABLE-only, returned 409). `Available Items` table now includes `RETURNED_KEEP` with **blue badge** (vs AVAILABLE emerald); sorted **AVAILABLE first, then RETURNED_KEEP** (multi-field `orderBy [{status asc},{dateReceived asc}]`). Re-release requires GID/Email/Hostname again (can differ).
+- **Commits:** `014f5fc` (return gid/email) · `42f697b` (item row + returned by) · `7fee01d` (section+spacing) · `92007e6` (section spacing) · `7c9ed7f` (opsi A) · `b09101e` (sort available-first)
 
 ---
 
