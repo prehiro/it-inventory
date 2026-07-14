@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 
 export async function AvailableItemsTable() {
   const items = await prisma.item.findMany({
-    where: { isDeleted: false, status: "AVAILABLE" },
+    where: { isDeleted: false, status: { in: ["AVAILABLE", "RETURNED_KEEP"] } },
     orderBy: { dateReceived: "asc" },
     select: {
       serialNumber: true,
@@ -47,9 +47,15 @@ export async function AvailableItemsTable() {
                     <td className="px-4 py-3">{i.model.model}</td>
                     <td className="px-4 py-3">{i.model.category}</td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400">
-                        {i.status}
-                      </span>
+                      {i.status === "RETURNED_KEEP" ? (
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-500/15 dark:text-blue-300">
+                          {i.status}
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400">
+                          {i.status}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))
