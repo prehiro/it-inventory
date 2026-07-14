@@ -4,10 +4,10 @@ export type Role = "ADMIN" | "MANAGER" | "OPERATOR";
 
 export type ItemStatus =
   | "AVAILABLE"
-  | "DEPLOYED"
+  | "RELEASED"
   | "RETURNED_KEEP"
   | "IN_REPAIR"
-  | "DISPOSED";
+  | "PLAN_DISPOSE";
 
 export type CategoryType = "FA" | "NCA" | "GENERAL";
 
@@ -30,19 +30,19 @@ export type TransactionType = "RECEIVE" | "RELEASE" | "RETURN";
 export const ROLES: Role[] = ["ADMIN", "MANAGER", "OPERATOR"];
 export const ITEM_STATUSES: ItemStatus[] = [
   "AVAILABLE",
-  "DEPLOYED",
+  "RELEASED",
   "RETURNED_KEEP",
   "IN_REPAIR",
-  "DISPOSED",
+  "PLAN_DISPOSE",
 ];
 export const CATEGORY_TYPES: CategoryType[] = ["FA", "NCA", "GENERAL"];
 
 // Display labels differ from internal status values (DB union stays stable).
-// DEPLOYED → "RELEASED", DISPOSED → "PLAN DISPOSE".
+// RELEASED → "RELEASED" (was DEPLOYED), PLAN_DISPOSE → "PLAN DISPOSE" (was DISPOSED).
 export function statusLabel(status: string): string {
-  if (status === "DEPLOYED") return "RELEASED";
-  if (status === "DISPOSED") return "PLAN DISPOSE";
-  return status.replace(/_/g, " ");
+  if (status === "PLAN_DISPOSE") return "PLAN DISPOSE";
+  if (status === "RETURNED_KEEP") return "RETURNED_KEEP";
+  return status;
 }
 export const ITEM_TYPES: ItemType[] = [
   "PC",

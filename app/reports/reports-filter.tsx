@@ -56,10 +56,10 @@ export function ReportsFilter({
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
           <option value="">All</option>
           <option value="AVAILABLE">Available</option>
-          <option value="DEPLOYED">Released</option>
+          <option value="RELEASED">Released</option>
           <option value="RETURNED_KEEP">Returned</option>
           <option value="IN_REPAIR">In Repair</option>
-          <option value="DISPOSED">Plan Dispose</option>
+          <option value="PLAN_DISPOSE">Plan Dispose</option>
         </select>
       </div>
       <div>

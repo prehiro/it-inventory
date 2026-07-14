@@ -26,15 +26,15 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     prisma.item.count({ where: { isDeleted: false } }),
     prisma.item.count({ where: { isDeleted: false, status: "AVAILABLE" } }),
-    prisma.item.count({ where: { isDeleted: false, status: "DEPLOYED" } }),
+    prisma.item.count({ where: { isDeleted: false, status: "RELEASED" } }),
     prisma.item.count({ where: { isDeleted: false, status: "RETURNED_KEEP" } }),
     prisma.item.count({ where: { isDeleted: false, status: "IN_REPAIR" } }),
-    prisma.item.count({ where: { isDeleted: false, status: "DISPOSED" } }),
+    prisma.item.count({ where: { isDeleted: false, status: "PLAN_DISPOSE" } }),
     prisma.itemModel.count({ where: { isDeleted: false } }),
     prisma.item.groupBy({ by: ["modelId"], where: { isDeleted: false }, _count: { _all: true } }),
     prisma.itemTxn.groupBy({
       by: ["assigneeDept"],
-      where: { type: "RELEASE", item: { status: "DEPLOYED" } },
+      where: { type: "RELEASE", item: { status: "RELEASED" } },
       _count: { _all: true },
     }),
     prisma.auditLog.findMany({

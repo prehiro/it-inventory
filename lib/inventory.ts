@@ -102,7 +102,7 @@ export async function releaseItem(input: ReleaseInput, operatorId: string) {
 
     await tx.item.update({
       where: { id: item.id },
-      data: { status: "DEPLOYED", hostname },
+      data: { status: "RELEASED", hostname },
     });
 
     const txn = await tx.itemTxn.create({
@@ -139,14 +139,14 @@ export async function returnItem(input: ReturnInput, operatorId: string) {
   return prisma.$transaction(async (tx) => {
     const item = await tx.item.findUnique({ where: { id: input.itemId } });
     if (!item || item.isDeleted) throw new Error("Item not found");
-    if (item.status !== "DEPLOYED")
+    if (item.status !== "RELEASED")
       throw new Error(`Item is ${item.status}, cannot return`);
 
     const status =
       input.disposition === "REPAIR"
         ? "IN_REPAIR"
         : input.disposition === "DISPOSE"
-          ? "DISPOSED"
+          ? "PLAN_DISPOSE"
           : "RETURNED_KEEP";
 
     await tx.item.update({

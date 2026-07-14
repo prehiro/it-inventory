@@ -279,7 +279,7 @@ export function ReturnForm() {
                   returnedDisposition === "REPAIR"
                     ? statusLabel("IN_REPAIR")
                     : returnedDisposition === "DISPOSE"
-                      ? statusLabel("DISPOSED")
+                      ? statusLabel("PLAN_DISPOSE")
                       : statusLabel("RETURNED_KEEP")
                 }
                 badge

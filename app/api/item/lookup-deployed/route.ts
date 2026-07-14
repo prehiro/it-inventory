@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!item) {
     return NextResponse.json({ found: false, reason: "Serial not found" }, { status: 404 });
   }
-  if (item.status !== "DEPLOYED") {
+  if (item.status !== "RELEASED") {
     return NextResponse.json(
       { found: false, reason: `Item is ${item.status}, not released` },
       { status: 409 },
