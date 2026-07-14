@@ -64,14 +64,6 @@ export function ReturnForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSerial("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPicEmp("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPicName("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPicGid("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPicEmail("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisposition("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
@@ -105,6 +97,8 @@ export function ReturnForm() {
     setReturned(false);
     setReturnedItem(null);
     setReturnedDisposition("");
+    setPicEmp("");
+    setPicName("");
     setPicGid("");
     setPicEmail("");
     if (debounce.current) clearTimeout(debounce.current);
@@ -263,12 +257,11 @@ export function ReturnForm() {
             </div>
             <p className="mb-4 text-sm font-medium text-emerald-600 dark:text-emerald-400">Item returned</p>
             <dl className="w-full space-y-3 text-left text-sm">
+              <Row label="Item" value={`${returnedItem.type} ${returnedItem.brand} ${returnedItem.model}`.toUpperCase()} />
               <Row label="Serial" value={returnedItem.serialNumber} />
-              <Row label="Type" value={returnedItem.type} />
-              <Row label="Brand" value={returnedItem.brand} />
-              <Row label="Model" value={returnedItem.model} />
               <Row label="Location" value={returnedItem.location} />
               <Row label="Assignee" value={assigneeLabel(returnedItem)} />
+              <Row label="Returned by" value={[picEmp, picName].filter(Boolean).join(" — ") || "—"} />
               <Row label="Deployed" value={formatDate(returnedItem.releasedAt)} />
               <Row label="Returned" value={formatDate(returnedItem.returnedAt ?? null)} />
               <Row
