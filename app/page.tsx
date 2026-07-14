@@ -8,9 +8,9 @@ import type { Role } from "@/lib/types";
 const CARD_ICONS: Record<string, { path: string; tone: string }> = {
   "Total Items": { path: "M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10", tone: "text-slate-400 bg-slate-100" },
   "Available": { path: "M9 12l2 2 4-4M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z", tone: "text-emerald-600 bg-emerald-50" },
-  "Deployed": { path: "M7 17L17 7M9 7h8v8", tone: "text-indigo-600 bg-indigo-50" },
+  "Released": { path: "M7 17L17 7M9 7h8v8", tone: "text-indigo-600 bg-indigo-50" },
   "In Repair": { path: "M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z", tone: "text-amber-600 bg-amber-50" },
-  "Disposed": { path: "M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13", tone: "text-rose-600 bg-rose-50" },
+  "Plan Dispose": { path: "M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13", tone: "text-rose-600 bg-rose-50" },
   "Models": { path: "M3 7h8l-1 5h4l-1 5H3zM13 12h8M13 17h8", tone: "text-slate-500 bg-slate-100" },
 };
 
@@ -68,9 +68,9 @@ export default async function DashboardPage() {
   const cards = [
     { label: "Total Items", value: total, tone: "text-slate-900" },
     { label: "Available", value: available, tone: "text-emerald-600" },
-    { label: "Deployed", value: deployed, tone: "text-indigo-600" },
+    { label: "Released", value: deployed, tone: "text-indigo-600" },
     { label: "In Repair", value: inRepair, tone: "text-amber-600" },
-    { label: "Disposed", value: disposed, tone: "text-rose-600" },
+    { label: "Plan Dispose", value: disposed, tone: "text-rose-600" },
     { label: "Models", value: models, tone: "text-slate-900" },
   ];
 
