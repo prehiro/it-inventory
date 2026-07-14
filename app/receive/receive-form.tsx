@@ -12,6 +12,13 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
   );
   const [toast, setToast] = useState<string | null>(null);
   const [modelId, setModelId] = useState("");
+  const [po, setPo] = useState("PTCAP__");
+
+  const PO_PREFIX = "PTCAP__";
+  function onPoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setPo(v.startsWith(PO_PREFIX) ? v : PO_PREFIX + v.replace(/PTCAP__/g, ""));
+  }
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -40,12 +47,21 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">PO Number</label>
           <input
-            value="PTCAP__"
-            readOnly
-            tabIndex={-1}
-            className="w-full cursor-not-allowed rounded-lg border border-slate-200 bg-slate-100 px-3 py-2.5 font-mono text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-500"
+            value={po}
+            onChange={onPoChange}
+            onKeyDown={(e) => {
+              const el = e.currentTarget;
+              const atPrefix = el.selectionStart !== null && el.selectionStart <= PO_PREFIX.length && el.selectionEnd !== null && el.selectionEnd <= PO_PREFIX.length;
+              if ((e.key === "Backspace" || e.key === "Delete") && atPrefix) e.preventDefault();
+            }}
+            onPaste={(e) => {
+              const el = e.currentTarget;
+              if (el.selectionStart !== null && el.selectionStart < PO_PREFIX.length) e.preventDefault();
+            }}
+            placeholder="PTCAP__"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
-          <input type="hidden" name="poNumber" value="PTCAP__" />
+          <input type="hidden" name="poNumber" value={po} />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Location</label>
