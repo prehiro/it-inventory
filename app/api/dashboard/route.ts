@@ -12,7 +12,7 @@ export async function GET() {
     await Promise.all([
       prisma.item.count({ where: { isDeleted: false } }),
       prisma.item.count({ where: { isDeleted: false, status: "AVAILABLE" } }),
-      prisma.item.count({ where: { isDeleted: false, status: "DEPLOYED" } }),
+      prisma.item.count({ where: { isDeleted: false, status: "RELEASED" } }),
       prisma.item.count({ where: { isDeleted: false, status: "RETURNED_KEEP" } }),
       prisma.itemModel.count({ where: { isDeleted: false } }),
       prisma.auditLog.findMany({
