@@ -56,6 +56,7 @@ export async function releaseAction(
     revalidatePath("/");
     revalidatePath("/reports");
     revalidatePath("/release");
+    revalidatePath("/pc-ledger");
     return { ok: true, releasedAt: result.date.toISOString() };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };

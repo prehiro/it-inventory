@@ -55,3 +55,6 @@ export const TRANSACTION_TYPES: TransactionType[] = [
   "RELEASE",
   "RETURN",
 ];
+
+// Item types that require a hostname at release (PC Ledger scope)
+export const HOSTNAME_TYPES: ItemType[] = ["PC", "Laptop", "Tablet"];

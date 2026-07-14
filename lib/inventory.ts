@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import type { ReceiveInput, ReleaseInput, ReturnInput } from "@/lib/validation";
+import { HOSTNAME_TYPES, type ItemType } from "@/lib/types";
 
 /**
  * All inventory mutations run inside a single interactive $transaction so the
@@ -85,14 +86,23 @@ export async function receiveItem(input: ReceiveInput, operatorId: string) {
 export async function releaseItem(input: ReleaseInput, operatorId: string) {
   return prisma.$transaction(async (tx) => {
     // Lock the item row for update by reading it inside the tx.
-    const item = await tx.item.findUnique({ where: { id: input.itemId } });
+    const item = await tx.item.findUnique({
+      where: { id: input.itemId },
+      include: { model: true },
+    });
     if (!item || item.isDeleted) throw new Error("Item not found");
     if (item.status !== "AVAILABLE")
       throw new Error(`Item is ${item.status}, cannot release`);
 
+    // Hostname required for PC/Laptop/Tablet, auto N/A otherwise.
+    const needsHostname = HOSTNAME_TYPES.includes(item.model.type as ItemType);
+    const hostname = needsHostname
+      ? (input.hostname?.trim() || (() => { throw new Error("Hostname required for this item type"); })())
+      : "N/A";
+
     await tx.item.update({
       where: { id: item.id },
-      data: { status: "DEPLOYED" },
+      data: { status: "DEPLOYED", hostname },
     });
 
     const txn = await tx.itemTxn.create({
@@ -103,6 +113,8 @@ export async function releaseItem(input: ReleaseInput, operatorId: string) {
         assigneeEmpNumber: input.assigneeEmpNumber,
         assigneeName: input.assigneeName,
         assigneeDept: input.assigneeDept || null,
+        gid: input.gid,
+        email: input.email,
         remarks: input.remarks || null,
       },
     });

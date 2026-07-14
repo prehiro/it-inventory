@@ -40,6 +40,11 @@ const I = {
       <path d="M9 17V9m4 8V5m4 12v-6" strokeLinecap="round" />
     </svg>
   ),
+  ledger: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+      <rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 9h8M8 13h8M8 17h5" strokeLinecap="round" />
+    </svg>
+  ),
   admin: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
       <circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" strokeLinecap="round" />
@@ -55,6 +60,7 @@ export function Sidebar({ role }: { role: Role }) {
     { href: "/receive", label: "Receive", icon: I.receive },
     { href: "/release", label: "Release", icon: I.release },
     { href: "/return", label: "Return", icon: I.return },
+    { href: "/pc-ledger", label: "PC Ledger", icon: I.ledger },
   ];
   if (role === "ADMIN") items.push({ href: "/master-data", label: "Master Data", icon: I.master });
   if (role === "ADMIN" || role === "MANAGER")
