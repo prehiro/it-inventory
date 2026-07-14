@@ -184,11 +184,9 @@ export function ReleaseForm() {
                 <Row label="Hostname" value={hostname || "—"} />
               )}
               <Row label="Serial" value={releasedItem.serialNumber} />
-              <Row label="Location" value={releasedItem.location} />
-              <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
-              <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
               <Row label="Assignee Emp #" value={empNumber || "—"} />
               <Row label="Assignee Name" value={assigneeName || "—"} />
+              <Row label="Section" value={dept || "—"} />
               <Row label="Status" value="RELEASED" badge />
             </dl>
           </div>
