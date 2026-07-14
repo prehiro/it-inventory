@@ -162,6 +162,7 @@ export async function returnItem(input: ReturnInput, operatorId: string) {
         returningPicName: input.returningPicName,
         gid: input.gid,
         email: input.email,
+        assigneeDept: input.assigneeDept || null,
         returnReason: input.returnReason || null,
       },
     });

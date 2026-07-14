@@ -50,6 +50,7 @@ export const returnSchema = z.object({
   returningPicName: z.string().min(1).max(200),
   gid: z.string().min(1, "GID required").max(100),
   email: z.string().email("Invalid email").max(200),
+  assigneeDept: z.string().max(100).optional().or(z.literal("")),
   returnReason: z.string().max(500).optional().or(z.literal("")),
 });
 export type ReturnInput = z.infer<typeof returnSchema>;
