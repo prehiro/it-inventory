@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type Model = { id: string; type: string; name: string; brand: string; category: string };
+type Model = { id: string; type: string; model: string; brand: string; category: string };
 
 const CATEGORIES = ["FA", "NCA", "GENERAL"];
 
@@ -31,7 +31,7 @@ export function ModelCombobox({
     return models.filter(
       (m) =>
         m.type.toLowerCase().includes(q) ||
-        m.name.toLowerCase().includes(q) ||
+        m.model.toLowerCase().includes(q) ||
         m.brand.toLowerCase().includes(q),
     );
   }, [models, query]);
@@ -101,7 +101,7 @@ export function ModelCombobox({
         {selected ? (
           <span className="flex items-center gap-2">
             <span className="font-medium text-slate-900 dark:text-slate-100">
-              {selected.type} · {selected.brand} {selected.name}
+              {selected.type} · {selected.brand} {selected.model}
             </span>
             <CatBadge cat={selected.category} />
           </span>
@@ -148,7 +148,7 @@ export function ModelCombobox({
                       }`}
                     >
                       <span className={value === m.id ? "font-medium text-indigo-700 dark:text-indigo-300" : "text-slate-800 dark:text-slate-100"}>
-                        {m.type} · {m.brand} {m.name}
+                        {m.type} · {m.brand} {m.model}
                       </span>
                       <CatBadge cat={m.category} />
                     </button>

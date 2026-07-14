@@ -34,7 +34,7 @@ model ItemModel {
   id       String  @id @default(uuid())
   type     String  @default("") // PC | Laptop | Tablet | Mouse | Keyboard | Monitor | Projector | Camera | CCTV | Printer | Kensington | Adaptor
   category String  // FA | NCA | GENERAL
-  name     String  // e.g., "ThinkPad T14", "Logitech Mouse"
+  model    String  // e.g., "ThinkPad T14", "Logitech Mouse"
   brand    String  // e.g., "Lenovo", "Logitech"
   isDeleted Boolean @default(false)
 

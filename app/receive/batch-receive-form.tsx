@@ -9,7 +9,7 @@ type RowResult = { serial: string; ok: boolean; error?: string };
 export function BatchReceiveForm({
   models,
 }: {
-  models: { id: string; type: string; name: string; brand: string; category: string }[];
+  models: { id: string; type: string; model: string; brand: string; category: string }[];
 }) {
   const [modelId, setModelId] = useState("");
   const location = "IT Store";

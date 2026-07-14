@@ -47,7 +47,7 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const modelsAll = await prisma.itemModel.findMany({ where: { isDeleted: false }, select: { id: true, category: true, name: true } });
+  const modelsAll = await prisma.itemModel.findMany({ where: { isDeleted: false }, select: { id: true, category: true, model: true } });
   const catMap = new Map(modelsAll.map((m) => [m.id, m.category]));
   const catAgg = new Map<string, number>();
   for (const g of byCategory) {
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
 
   const lowStock = lowStockRaw
     .filter((m) => m._count.items <= 2)
-    .map((m) => ({ name: m.name, available: m._count.items }));
+    .map((m) => ({ model: m.model, available: m._count.items }));
 
   const cards = [
     { label: "Total Items", value: total, tone: "text-slate-900" },
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
           <p className="text-sm font-medium text-amber-800">⚠ Low stock alert</p>
           <ul className="mt-1 text-sm text-amber-700">
             {lowStock.map((l) => (
-              <li key={l.name}>{l.name}: only {l.available} available</li>
+              <li key={l.model}>{l.model}: only {l.available} available</li>
             ))}
           </ul>
         </div>

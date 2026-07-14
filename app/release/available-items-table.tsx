@@ -8,7 +8,7 @@ export async function AvailableItemsTable() {
       serialNumber: true,
       status: true,
       dateReceived: true,
-      model: { select: { type: true, brand: true, name: true, category: true } },
+      model: { select: { type: true, brand: true, model: true, category: true } },
     },
   });
 
@@ -44,7 +44,7 @@ export async function AvailableItemsTable() {
                     <td className="px-4 py-3 font-mono text-xs">{i.serialNumber}</td>
                     <td className="px-4 py-3">{i.model.type}</td>
                     <td className="px-4 py-3">{i.model.brand}</td>
-                    <td className="px-4 py-3">{i.model.name}</td>
+                    <td className="px-4 py-3">{i.model.model}</td>
                     <td className="px-4 py-3">{i.model.category}</td>
                     <td className="px-4 py-3">
                       <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400">

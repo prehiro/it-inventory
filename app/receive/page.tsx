@@ -7,8 +7,8 @@ export default async function ReceivePage() {
   await requireAuth();
   const models = await prisma.itemModel.findMany({
     where: { isDeleted: false },
-    orderBy: { name: "asc" },
-    select: { id: true, type: true, name: true, brand: true, category: true },
+    orderBy: { model: "asc" },
+    select: { id: true, type: true, model: true, brand: true, category: true },
   });
 
   return (

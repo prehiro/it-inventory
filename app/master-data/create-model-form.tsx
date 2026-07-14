@@ -30,7 +30,7 @@ export function CreateModelForm() {
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Model</label>
-        <input name="name" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+        <input name="model" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Category</label>

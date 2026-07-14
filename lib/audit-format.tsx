@@ -64,9 +64,9 @@ export function auditView(action: string, details: string): AuditView {
   const d = parse(details);
   switch (action) {
     case "CREATED_MODEL":
-      return { label: "Model added", tone: "indigo", icon: ICONS.plus, summary: `${d.brand ?? ""} ${d.name ?? ""}`.trim() || "—" };
+      return { label: "Model added", tone: "indigo", icon: ICONS.plus, summary: `${d.brand ?? ""} ${d.model ?? ""}`.trim() || "—" };
     case "UPDATED_MODEL":
-      return { label: "Model updated", tone: "indigo", icon: ICONS.swap, summary: `${d.brand ?? ""} ${d.name ?? ""}`.trim() || "—" };
+      return { label: "Model updated", tone: "indigo", icon: ICONS.swap, summary: `${d.brand ?? ""} ${d.model ?? ""}`.trim() || "—" };
     case "DELETED_MODEL":
       return { label: "Model removed", tone: "rose", icon: ICONS.trash, summary: d.id ?? "—" };
     case "RECEIVED_ITEM":

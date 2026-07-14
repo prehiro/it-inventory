@@ -5,7 +5,7 @@ import { receiveAction, type ActionResult } from "@/app/actions/inventory";
 import { Toast } from "@/components/toast";
 import { ModelCombobox } from "@/components/model-combobox";
 
-export function ReceiveForm({ models }: { models: { id: string; type: string; name: string; brand: string; category: string }[] }) {
+export function ReceiveForm({ models }: { models: { id: string; type: string; model: string; brand: string; category: string }[] }) {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     async (_prev, formData) => receiveAction(Object.fromEntries(formData.entries())),
     null,
