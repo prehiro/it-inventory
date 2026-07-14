@@ -61,12 +61,6 @@ export function ReleaseForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDept("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHostname("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setEmpNumber("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAssigneeName("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
@@ -97,6 +91,9 @@ export function ReleaseForm() {
     setSerial(v);
     setReleased(false);
     setReleasedItem(null);
+    setHostname("");
+    setEmpNumber("");
+    setAssigneeName("");
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => runLookup(v), 300);
   }
