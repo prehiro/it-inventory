@@ -44,7 +44,13 @@ export function ReleaseForm() {
   const [released, setReleased] = useState(false);
   const [releasedItem, setReleasedItem] = useState<Lookup | null>(null);
   const [dept, setDept] = useState("");
-  const [hostname, setHostname] = useState("");
+  const [hostname, setHostname] = useState("BAL");
+
+  const HOSTNAME_PREFIX = "BAL";
+  function onHostnameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setHostname(v.startsWith(HOSTNAME_PREFIX) ? v : HOSTNAME_PREFIX + v.replace(/BAL/g, ""));
+  }
   const [empNumber, setEmpNumber] = useState("");
   const [assigneeName, setAssigneeName] = useState("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -89,7 +95,7 @@ export function ReleaseForm() {
     setSerial(v);
     setReleased(false);
     setReleasedItem(null);
-    setHostname("");
+    setHostname("BAL");
     setEmpNumber("");
     setAssigneeName("");
     setDept("");
@@ -147,7 +153,17 @@ export function ReleaseForm() {
         {lookup && HOSTNAME_TYPES.includes(lookup.type as (typeof HOSTNAME_TYPES)[number]) && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Hostname <span className="text-rose-500">*</span></label>
-            <input name="hostname" required placeholder="e.g. PC-DIRE-001" value={hostname} onChange={(e) => setHostname(e.target.value.toUpperCase())} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input name="hostname" required placeholder="BAL" value={hostname} onChange={onHostnameChange}
+              onKeyDown={(e) => {
+                const el = e.currentTarget;
+                const atPrefix = el.selectionStart !== null && el.selectionStart <= HOSTNAME_PREFIX.length && el.selectionEnd !== null && el.selectionEnd <= HOSTNAME_PREFIX.length;
+                if ((e.key === "Backspace" || e.key === "Delete") && atPrefix) e.preventDefault();
+              }}
+              onPaste={(e) => {
+                const el = e.currentTarget;
+                if (el.selectionStart !== null && el.selectionStart < HOSTNAME_PREFIX.length) e.preventDefault();
+              }}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
           </div>
         )}
         <div>
