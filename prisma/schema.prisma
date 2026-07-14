@@ -59,6 +59,8 @@ model Item {
   modelId String
   model   ItemModel @relation(fields: [modelId], references: [id])
 
+  hostname String @default("N/A") // per-device; PC/Laptop/Tablet filled at release, others N/A
+
   transactions ItemTxn[]
 
   @@index([status])
@@ -76,6 +78,8 @@ model ItemTxn {
   assigneeEmpNumber  String?
   assigneeName       String?
   assigneeDept       String?
+  gid                String?  // PIC Group ID (release)
+  email              String?  // PIC email (release)
 
   // Fields for Returning
   returningPicName   String?

@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState, useRef } from "react";
 import { releaseAction, type ActionResult } from "@/app/actions/inventory";
 import { Toast } from "@/components/toast";
 import { SectionCombobox } from "@/components/section-combobox";
+import { HOSTNAME_TYPES } from "@/lib/types";
 
 type Lookup = {
   id: string;
@@ -43,6 +44,7 @@ export function ReleaseForm() {
   const [released, setReleased] = useState(false);
   const [releasedItem, setReleasedItem] = useState<Lookup | null>(null);
   const [dept, setDept] = useState("");
+  const [hostname, setHostname] = useState("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -56,6 +58,8 @@ export function ReleaseForm() {
       setSerial("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDept("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHostname("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -124,10 +128,26 @@ export function ReleaseForm() {
             <input name="assigneeName" required onChange={(e) => { e.target.value = titleCase(e.target.value); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">GID</label>
+            <input name="gid" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+            <input name="email" type="email" required className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          </div>
+        </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
           <SectionCombobox name="assigneeDept" value={dept} onChange={setDept} />
         </div>
+        {lookup && HOSTNAME_TYPES.includes(lookup.type as (typeof HOSTNAME_TYPES)[number]) && (
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Hostname <span className="text-rose-500">*</span></label>
+            <input name="hostname" required placeholder="e.g. PC-DIRE-001" value={hostname} onChange={(e) => setHostname(e.target.value)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          </div>
+        )}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks</label>
           <input name="remarks" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
@@ -160,6 +180,9 @@ export function ReleaseForm() {
               <Row label="Type" value={releasedItem.type} />
               <Row label="Brand" value={releasedItem.brand} />
               <Row label="Model" value={releasedItem.model} />
+              {releasedItem.type && HOSTNAME_TYPES.includes(releasedItem.type as (typeof HOSTNAME_TYPES)[number]) && (
+                <Row label="Hostname" value={hostname || "—"} />
+              )}
               <Row label="Location" value={releasedItem.location} />
               <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
               <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />

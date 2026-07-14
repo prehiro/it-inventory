@@ -36,6 +36,9 @@ export const releaseSchema = z.object({
   assigneeEmpNumber: z.string().min(1).max(50),
   assigneeName: z.string().min(1).max(200),
   assigneeDept: z.string().max(200).optional().or(z.literal("")),
+  gid: z.string().min(1, "GID required").max(100),
+  email: z.string().email("Invalid email").max(200),
+  hostname: z.string().max(200).optional().or(z.literal("")),
   remarks: z.string().max(500).optional().or(z.literal("")),
 });
 export type ReleaseInput = z.infer<typeof releaseSchema>;
