@@ -46,6 +46,8 @@ export function ReturnForm() {
   const [returnedItem, setReturnedItem] = useState<Lookup | null>(null);
   const [picEmp, setPicEmp] = useState("");
   const [picName, setPicName] = useState("");
+  const [picGid, setPicGid] = useState("");
+  const [picEmail, setPicEmail] = useState("");
   const [disposition, setDisposition] = useState<"KEEP" | "REPAIR" | "DISPOSE" | "">("");
   const [returnedDisposition, setReturnedDisposition] = useState<"KEEP" | "REPAIR" | "DISPOSE" | "">("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -65,6 +67,10 @@ export function ReturnForm() {
       setPicEmp("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPicName("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPicGid("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPicEmail("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisposition("");
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -99,6 +105,8 @@ export function ReturnForm() {
     setReturned(false);
     setReturnedItem(null);
     setReturnedDisposition("");
+    setPicGid("");
+    setPicEmail("");
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => runLookup(v), 300);
   }
@@ -142,6 +150,25 @@ export function ReturnForm() {
               value={picName}
               onChange={(e) => setPicName(titleCase(e.target.value))}
               placeholder="Name"
+              required
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              name="gid"
+              value={picGid}
+              onChange={(e) => setPicGid(e.target.value.toUpperCase())}
+              placeholder="GID"
+              required
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            />
+            <input
+              name="email"
+              type="email"
+              value={picEmail}
+              onChange={(e) => setPicEmail(e.target.value)}
+              placeholder="Email"
               required
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />

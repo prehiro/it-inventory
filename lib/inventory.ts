@@ -160,6 +160,8 @@ export async function returnItem(input: ReturnInput, operatorId: string) {
         itemId: item.id,
         operatorId,
         returningPicName: input.returningPicName,
+        gid: input.gid,
+        email: input.email,
         returnReason: input.returnReason || null,
       },
     });
