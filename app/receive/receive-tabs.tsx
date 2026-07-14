@@ -14,7 +14,7 @@ type TabId = (typeof TABS)[number]["id"];
 export function ReceiveTabs({
   models,
 }: {
-  models: { id: string; type: string; name: string; brand: string; category: string }[];
+  models: { id: string; type: string; model: string; brand: string; category: string }[];
 }) {
   const [tab, setTab] = useState<TabId>("single");
   const activeIdx = TABS.findIndex((t) => t.id === tab);

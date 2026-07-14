@@ -9,14 +9,14 @@ export default async function MasterDataPage() {
 
   const models = await prisma.itemModel.findMany({
     where: { isDeleted: false },
-    orderBy: [{ type: "asc" }, { brand: "asc" }, { name: "asc" }],
+    orderBy: [{ type: "asc" }, { brand: "asc" }, { model: "asc" }],
     include: { _count: { select: { items: true } } },
   });
 
   const rows: ModelRow[] = models.map((m) => ({
     id: m.id,
     type: m.type,
-    name: m.name,
+    model: m.model,
     brand: m.brand,
     category: m.category,
     itemCount: m._count.items,

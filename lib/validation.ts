@@ -5,7 +5,7 @@ import { ITEM_TYPES } from "@/lib/types";
 export const itemModelSchema = z.object({
   type: z.enum(ITEM_TYPES),
   category: z.enum(["FA", "NCA", "GENERAL"]),
-  name: z.string().min(1, "Model required").max(200),
+  model: z.string().min(1, "Model required").max(200),
   brand: z.string().min(1, "Brand required").max(200),
 });
 export type ItemModelInput = z.infer<typeof itemModelSchema>;

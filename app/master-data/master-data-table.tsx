@@ -6,7 +6,7 @@ import { deleteModelAction } from "@/app/actions/master-data";
 export type ModelRow = {
   id: string;
   type: string;
-  name: string;
+  model: string;
   brand: string;
   category: string;
   itemCount: number;
@@ -60,7 +60,7 @@ export function MasterDataTable({ models }: { models: ModelRow[] }) {
               <tr key={m.id} className="row-hover">
                 <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{m.type}</td>
                 <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{m.brand}</td>
-                <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{m.name}</td>
+                <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{m.model}</td>
                 <td className="px-5 py-3">
                   <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">{m.category}</span>
                 </td>
@@ -104,7 +104,7 @@ export function MasterDataTable({ models }: { models: ModelRow[] }) {
                   </svg>
                 </div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                  Hapus model &ldquo;{target.name}&rdquo;?
+                  Hapus model &ldquo;{target.model}&rdquo;?
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   Model akan disembunyikan dari katalog master data.
@@ -139,7 +139,7 @@ export function MasterDataTable({ models }: { models: ModelRow[] }) {
                   Tidak bisa dihapus
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  Model &ldquo;{target.name}&rdquo; masih dipakai {target.itemCount} item aktif.
+                  Model &ldquo;{target.model}&rdquo; masih dipakai {target.itemCount} item aktif.
                   Hapus atau dispose item tersebut dulu.
                 </p>
                 <div className="mt-5 flex justify-center">
@@ -187,7 +187,7 @@ export function MasterDataTable({ models }: { models: ModelRow[] }) {
                   Model dihapus
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  &ldquo;{target.name}&rdquo; telah disembunyikan dari katalog.
+                  &ldquo;{target.model}&rdquo; telah disembunyikan dari katalog.
                 </p>
                 <div className="mt-5 flex justify-center">
                   <button

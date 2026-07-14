@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
   const item = await prisma.item.findFirst({
     where: { serialNumber: serial, isDeleted: false },
-    include: { model: { select: { type: true, brand: true, name: true } } },
+    include: { model: { select: { type: true, brand: true, model: true } } },
   });
 
   if (!item) {
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       serialNumber: item.serialNumber,
       type: item.model.type,
       brand: item.model.brand,
-      model: item.model.name,
+      model: item.model.model,
       location: item.location,
       status: item.status,
       receivedAt: item.dateReceived,

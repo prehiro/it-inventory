@@ -71,7 +71,7 @@ export async function receiveItem(input: ReceiveInput, operatorId: string) {
         action: "RECEIVED_ITEM",
         details: JSON.stringify({
           serialNumber: item.serialNumber,
-          model: model.name,
+          model: model.model,
           poNumber: input.poNumber || null,
         }),
         userId: operatorId,
