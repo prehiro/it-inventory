@@ -40,9 +40,9 @@ export function CategoryDonut({ data }: { data: { name: string; value: number }[
 export function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-      <h3 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">Deployed by Department</h3>
+      <h3 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">Released by Department</h3>
       {data.length === 0 ? (
-        <p className="py-8 text-center text-sm text-slate-400">No deployed items</p>
+        <p className="py-8 text-center text-sm text-slate-400">No released items</p>
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data} margin={{ left: -20 }}>

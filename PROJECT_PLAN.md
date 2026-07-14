@@ -44,6 +44,7 @@
 | `AuditLog` | id, userId, action, details (JSON string), timestamp | every create/role/delete/op |
 
 Status union: `AVAILABLE | DEPLOYED | RETURNED_KEEP | IN_REPAIR | DISPOSED`
+(Display labels: `DEPLOYED`→**RELEASED**, `DISPOSED`→**PLAN DISPOSE** via `statusLabel()` in `lib/types.ts`; DB values unchanged.)
 Category union: `FA | NCA | GENERAL`  (was `OTHER` → renamed `GENERAL`)
 ItemType union: `PC | Laptop | Tablet | Mouse | Keyboard | Monitor | Projector | Camera | CCTV | Printer | Kensington | Adaptor` (dropdown in master-data)
 Transaction union: `RECEIVE | RELEASE | RETURN`

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   }
   if (item.status !== "DEPLOYED") {
     return NextResponse.json(
-      { found: false, reason: `Item is ${item.status}, not DEPLOYED` },
+      { found: false, reason: `Item is ${item.status}, not released` },
       { status: 409 },
     );
   }

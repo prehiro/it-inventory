@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { prisma } from "@/lib/db";
-import { HOSTNAME_TYPES } from "@/lib/types";
+import { HOSTNAME_TYPES, statusLabel } from "@/lib/types";
 import ExcelJS from "exceljs";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +38,7 @@ export async function GET() {
       model: it.model.model,
       section,
       remarks: it.remarks || "—",
-      status: it.status,
+      status: statusLabel(it.status),
     };
   });
   rows.sort((a, b) => {

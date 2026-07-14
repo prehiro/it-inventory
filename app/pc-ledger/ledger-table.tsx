@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { statusLabel } from "@/lib/types";
 
 export type LedgerRow = {
   empNumber: string;
@@ -92,7 +93,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                 <td className="px-3 py-2.5 max-w-[200px] truncate" title={r.remarks}>{r.remarks}</td>
                 <td className="px-3 py-2.5">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_TONE[r.status] ?? ""}`}>
-                    {r.status}
+                    {statusLabel(r.status)}
                   </span>
                 </td>
               </tr>

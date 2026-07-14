@@ -36,6 +36,14 @@ export const ITEM_STATUSES: ItemStatus[] = [
   "DISPOSED",
 ];
 export const CATEGORY_TYPES: CategoryType[] = ["FA", "NCA", "GENERAL"];
+
+// Display labels differ from internal status values (DB union stays stable).
+// DEPLOYED → "RELEASED", DISPOSED → "PLAN DISPOSE".
+export function statusLabel(status: string): string {
+  if (status === "DEPLOYED") return "RELEASED";
+  if (status === "DISPOSED") return "PLAN DISPOSE";
+  return status.replace(/_/g, " ");
+}
 export const ITEM_TYPES: ItemType[] = [
   "PC",
   "Laptop",

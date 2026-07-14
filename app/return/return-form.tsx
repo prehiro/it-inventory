@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState, useRef } from "react";
 import { returnAction, type ActionResult } from "@/app/actions/inventory";
+import { statusLabel } from "@/lib/types";
 import { Toast } from "@/components/toast";
 import { SectionCombobox } from "@/components/section-combobox";
 
@@ -274,7 +275,13 @@ export function ReturnForm() {
               <Row label="Returned" value={formatDate(returnedItem.returnedAt ?? null)} />
               <Row
                 label="Status"
-                value={returnedDisposition === "REPAIR" ? "IN_REPAIR" : returnedDisposition === "DISPOSE" ? "DISPOSED" : "RETURNED_KEEP"}
+                value={
+                  returnedDisposition === "REPAIR"
+                    ? statusLabel("IN_REPAIR")
+                    : returnedDisposition === "DISPOSE"
+                      ? statusLabel("DISPOSED")
+                      : statusLabel("RETURNED_KEEP")
+                }
                 badge
                 badgeTone={returnedDisposition === "DISPOSE" ? "rose" : returnedDisposition === "REPAIR" ? "amber" : "blue"}
               />

@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
+import { statusLabel } from "@/lib/types";
 
 export type ExportResult = { ok: true; data: string; filename: string } | { ok: false; error: string };
 
@@ -33,7 +34,7 @@ export async function exportExcelAction(filter: Record<string, unknown>): Promis
       Date: t.date.toISOString(),
       Type: t.type,
       Serial: t.item.serialNumber,
-      Status: t.item.status,
+      Status: statusLabel(t.item.status),
       Operator: t.operator.name,
       Assignee: t.assigneeName ?? "",
       ReturningPIC: t.returningPicName ?? "",
@@ -63,7 +64,7 @@ export async function exportPdfAction(filter: Record<string, unknown>): Promise<
     doc.text("Date | Type | Serial | Status | Operator", 14, y);
     y += 6;
     for (const t of txns.slice(0, 60)) {
-      const line = `${t.date.toLocaleDateString()} | ${t.type} | ${t.item.serialNumber} | ${t.item.status} | ${t.operator.name}`;
+      const line = `${t.date.toLocaleDateString()} | ${t.type} | ${t.item.serialNumber} | ${statusLabel(t.item.status)} | ${t.operator.name}`;
       doc.text(line.substring(0, 110), 14, y);
       y += 5;
       if (y > 280) { doc.addPage(); y = 18; }
