@@ -87,8 +87,10 @@ export function ReturnForm() {
     fetch(`/api/item/lookup-deployed?serial=${encodeURIComponent(q)}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.found) setLookup(data.item);
-        else setLookupErr(data.reason ?? "Not found");
+        if (data.found) {
+          setLookup(data.item);
+          setPicDept(data.item.assigneeDept ?? "");
+        } else setLookupErr(data.reason ?? "Not found");
       })
       .catch(() => setLookupErr("Lookup failed"))
       .finally(() => setChecking(false));

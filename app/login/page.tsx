@@ -41,7 +41,7 @@ export default function LoginPage() {
         <h1 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">Sign in</h1>
         <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">Internal IT asset management</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form method="post" onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="employeeNumber" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Employee Number</label>
             <input
