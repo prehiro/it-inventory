@@ -185,6 +185,7 @@ export function ReleaseForm() {
       {/* RIGHT: preview */}
       <div className="rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">ITEM DETAILS</h3>
+        <div key={released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="animate-panel-in">
         {released && releasedItem ? (
           <div className="flex flex-col items-center justify-center py-6 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
@@ -230,6 +231,7 @@ export function ReleaseForm() {
             </p>
           </div>
         )}
+        </div>
       </div>
     </form>
   );
