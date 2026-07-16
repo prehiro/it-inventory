@@ -73,6 +73,7 @@ model ItemTxn {
   id                 String   @id @default(uuid())
   type               String   // RECEIVE | RELEASE | RETURN
   date               DateTime @default(now())
+  statusAfter        String   @default("AVAILABLE") // Item status right after this txn (snapshot for reports)
 
   // Fields for Releasing
   assigneeEmpNumber  String?

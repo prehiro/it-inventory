@@ -7,6 +7,7 @@ import {
   releaseItem,
   returnItem,
   receiveBatch,
+  isDuplicateSerialError,
   type BatchResult,
 } from "@/lib/inventory";
 import {
@@ -16,7 +17,7 @@ import {
   batchReceiveSchema,
 } from "@/lib/validation";
 
-export type ActionResult = { ok: true; releasedAt?: string; txnAt?: string } | { ok: false; error: string };
+export type ActionResult = { ok: true; releasedAt?: string; txnAt?: string } | { ok: false; error: string; duplicateSerial?: boolean };
 export type BatchActionResult =
   | { ok: true; results: BatchResult[] }
   | { ok: false; error: string };
@@ -37,7 +38,12 @@ export async function receiveAction(
     revalidatePath("/reports");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Failed" };
+    const dup = isDuplicateSerialError(e);
+    return {
+      ok: false,
+      error: dup ? "Serial Number already exists" : (e instanceof Error ? e.message : "Failed to receive item"),
+      duplicateSerial: dup,
+    };
   }
 }
 
