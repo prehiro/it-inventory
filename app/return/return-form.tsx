@@ -271,8 +271,7 @@ export function ReturnForm() {
               <Row label="Serial" value={returnedItem.serialNumber} />
               <Row label="Location" value={returnedItem.location} />
               <Row label="Assignee" value={assigneeLabel(returnedItem)} />
-              <Row label="Returned by" value={[picEmp, picName].filter(Boolean).join(" — ") || "—"} />
-              <Row label="Section" value={picDept || "—"} />
+              <Row label="Returned by" value={[picEmp, picName, picDept].filter(Boolean).join(" — ") || "—"} />
               <Row label="Deployed" value={formatDate(returnedItem.releasedAt)} />
               <Row label="Returned" value={formatDate(returnedItem.returnedAt ?? null)} />
               <Row
