@@ -168,11 +168,18 @@ a double-action guard so the same serial can't be double-released.
 - [x] **Release form**: Hostname auto-UPPERCASE; success panel combines Type/Brand/Model → one "Item TYPE BRAND MODEL" row (uppercased); Hostname + Assignee Emp# + Assignee Name + Section shown from submitted values (snapshot kept, cleared on new serial). Received/Released rows below Section.
 - **Commits:** `bba108e` (rename) · `9146b62` (ledger+hostname) · `3cd4d74` (SN/PO/hostname/ui) · `fb371e0` (PO lock) · `6b61e32` (success snapshot) · `394b4be` (reorder) · `b7fe396` (section+dates)
 
-### ✅ UI Tune-up 5 — Return detail + RETURNED_KEEP re-deploy (Opsi A)
+### ✅ UI Tune-up 5 — Return detail + RETURNED_KEEP re-deploy (Opsi A) + status relabel
 - [x] **Return form**: Returning PIC → Emp# + Name + **GID** + **Email** (all required, persist to RETURN txn) + **Section** combobox (persist `assigneeDept`). GID/Email auto-upper/email; spacing `mt-4` between Name→GID/Email and GID/Email→Section.
-- [x] **Returned Item Details** success panel: Item = TYPE BRAND MODEL (1 row, uppercase) → Serial → Location → Assignee → **Returned by** (Emp — Name) → **Section** → Deployed → Returned → Status. PIC snapshot kept for display (cleared on new serial).
-- [x] **Opsi A (re-deploy RETURNED_KEEP)**: lookup route accepts `AVAILABLE` **or** `RETURNED_KEEP` for release (was AVAILABLE-only, returned 409). `Available Items` table now includes `RETURNED_KEEP` with **blue badge** (vs AVAILABLE emerald); sorted **AVAILABLE first, then RETURNED_KEEP** (multi-field `orderBy [{status asc},{dateReceived asc}]`). Re-release requires GID/Email/Hostname again (can differ).
-- **Commits:** `014f5fc` (return gid/email) · `42f697b` (item row + returned by) · `7fee01d` (section+spacing) · `92007e6` (section spacing) · `7c9ed7f` (opsi A) · `b09101e` (sort available-first)
+- [x] **Returned Item Details** success panel: Item = TYPE BRAND MODEL (1 row, uppercase) → Serial → Location → Assignee → **Returned by** (`EMP — NAME — SECTION`, Section merged in, no separate row) → Deployed → Returned → Status. PIC snapshot kept for display (cleared on new serial).
+- [x] **Auto-fill Section**: on serial lookup, Section prefills from `assigneeDept` of latest RELEASE txn (`lookup-deployed` already returns it) — user need not re-select.
+- [x] **Opsi A (re-deploy RETURNED_KEEP)**: lookup route accepts `AVAILABLE` **or** `RETURNED_KEEP` for release (was AVAILABLE-only, returned 409). `Available Items` table includes `RETURNED_KEEP` with **blue badge** (vs AVAILABLE emerald); sorted **AVAILABLE first, then RETURNED_KEEP**. Re-release requires GID/Email/Hostname again (can differ).
+- [x] **Status relabel (display + DB)**: `DEPLOYED`→`RELEASED`, `DISPOSED`→`PLAN_DISPOSE` (DB values changed via UPDATE; union + `ITEM_STATUSES` + `statusLabel()` in `lib/types.ts`). Display: "RELEASED" / "PLAN DISPOSE". All badges, dashboard cards/charts, reports filter, exports synced.
+- [x] **Smooth transition**: right panel (release + return) content keyed by serial/status + `animate-panel-in` (fade + slide-up 0.32s) — no abrupt pop-in on lookup/submit.
+- **Commits:** `014f5fc` · `42f697b` · `7fee01d` · `92007e6` · `7c9ed7f` · `b09101e` · `7ab2cc0` (relabel UI) · `585b3df` (relabel DB) · `711cbdf` (auto-fill section) · `a8cdb6a` (returned-by merge) · `652f36a` (panel-in)
+
+### ✅ UI Tune-up 6 — Release hostname BAL prefix
+- [x] **Hostname locked prefix `BAL`** on release (PC/Laptop/Tablet only): controlled input, prefix undeletable (Backspace/Delete/paste blocked inside prefix), user appends after it; resets to `BAL` on new serial. Mirrors PO `PTCAP__` behaviour on receive.
+- **Commit:** `7124316`
 
 ---
 
@@ -190,7 +197,7 @@ Plan:
 
 ### ⬜ Housekeeping (optional)
 - [ ] Change admin password (ADM001) before production.
-- [ ] Clean test data in `db_itInventory` (SN-TEST-001, ViaActionModel, SN-P3-FLOW, EMP010) — optional.
+- [x] Clean test data in `db_itInventory` (all rows DELETE; SystemUser preserved incl. ADM001) — done via sqlcmd, ready for clean UI input.
 - [x] `SS/` (screenshots) added to `.gitignore` (commit `1d80143`).
 
 ---
@@ -198,9 +205,9 @@ Plan:
 ## 5. UI/UX Design System (applied)
 - **Layout:** fixed left sidebar (role-based nav) + topbar (centered global search + theme toggle + avatar dropdown).
 - **Font:** Inter (via `next/font`).
-- **Palette:** indigo-600 primary · emerald = AVAILABLE (badge + soft glow) · blue = RETURNED_KEEP (disposition) · amber = IN_REPAIR (disposition) · rose = DISPOSED (disposition) · slate = neutral. Return disposition circles: neon-breathing glow + soft box-shadow on selected; label/border/badge follow tone.
+- **Palette:** indigo-600 primary · emerald = AVAILABLE (badge + soft glow) · blue = RETURNED_KEEP (badge) / RELEASED context · amber = IN_REPAIR (disposition) · rose = PLAN_DISPOSE (disposition) · slate = neutral. Return disposition circles: neon-breathing glow + soft box-shadow on selected; label/border/badge follow tone.
 - **Cards:** `rounded-2xl` + subtle shadow + `ring-1`.
-- **Micro-animations:** fade-in on load, slide-up toast, row/button hover.
+- **Micro-animations:** fade-in / slide-up on load, slide-up toast, row/button hover, `panel-in` (fade + slide-up 0.32s) on release/return detail panel keyed by serial, check-pop/check-draw on success.
 - **Dark mode:** full `dark:` support, `class` strategy via next-themes.
 - **StatusBadge:** colored pill per status.
 - **Audit formatting:** human-readable labels + icons (no raw JSON shown to user).
