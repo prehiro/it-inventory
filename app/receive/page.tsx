@@ -12,7 +12,7 @@ export default async function ReceivePage() {
   });
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-5xl">
       <PageHeader title="Receive Item" subtitle="Log incoming IT items from logistics" />
       {models.length === 0 ? (
         <p className="text-sm text-slate-400">No models yet. Add one in Master Data first.</p>

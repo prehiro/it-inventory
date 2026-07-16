@@ -29,9 +29,9 @@ export default async function ReportsPage({
       item: { select: { serialNumber: true, status: true } },
       operator: { select: { name: true } },
     },
-  });
+    });
 
-  const typeLabel: Record<string, string> = { RECEIVE: "Received", RELEASE: "Released", RETURN: "Returned" };
+    const typeLabel: Record<string, string> = { RECEIVE: "Received", RELEASE: "Released", RETURN: "Returned" };
   const filter = { type: sp.type ?? "", status: sp.status ?? "", from: sp.from ?? "", to: sp.to ?? "" };
 
   return (
@@ -57,7 +57,7 @@ export default async function ReportsPage({
                 <td className="whitespace-nowrap px-5 py-3 text-slate-500 dark:text-slate-400">{t.date.toLocaleDateString()}</td>
                 <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{typeLabel[t.type] ?? t.type}</td>
                 <td className="px-5 py-3 text-slate-700 dark:text-slate-200">{t.item.serialNumber}</td>
-                <td className="px-5 py-3"><StatusBadge status={t.item.status} /></td>
+                <td className="px-5 py-3"><StatusBadge status={t.statusAfter} /></td>
                 <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{t.operator.name}</td>
                 <td className="px-5 py-3 text-slate-400 dark:text-slate-500">{t.assigneeName ?? t.returningPicName ?? t.remarks ?? "—"}</td>
               </tr>

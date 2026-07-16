@@ -64,6 +64,20 @@ body {
 }
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
+/* Color-driven breathing glow (uses --neon, no indigo fallback) */
+@keyframes status-breath {
+  0%, 100% { box-shadow: 0 0 0 0 var(--neon); }
+  50% { box-shadow: 0 0 7px 2px var(--neon); }
+}
+.animate-status-breath { animation: status-breath 1.8s ease-in-out infinite; }
+
+/* Soft text glow that breathes (uses --neon) */
+@keyframes text-glow-breath {
+  0%, 100% { text-shadow: 0 0 0 0 var(--neon); }
+  50% { text-shadow: 0 0 4px 1px var(--neon); }
+}
+.animate-text-glow-breath { animation: text-glow-breath 1.8s ease-in-out infinite; }
+
 .nav-link-active {
   background: #eef2ff; /* indigo-50 */
   color: #4338ca; /* indigo-700 */

@@ -1,7 +1,23 @@
 import "server-only";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import type { ReceiveInput, ReleaseInput, ReturnInput } from "@/lib/validation";
 import { HOSTNAME_TYPES, type ItemType } from "@/lib/types";
+
+/** Friendly error message for a batch receive failure (no raw Prisma stack). */
+function describeReceiveError(e: unknown): string {
+  if (e instanceof Prisma.PrismaClientKnownRequestError) {
+    if (e.code === "P2002") return "Serial already exists";
+    if (e.code === "P2003") return "Invalid model reference";
+  }
+  if (e instanceof Error) return e.message;
+  return "Failed to receive item";
+}
+
+/** True when a receive failed because the serial number already exists (P2002). */
+export function isDuplicateSerialError(e: unknown): boolean {
+  return e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
+}
 
 /**
  * All inventory mutations run inside a single interactive $transaction so the
@@ -33,7 +49,7 @@ export async function receiveBatch(
       results.push({
         serial,
         ok: false,
-        error: e instanceof Error ? e.message : "Failed",
+        error: describeReceiveError(e),
       });
     }
   }
@@ -63,6 +79,7 @@ export async function receiveItem(input: ReceiveInput, operatorId: string) {
         type: "RECEIVE",
         itemId: item.id,
         operatorId,
+        statusAfter: "AVAILABLE",
         remarks: input.remarks || null,
       },
     });
@@ -110,6 +127,7 @@ export async function releaseItem(input: ReleaseInput, operatorId: string) {
         type: "RELEASE",
         itemId: item.id,
         operatorId,
+        statusAfter: "RELEASED",
         assigneeEmpNumber: input.assigneeEmpNumber,
         assigneeName: input.assigneeName,
         assigneeDept: input.assigneeDept || null,
@@ -159,6 +177,7 @@ export async function returnItem(input: ReturnInput, operatorId: string) {
         type: "RETURN",
         itemId: item.id,
         operatorId,
+        statusAfter: status,
         returningPicName: input.returningPicName,
         gid: input.gid,
         email: input.email,

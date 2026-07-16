@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import { statusLabel } from "@/lib/types";
@@ -9,13 +10,14 @@ import { statusLabel } from "@/lib/types";
 export type ExportResult = { ok: true; data: string; filename: string } | { ok: false; error: string };
 
 async function loadTxns(f: Record<string, unknown>) {
-  const where: Record<string, unknown> = {};
-  if (f.type) where.type = f.type;
-  if (f.status) where.item = { status: f.status };
+  const where: Prisma.ItemTxnWhereInput = {};
+  if (f.type) where.type = f.type as string;
+  if (f.status) where.item = { status: f.status as string };
   if (f.from || f.to) {
-    where.date = {};
-    if (f.from) (where.date as any).gte = new Date(f.from as string);
-    if (f.to) (where.date as any).lte = new Date(f.to as string);
+    const date: { gte?: Date; lte?: Date } = {};
+    if (f.from) date.gte = new Date(f.from as string);
+    if (f.to) date.lte = new Date(f.to as string);
+    where.date = date;
   }
   return prisma.itemTxn.findMany({
     where,
@@ -34,7 +36,7 @@ export async function exportExcelAction(filter: Record<string, unknown>): Promis
       Date: t.date.toISOString(),
       Type: t.type,
       Serial: t.item.serialNumber,
-      Status: statusLabel(t.item.status),
+      Status: statusLabel(t.statusAfter),
       Operator: t.operator.name,
       Assignee: t.assigneeName ?? "",
       ReturningPIC: t.returningPicName ?? "",
@@ -64,7 +66,7 @@ export async function exportPdfAction(filter: Record<string, unknown>): Promise<
     doc.text("Date | Type | Serial | Status | Operator", 14, y);
     y += 6;
     for (const t of txns.slice(0, 60)) {
-      const line = `${t.date.toLocaleDateString()} | ${t.type} | ${t.item.serialNumber} | ${statusLabel(t.item.status)} | ${t.operator.name}`;
+      const line = `${t.date.toLocaleDateString()} | ${t.type} | ${t.item.serialNumber} | ${statusLabel(t.statusAfter)} | ${t.operator.name}`;
       doc.text(line.substring(0, 110), 14, y);
       y += 5;
       if (y > 280) { doc.addPage(); y = 18; }
