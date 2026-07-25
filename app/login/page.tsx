@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 function ParticlesBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
 
   const initParticles = useCallback((canvas: HTMLCanvasElement, isDark: boolean) => {
     const ctx = canvas.getContext("2d");
@@ -15,8 +16,9 @@ function ParticlesBg() {
     const w = (canvas.width = window.innerWidth);
     const h = (canvas.height = window.innerHeight);
 
-    const count = 120;
+    const count = 140;
     const connectionDist = 150;
+    const mouseConnectionDist = 220;
     const colors = isDark
       ? { particle: "rgba(0,245,255,", line: "rgba(0,217,255," }
       : { particle: "rgba(2,119,189,", line: "rgba(2,136,209," };
@@ -30,13 +32,59 @@ function ParticlesBg() {
         y: Math.random() * h,
         vx: (Math.random() - 0.5) * 1.2,
         vy: (Math.random() - 0.5) * 1.2,
-        r: 1 + Math.random() * 2,
+        r: 1 + Math.random() * 2.5,
       });
     }
+
+    const mouse = mouseRef.current;
 
     function animate() {
       ctx!.clearRect(0, 0, w, h);
 
+      // draw connections between particles
+      for (let i = 0; i < dots.length; i++) {
+        for (let j = i + 1; j < dots.length; j++) {
+          const dx = dots[i].x - dots[j].x;
+          const dy = dots[i].y - dots[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < connectionDist) {
+            ctx!.beginPath();
+            ctx!.moveTo(dots[i].x, dots[i].y);
+            ctx!.lineTo(dots[j].x, dots[j].y);
+            ctx!.strokeStyle = colors.line + (0.35 * (1 - dist / connectionDist)) + ")";
+            ctx!.lineWidth = 0.7;
+            ctx!.stroke();
+          }
+        }
+      }
+
+      // draw connections to mouse
+      if (mouse.x > 0 && mouse.x < w && mouse.y > 0 && mouse.y < h) {
+        // find nearest particles to mouse
+        const nearest: { dot: Dot; dist: number }[] = [];
+        for (const d of dots) {
+          const dx = d.x - mouse.x;
+          const dy = d.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseConnectionDist) {
+            nearest.push({ dot: d, dist });
+          }
+        }
+        nearest.sort((a, b) => a.dist - b.dist);
+
+        // connect up to 6 nearest particles to mouse
+        for (let i = 0; i < Math.min(6, nearest.length); i++) {
+          const n = nearest[i];
+          ctx!.beginPath();
+          ctx!.moveTo(mouse.x, mouse.y);
+          ctx!.lineTo(n.dot.x, n.dot.y);
+          ctx!.strokeStyle = colors.line + (0.6 * (1 - n.dist / mouseConnectionDist)) + ")";
+          ctx!.lineWidth = 1.2;
+          ctx!.stroke();
+        }
+      }
+
+      // draw particles
       for (const d of dots) {
         d.x += d.vx;
         d.y += d.vy;
@@ -49,22 +97,6 @@ function ParticlesBg() {
         ctx!.fill();
       }
 
-      for (let i = 0; i < dots.length; i++) {
-        for (let j = i + 1; j < dots.length; j++) {
-          const dx = dots[i].x - dots[j].x;
-          const dy = dots[i].y - dots[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < connectionDist) {
-            ctx!.beginPath();
-            ctx!.moveTo(dots[i].x, dots[i].y);
-            ctx!.lineTo(dots[j].x, dots[j].y);
-            ctx!.strokeStyle = colors.line + (0.4 * (1 - dist / connectionDist)) + ")";
-            ctx!.lineWidth = 0.8;
-            ctx!.stroke();
-          }
-        }
-      }
-
       animRef.current = requestAnimationFrame(animate);
     }
 
@@ -75,13 +107,25 @@ function ParticlesBg() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       ctx!.clearRect(0, 0, canvas.width, canvas.height);
-      // restart animation loop but keep the dots intact
     };
     window.addEventListener("resize", onResize);
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+    const onMouseLeave = () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseleave", onMouseLeave);
 
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseleave", onMouseLeave);
     };
   }, []);
 
