@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ShellBg } from "@/components/shell-bg";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -24,7 +25,7 @@ export default async function RootLayout({
   if (!session?.user) {
     return (
       <html lang="en" className={inter.variable} suppressHydrationWarning>
-        <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950">
+        <body className="min-h-full antialiased">
           <ThemeProvider>{children}</ThemeProvider>
         </body>
       </html>
@@ -33,8 +34,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950">
+      <body className="min-h-full antialiased">
         <ThemeProvider>
+          <ShellBg />
           <Sidebar role={role!} />
           <div className="pl-60">
             <Topbar name={name} role={role!} />

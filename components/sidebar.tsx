@@ -68,7 +68,7 @@ export function Sidebar({ role }: { role: Role }) {
   if (role === "ADMIN") items.push({ href: "/admin", label: "Admin", icon: I.admin });
 
   return (
-    <aside className="sidebar-surface fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <aside className="sidebar-surface fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
       <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-5 dark:border-slate-800">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
           IT
