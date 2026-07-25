@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { receiveBatchAction, type BatchActionResult } from "@/app/actions/inventory";
 import { ModelCombobox } from "@/components/model-combobox";
 
@@ -15,16 +15,27 @@ export function BatchReceiveForm({
   const location = "IT Store";
   const PO_PREFIX = "PTCAP__";
   const [poNumber, setPoNumber] = useState("PTCAP__");
-  function onPoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const v = e.target.value;
-    setPoNumber(v.startsWith(PO_PREFIX) ? v : PO_PREFIX + v.replace(/PTCAP__/g, ""));
-  }
   const [remarks, setRemarks] = useState("");
   const [raw, setRaw] = useState("");
   const [pending, start] = useTransition();
   const [results, setResults] = useState<RowResult[] | null>(null);
   const [runId, setRunId] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Reset form + results when user picks a different model
+  useEffect(() => {
+    setPoNumber("PTCAP__");
+    setRemarks("");
+    setRaw("");
+    setResults(null);
+    setRunId((n) => n + 1);
+    setError(null);
+  }, [modelId]);
+
+  function onPoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setPoNumber(v.startsWith(PO_PREFIX) ? v : PO_PREFIX + v.replace(/PTCAP__/g, ""));
+  }
 
   const lines = raw
     .split(/\r?\n/)

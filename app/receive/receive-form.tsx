@@ -23,6 +23,15 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
     setPo(v.startsWith(PO_PREFIX) ? v : PO_PREFIX + v.replace(/PTCAP__/g, ""));
   }
 
+  // Reset form fields when user picks a different model
+  useEffect(() => {
+    setSnValue("");
+    setSnExists(false);
+    setSnChecking(false);
+    setReceived(null);
+    setPo("PTCAP__");
+  }, [modelId]);
+
   function onSerialChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value.toUpperCase();
     e.target.value = v;
