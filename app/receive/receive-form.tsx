@@ -14,7 +14,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
   const [snExists, setSnExists] = useState(false);
   const [snChecking, setSnChecking] = useState(false);
   const [snValue, setSnValue] = useState("");
-  const [received, setReceived] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const snTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const PO_PREFIX = "PTCAP__";
@@ -28,7 +28,6 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
     setSnValue("");
     setSnExists(false);
     setSnChecking(false);
-    setReceived(null);
     setPo("PTCAP__");
   }, [modelId]);
 
@@ -37,7 +36,6 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
     e.target.value = v;
     setSnValue(v);
     setSnExists(false);
-    setReceived(null);
     const sn = v.trim();
     if (snTimer.current) clearTimeout(snTimer.current);
     if (sn.length === 0) {
@@ -65,8 +63,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
     if (state?.ok) {
       const m = models.find((x) => x.id === modelId);
       const label = m ? `${m.type} ${m.brand} ${m.model}`.toUpperCase() : "ITEM";
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setReceived(`${label} SN:${snValue.trim() || "—"}`);
+      setToast(label);
       // reset fields so the user is ready for the next item
       setModelId("");
       setSnValue("");
@@ -169,19 +166,38 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
       >
         {pending ? "Saving…" : "Receive Item"}
       </button>
-      {received && (
-        <div className="animate-panel-in flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 ring-1 ring-emerald-600/20 dark:bg-emerald-500/10 dark:ring-emerald-500/20">
+      {toast && (
+        <div
+          onClick={() => setToast(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/50"
+        >
           <div
-            style={{ ["--neon" as string]: "rgba(16,185,129,0.55)" }}
-            className="flex h-8 w-8 shrink-0 animate-check-pop animate-status-breath items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-sm animate-fade-in rounded-2xl bg-white p-6 text-center shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
-              <path className="animate-check-draw" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Item received</p>
-            <p className="truncate font-mono text-xs text-emerald-700/80 dark:text-emerald-400/80">{received}</p>
+            <div className="animate-fade-in">
+              <div className="mx-auto mb-4 flex h-14 w-14 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-7 w-7" strokeLinecap="round" strokeLinejoin="round">
+                  <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                Item received
+              </h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {toast}
+              </p>
+              <div className="mt-5 flex justify-center">
+                <button
+                  onClick={() => setToast(null)}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
+                >
+                  Selesai
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
