@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { receiveBatchAction, type BatchActionResult } from "@/app/actions/inventory";
 import { ModelCombobox } from "@/components/model-combobox";
 
@@ -21,6 +21,7 @@ export function BatchReceiveForm({
   const [results, setResults] = useState<RowResult[] | null>(null);
   const [runId, setRunId] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ ok: number; fail: number } | null>(null);
 
   // Reset form + results when user picks a different model
   useEffect(() => {
@@ -31,6 +32,14 @@ export function BatchReceiveForm({
     setRunId((n) => n + 1);
     setError(null);
   }, [modelId]);
+
+  // Auto-dismiss toast after 3s
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   function onPoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value;
@@ -46,6 +55,7 @@ export function BatchReceiveForm({
   function process() {
     setError(null);
     setResults(null);
+    setToast(null);
     if (!modelId) {
       setError("Pilih model dulu.");
       return;
@@ -68,6 +78,9 @@ export function BatchReceiveForm({
       }
       setResults(res.results);
       setRunId((n) => n + 1);
+      const ok = res.results.filter((r) => r.ok).length;
+      const fail = res.results.filter((r) => !r.ok).length;
+      setToast({ ok, fail });
     });
   }
 
@@ -214,6 +227,43 @@ export function BatchReceiveForm({
           </div>
         )}
       </div>
+
+      {/* SUCCESS MODAL */}
+      {toast && (
+        <div
+          onClick={() => setToast(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-sm animate-fade-in rounded-2xl bg-white p-6 text-center shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
+          >
+            <div key={runId} className="animate-fade-in">
+              <div className="mx-auto mb-4 flex h-14 w-14 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-7 w-7" strokeLinecap="round" strokeLinejoin="round">
+                  <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                Batch received
+              </h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {toast.ok} item{toast.ok !== 1 ? "s" : ""} received{toast.fail > 0 && ` · ${toast.fail} failed`}
+              </p>
+              <div className="mt-5 flex justify-center">
+                <button
+                  onClick={() => setToast(null)}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
+                >
+                  Selesai
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

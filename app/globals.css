@@ -58,6 +58,11 @@ body {
 }
 .animate-panel-in { animation: panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
 
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 16px) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
 @keyframes neon-breath {
   0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(99,102,241,0.6)); }
   50% { box-shadow: 0 0 14px 4px var(--neon, rgba(99,102,241,0.6)); }
