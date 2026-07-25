@@ -2,7 +2,13 @@
 
 import { useEffect, useCallback, useRef } from "react";
 
-export function ParticlesBg() {
+export function ParticlesBg({
+  className,
+  contained = false,
+}: {
+  className?: string;
+  contained?: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const mouseRef = useRef({ x: -9999, y: -9999 });
@@ -11,12 +17,20 @@ export function ParticlesBg() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const w = (canvas.width = window.innerWidth);
-    const h = (canvas.height = window.innerHeight);
+    let w: number, h: number;
+    if (contained) {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      w = canvas.width = parent.clientWidth;
+      h = canvas.height = parent.clientHeight;
+    } else {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
 
-    const count = 140;
-    const connectionDist = 150;
-    const mouseConnectionDist = 220;
+    const count = contained ? 30 : 140;
+    const connectionDist = contained ? 100 : 150;
+    const mouseConnectionDist = contained ? 150 : 220;
     const colors = isDark
       ? { particle: "rgba(0,245,255,", line: "rgba(0,217,255," }
       : { particle: "rgba(2,119,189,", line: "rgba(2,136,209," };
@@ -28,9 +42,9 @@ export function ParticlesBg() {
       dots.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        r: 1 + Math.random() * 2.5,
+        vx: (Math.random() - 0.5) * (contained ? 0.8 : 1.2),
+        vy: (Math.random() - 0.5) * (contained ? 0.8 : 1.2),
+        r: (contained ? 0.8 : 1) + Math.random() * (contained ? 1.5 : 2.5),
       });
     }
 
@@ -49,15 +63,15 @@ export function ParticlesBg() {
             ctx!.beginPath();
             ctx!.moveTo(dots[i].x, dots[i].y);
             ctx!.lineTo(dots[j].x, dots[j].y);
-            ctx!.strokeStyle = colors.line + (0.35 * (1 - dist / connectionDist)) + ")";
-            ctx!.lineWidth = 0.7;
+            ctx!.strokeStyle = colors.line + (contained ? 0.2 : 0.3) * (1 - dist / connectionDist) + ")";
+            ctx!.lineWidth = contained ? 0.4 : 0.5;
             ctx!.stroke();
           }
         }
       }
 
       // draw connections to mouse
-      if (mouse.x > 0 && mouse.x < w && mouse.y > 0 && mouse.y < h) {
+      if (mouse.x >= 0 && mouse.x <= w && mouse.y >= 0 && mouse.y <= h) {
         const nearest: { dot: Dot; dist: number }[] = [];
         for (const d of dots) {
           const dx = d.x - mouse.x;
@@ -69,13 +83,13 @@ export function ParticlesBg() {
         }
         nearest.sort((a, b) => a.dist - b.dist);
 
-        for (let i = 0; i < Math.min(6, nearest.length); i++) {
+        for (let i = 0; i < Math.min(4, nearest.length); i++) {
           const n = nearest[i];
           ctx!.beginPath();
           ctx!.moveTo(mouse.x, mouse.y);
           ctx!.lineTo(n.dot.x, n.dot.y);
-          ctx!.strokeStyle = colors.line + (0.6 * (1 - n.dist / mouseConnectionDist)) + ")";
-          ctx!.lineWidth = 1.2;
+          ctx!.strokeStyle = colors.line + (contained ? 0.35 : 0.5) * (1 - n.dist / mouseConnectionDist) + ")";
+          ctx!.lineWidth = contained ? 0.7 : 1;
           ctx!.stroke();
         }
       }
@@ -89,7 +103,7 @@ export function ParticlesBg() {
 
         ctx!.beginPath();
         ctx!.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx!.fillStyle = colors.particle + "0.7)";
+        ctx!.fillStyle = colors.particle + (contained ? 0.4 : 0.6) + ")";
         ctx!.fill();
       }
 
@@ -100,28 +114,45 @@ export function ParticlesBg() {
 
     const onResize = () => {
       cancelAnimationFrame(animRef.current);
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (contained) {
+        if (!canvas.parentElement) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+      } else {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
       ctx!.clearRect(0, 0, canvas.width, canvas.height);
     };
     window.addEventListener("resize", onResize);
 
     const onMouseMove = (e: MouseEvent) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
     };
     const onMouseLeave = () => {
       mouse.x = -9999;
       mouse.y = -9999;
     };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseleave", onMouseLeave);
+    if (contained) {
+      canvas.addEventListener("mousemove", onMouseMove);
+      canvas.addEventListener("mouseleave", onMouseLeave);
+    } else {
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseleave", onMouseLeave);
+    }
 
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseleave", onMouseLeave);
+      if (contained) {
+        canvas.removeEventListener("mousemove", onMouseMove);
+        canvas.removeEventListener("mouseleave", onMouseLeave);
+      } else {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseleave", onMouseLeave);
+      }
     };
   }, []);
 
@@ -154,7 +185,8 @@ export function ParticlesBg() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none"
+      className={className ?? "fixed inset-0 pointer-events-none"}
     />
   );
 }
+

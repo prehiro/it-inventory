@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { Role } from "@/lib/types";
-
 import type { ReactElement } from "react";
+import { ParticlesBg } from "@/components/particles-bg";
 
 type NavItem = { href: string; label: string; icon: ReactElement };
 
@@ -68,12 +68,13 @@ export function Sidebar({ role }: { role: Role }) {
   if (role === "ADMIN") items.push({ href: "/admin", label: "Admin", icon: I.admin });
 
   return (
-    <aside className="sidebar-surface fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
-      <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-5 dark:border-slate-800">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
+    <aside className="sidebar-surface fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="relative flex h-16 items-center gap-2 border-b border-slate-200 px-5 dark:border-slate-800">
+        <ParticlesBg contained className="absolute inset-0 w-full h-full pointer-events-none" />
+        <div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
           IT
         </div>
-        <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">Inventory</span>
+        <span className="relative z-10 text-sm font-semibold text-slate-900 dark:text-slate-100">Inventory</span>
       </div>
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
         {items.map((it) => {
