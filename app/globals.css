@@ -86,11 +86,11 @@ body {
 .animate-text-glow-breath { animation: text-glow-breath 1.8s ease-in-out infinite; }
 
 .nav-link-active {
-  background: #eef2ff; /* indigo-50 */
-  color: #4338ca; /* indigo-700 */
+  background: #e0f2fe; /* sky-50 */
+  color: #066fd1; /* primary */
   font-weight: 500;
 }
 .dark .nav-link-active {
-  background: rgba(79, 70, 229, 0.15); /* indigo-600/15 */
-  color: #a5b4fc; /* indigo-300 */
+  background: rgba(6, 111, 209, 0.15); /* primary/15 */
+  color: #38bdf8; /* sky-400 */
 }

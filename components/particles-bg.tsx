@@ -71,11 +71,19 @@ export function ParticlesBg({
       }
 
       // draw connections to mouse
-      if (mouse.x >= 0 && mouse.x <= w && mouse.y >= 0 && mouse.y <= h) {
+      let mx = mouse.x;
+      let my = mouse.y;
+      // For contained mode, subtract canvas offset because mouse is tracked in window coords
+      if (contained) {
+        const rect = canvas.getBoundingClientRect();
+        mx -= rect.left;
+        my -= rect.top;
+      }
+      if (mx >= 0 && mx <= w && my >= 0 && my <= h) {
         const nearest: { dot: Dot; dist: number }[] = [];
         for (const d of dots) {
-          const dx = d.x - mouse.x;
-          const dy = d.y - mouse.y;
+          const dx = d.x - mx;
+          const dy = d.y - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < mouseConnectionDist) {
             nearest.push({ dot: d, dist });
@@ -86,7 +94,7 @@ export function ParticlesBg({
         for (let i = 0; i < Math.min(4, nearest.length); i++) {
           const n = nearest[i];
           ctx!.beginPath();
-          ctx!.moveTo(mouse.x, mouse.y);
+          ctx!.moveTo(mx, my);
           ctx!.lineTo(n.dot.x, n.dot.y);
           ctx!.strokeStyle = colors.line + (contained ? 0.35 : 0.5) * (1 - n.dist / mouseConnectionDist) + ")";
           ctx!.lineWidth = contained ? 0.7 : 1;
@@ -112,47 +120,8 @@ export function ParticlesBg({
 
     animate();
 
-    const onResize = () => {
-      cancelAnimationFrame(animRef.current);
-      if (contained) {
-        if (!canvas.parentElement) return;
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-      } else {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      ctx!.clearRect(0, 0, canvas.width, canvas.height);
-    };
-    window.addEventListener("resize", onResize);
-
-    const onMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    };
-    const onMouseLeave = () => {
-      mouse.x = -9999;
-      mouse.y = -9999;
-    };
-    if (contained) {
-      canvas.addEventListener("mousemove", onMouseMove);
-      canvas.addEventListener("mouseleave", onMouseLeave);
-    } else {
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseleave", onMouseLeave);
-    }
-
     return () => {
       cancelAnimationFrame(animRef.current);
-      window.removeEventListener("resize", onResize);
-      if (contained) {
-        canvas.removeEventListener("mousemove", onMouseMove);
-        canvas.removeEventListener("mouseleave", onMouseLeave);
-      } else {
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseleave", onMouseLeave);
-      }
     };
   }, []);
 
@@ -167,6 +136,27 @@ export function ParticlesBg({
 
     let cleanup = initParticles(canvas, detectDark());
 
+    const onResize = () => {
+      if (cleanup) cleanup();
+      cleanup = initParticles(canvas, detectDark());
+    };
+    window.addEventListener("resize", onResize);
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+    };
+    const onMouseLeave = () => {
+      mouseRef.current.x = -9999;
+      mouseRef.current.y = -9999;
+    };
+
+    // For login page (fullscreen), mouse is on window
+    // For sidebar (contained), mouse is on parent — but we need to capture on window
+    // since canvas has pointer-events-none in fullscreen mode
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseleave", onMouseLeave);
+
     const observer = new MutationObserver(() => {
       if (cleanup) cleanup();
       cleanup = initParticles(canvas, detectDark());
@@ -179,6 +169,9 @@ export function ParticlesBg({
     return () => {
       if (cleanup) cleanup();
       observer.disconnect();
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseleave", onMouseLeave);
     };
   }, [initParticles]);
 
