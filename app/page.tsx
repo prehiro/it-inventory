@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/page-header";
 import { RecentActivity } from "./recent-activity";
 import { CategoryDonut, DepartmentBar } from "@/components/dashboard-charts";
-import { LowStockPopover } from "@/components/low-stock-popover";
 import type { Role } from "@/lib/types";
 
 const CARD_ICONS: Record<string, { path: string; tone: string }> = {
@@ -77,15 +76,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-        subtitle="Real-time overview of your IT inventory"
-        action={
-          lowStock.length > 0 ? (
-            <LowStockPopover items={lowStock} />
-          ) : undefined
-        }
-      />
+      <PageHeader title="Dashboard" subtitle="Real-time overview of your IT inventory" />
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => {

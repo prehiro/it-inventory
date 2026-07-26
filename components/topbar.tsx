@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
+import { TopbarLowStock } from "@/components/topbar-low-stock";
 
 export function Topbar({
   name,
@@ -59,6 +60,7 @@ export function Topbar({
       </form>
 
       <div className="ml-auto flex items-center gap-2">
+        <TopbarLowStock />
         <button
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
           aria-label="Toggle theme"
