@@ -11,6 +11,7 @@ type Lookup = {
   type: string;
   brand: string;
   model: string;
+  category: string;
   location: string;
   status: string;
   receivedAt: string;
@@ -46,7 +47,7 @@ export function ReleaseForm() {
 
   const HOSTNAME_PREFIX = "BAL";
   function onHostnameChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setHostname(v.startsWith(HOSTNAME_PREFIX) ? v : HOSTNAME_PREFIX + v.replace(/BAL/g, ""));
   }
   const [empNumber, setEmpNumber] = useState("");
@@ -70,6 +71,13 @@ export function ReleaseForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
+
+  // Auto-uppercase hostname when item category is NCA
+  useEffect(() => {
+    if (lookup && lookup.category === "NCA") {
+      setHostname((prev) => prev.toUpperCase());
+    }
+  }, [lookup]);
 
   function runLookup(s: string) {
     const q = s.trim();
