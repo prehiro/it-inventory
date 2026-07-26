@@ -66,8 +66,8 @@ body {
 }
 
 @keyframes neon-breath {
-  0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(6,111,209,0.3)); }
-  50% { box-shadow: 0 0 5px 1px var(--neon, rgba(6,111,209,0.45)); }
+  0%, 100% { box-shadow: 0 0 3px 1px var(--neon, rgba(6,111,209,0.2)); }
+  50% { box-shadow: 0 0 3px 1px var(--neon, rgba(6,111,209,0.5)); }
 }
 /* Color-driven breathing glow (uses --neon) */
 @keyframes status-breath {
@@ -86,6 +86,7 @@ body {
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 .input-glow:focus {
   animation: neon-breath 1.6s ease-in-out infinite;
+  will-change: box-shadow;
 }
 
 .nav-link-active {
