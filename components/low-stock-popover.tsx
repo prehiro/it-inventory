@@ -48,7 +48,7 @@ export function LowStockPopover({ items }: { items: LowStockItem[] }) {
       </button>
 
       {open && (
-        <div className="low-stock-popover absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-amber-200 bg-white shadow-lg ring-1 ring-black/5 dark:border-amber-700 dark:bg-slate-900">
+        <div className="low-stock-popover absolute left-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-amber-200 bg-white shadow-lg ring-1 ring-black/5 dark:border-amber-700 dark:bg-slate-900">
           <div className="border-b border-amber-100 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:border-amber-800 dark:text-amber-400">
             Low Stock Items
           </div>

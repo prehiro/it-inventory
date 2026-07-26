@@ -133,7 +133,7 @@ body {
 
 /* Popover entry animation */
 .low-stock-popover {
-  transform-origin: top right;
+  transform-origin: top left;
   animation: popover-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes popover-in {
