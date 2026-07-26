@@ -41,21 +41,23 @@ export function Topbar({
 
   return (
     <>
-    <header className="sticky top-0 z-20 flex h-16 items-center border-b border-slate-200 bg-white/80 px-6 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
-      <div className="flex w-full max-w-6xl items-center gap-4">
+    <header className="sticky top-0 z-20 flex h-16 items-center border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-6">
       <form onSubmit={onSearch} className="relative w-full max-w-[14rem]">
-        <svg
-          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-        >
-          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" strokeLinecap="round" />
-        </svg>
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by serial number…"
-          className="input-rainbow w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-800"
-        />
+        <div className="rainbow-border">
+          <svg
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 z-10"
+          >
+            <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" strokeLinecap="round" />
+          </svg>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search by serial number…"
+            className="relative w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-800"
+          />
+        </div>
       </form>
 
       <div className="ml-auto flex items-center gap-2">

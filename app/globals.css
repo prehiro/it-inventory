@@ -119,18 +119,29 @@ body {
   color: #38bdf8; /* sky-400 */
 }
 
-/* Rainbow border for search input */
-.input-rainbow:focus {
-  animation: rainbow-border 2s linear infinite;
-  outline: none;
+/* Rainbow border for search input — clockwise conic spin */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
-@keyframes rainbow-border {
-  0% { border-color: #ff6b6b; box-shadow: 0 0 0 1px #ff6b6b; }
-  14% { border-color: #ffa502; box-shadow: 0 0 0 1px #ffa502; }
-  28% { border-color: #ffd93d; box-shadow: 0 0 0 1px #ffd93d; }
-  42% { border-color: #6bcf7f; box-shadow: 0 0 0 1px #6bcf7f; }
-  57% { border-color: #4dabf7; box-shadow: 0 0 0 1px #4dabf7; }
-  71% { border-color: #7c6bf7; box-shadow: 0 0 0 1px #7c6bf7; }
-  85% { border-color: #e06bf7; box-shadow: 0 0 0 1px #e06bf7; }
-  100% { border-color: #ff6b6b; box-shadow: 0 0 0 1px #ff6b6b; }
+
+.rainbow-border {
+  position: relative;
+  border-radius: 0.5rem;
+}
+.rainbow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 0.5rem;
+  background: conic-gradient(from var(--angle), #ff6b6b, #ffa502, #ffd93d, #6bcf7f, #4dabf7, #7c6bf7, #e06bf7, #ff6b6b);
+  z-index: -1;
+  pointer-events: none;
+}
+@keyframes spin-angle {
+  to { --angle: 360deg; }
+}
+.rainbow-border:focus-within::before {
+  animation: spin-angle 2s linear infinite;
 }
