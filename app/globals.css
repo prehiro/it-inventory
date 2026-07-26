@@ -85,15 +85,27 @@ body {
 }
 .animate-text-glow-breath { animation: text-glow-breath 1.8s ease-in-out infinite; }
 
-/* Breathing border glow — smooth, GPU-composited */
-@keyframes breathing-border {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(6, 111, 209, 0.2); }
-  50% { box-shadow: 0 0 5px 1.5px rgba(6, 111, 209, 0.35); }
+/* Breathing border glow via pseudo-element opacity (GPU composited, zero repaint) */
+.breathing-wrap {
+  position: relative;
 }
-.animate-breathing-border:focus {
-  animation: breathing-border 3s ease-in-out infinite;
-  will-change: box-shadow;
-  backface-visibility: hidden;
+.breathing-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  box-shadow: 0 0 6px 2px rgba(6, 111, 209, 0.3);
+}
+.breathing-wrap:focus-within::after {
+  opacity: 1;
+  animation: breathe-opacity 3s ease-in-out infinite;
+}
+@keyframes breathe-opacity {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
 }
 
 .nav-link-active {
