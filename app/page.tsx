@@ -76,7 +76,37 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Real-time overview of your IT inventory" />
+      <PageHeader
+        title="Dashboard"
+        subtitle="Real-time overview of your IT inventory"
+        action={
+          lowStock.length > 0 ? (
+            <div className="w-full max-w-[20rem] marquee-track">
+              <div className="marquee-content">
+                <span className="inline-flex items-center gap-1 px-3 text-sm font-medium text-amber-800">
+                  ⚠ Low stock:
+                </span>
+                {lowStock.map((l, i) => (
+                  <span key={l.model} className="inline-flex items-center gap-1 px-3 text-sm text-amber-700">
+                    {i > 0 && <span className="text-amber-300 mx-0.5">•</span>}
+                    {l.model}: {l.available}
+                  </span>
+                ))}
+                {/* duplicate for seamless loop */}
+                <span className="inline-flex items-center gap-1 px-3 text-sm font-medium text-amber-800">
+                  ⚠ Low stock:
+                </span>
+                {lowStock.map((l, i) => (
+                  <span key={`dup-${l.model}`} className="inline-flex items-center gap-1 px-3 text-sm text-amber-700">
+                    {i > 0 && <span className="text-amber-300 mx-0.5">•</span>}
+                    {l.model}: {l.available}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : undefined
+        }
+      />
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => {
@@ -111,32 +141,6 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-
-      {lowStock.length > 0 && (
-        <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-3 marquee-track">
-          <div className="marquee-content">
-            <span className="inline-flex items-center gap-2 px-4 text-sm font-medium text-amber-800">
-              ⚠ Low stock alert:
-            </span>
-            {lowStock.map((l, i) => (
-              <span key={l.model} className="inline-flex items-center gap-1 px-6 text-sm text-amber-700">
-                {i > 0 && <span className="text-amber-300">•</span>}
-                {l.model}: only {l.available} available
-              </span>
-            ))}
-            {/* duplicate for seamless loop */}
-            <span className="inline-flex items-center gap-2 px-4 text-sm font-medium text-amber-800">
-              ⚠ Low stock alert:
-            </span>
-            {lowStock.map((l, i) => (
-              <span key={`dup-${l.model}`} className="inline-flex items-center gap-1 px-6 text-sm text-amber-700">
-                {i > 0 && <span className="text-amber-300">•</span>}
-                {l.model}: only {l.available} available
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
