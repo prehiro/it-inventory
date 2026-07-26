@@ -16,8 +16,10 @@ const I = {
     </svg>
   ),
   receive: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
-      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM15 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0z" />
+      <path d="M5 17H3V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v13h-3" />
+      <path d="M15 8h3l3 3v3h-3" />
     </svg>
   ),
   release: (
