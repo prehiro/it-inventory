@@ -55,6 +55,9 @@ export function ReleaseForm() {
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const BLOCKED_STATUSES = ["RELEASED", "PLAN_DISPOSE", "IN_REPAIR"];
+  const blockedStatus = lookup && BLOCKED_STATUSES.includes(lookup.status) ? lookup.status : null;
+
   useEffect(() => {
     if (state?.ok && lookup) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -121,12 +124,18 @@ export function ReleaseForm() {
             onChange={onSerialChange}
             required
             placeholder="Scan or type serial…"
-            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className={`${blockedStatus ? "input-glow-error" : "input-glow"} w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${
+              blockedStatus
+                ? "border-rose-400 focus:border-rose-500 dark:border-rose-500/60"
+                : "border-slate-300 focus:border-[#066fd1] dark:border-slate-700"
+            }`}
           />
           {checking && <p className="mt-1 text-xs text-slate-400">Checking…</p>}
           {lookupErr && <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">{lookupErr}</p>}
           {released ? (
             <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item released</p>
+          ) : lookup && blockedStatus ? (
+            <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">✗ {blockedStatus} — cannot be released</p>
           ) : lookup ? (
             <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item found — ready to release</p>
           ) : null}
@@ -176,7 +185,7 @@ export function ReleaseForm() {
           <input name="remarks" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
         </div>
         <button
-          disabled={pending || !lookup}
+          disabled={pending || !lookup || !!blockedStatus}
           className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
         >
           {pending ? "Saving…" : "Release Item"}
