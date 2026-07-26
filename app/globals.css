@@ -66,12 +66,10 @@ body {
 }
 
 @keyframes neon-breath {
-  0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(99,102,241,0.6)); }
-  50% { box-shadow: 0 0 14px 4px var(--neon, rgba(99,102,241,0.6)); }
+  0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(6,111,209,0.3)); }
+  50% { box-shadow: 0 0 10px 2px var(--neon, rgba(6,111,209,0.5)); }
 }
-.animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
-
-/* Color-driven breathing glow (uses --neon, no indigo fallback) */
+/* Color-driven breathing glow (uses --neon) */
 @keyframes status-breath {
   0%, 100% { box-shadow: 0 0 0 0 var(--neon); }
   50% { box-shadow: 0 0 7px 2px var(--neon); }
@@ -85,27 +83,9 @@ body {
 }
 .animate-text-glow-breath { animation: text-glow-breath 1.8s ease-in-out infinite; }
 
-/* Breathing border glow via pseudo-element opacity (GPU composited, zero repaint) */
-.breathing-wrap {
-  position: relative;
-}
-.breathing-wrap::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  box-shadow: 0 0 6px 2px rgba(6, 111, 209, 0.3);
-}
-.breathing-wrap:focus-within::after {
-  opacity: 1;
-  animation: breathe-opacity 3s ease-in-out infinite;
-}
-@keyframes breathe-opacity {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 1; }
+.animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
+.input-glow:focus {
+  animation: neon-breath 1.6s ease-in-out infinite;
 }
 
 .nav-link-active {
