@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/page-header";
 import { RecentActivity } from "./recent-activity";
 import { CategoryDonut, DepartmentBar } from "@/components/dashboard-charts";
+import { LowStockPopover } from "@/components/low-stock-popover";
 import type { Role } from "@/lib/types";
 
 const CARD_ICONS: Record<string, { path: string; tone: string }> = {
@@ -81,19 +82,7 @@ export default async function DashboardPage() {
         subtitle="Real-time overview of your IT inventory"
         action={
           lowStock.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5 items-center">
-              <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Low stock</span>
-              {lowStock.map((l) => (
-                <span key={l.model} className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:border-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-                    <path d="M12 9v4m0 4h.01" />
-                  </svg>
-                  {l.brand} {l.model}
-                  <span className="font-semibold">{l.available}</span>
-                </span>
-              ))}
-            </div>
+            <LowStockPopover items={lowStock} />
           ) : undefined
         }
       />
