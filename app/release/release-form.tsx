@@ -252,6 +252,9 @@ export function ReleaseForm() {
 
 function Row({ label, value, badge }: { label: string; value: string; badge?: boolean }) {
   const isAvail = badge && value === "AVAILABLE";
+  const isPlanDispose = badge && value === "PLAN_DISPOSE";
+  const isInRepair = badge && value === "IN_REPAIR";
+  const isReleased = badge && value === "RELEASED";
   return (
     <div className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
       <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
@@ -260,9 +263,15 @@ function Row({ label, value, badge }: { label: string; value: string; badge?: bo
           className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
             isAvail
               ? "bg-emerald-50 text-emerald-700 ring-emerald-600/30 dark:bg-emerald-500/15 dark:text-emerald-400"
-              : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
+              : isPlanDispose
+                ? "bg-rose-50 text-rose-700 ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400"
+                : isInRepair
+                  ? "bg-amber-50 text-amber-700 ring-amber-600/30 dark:bg-amber-500/15 dark:text-amber-400"
+                  : isReleased
+                    ? "bg-sky-50 text-sky-700 ring-sky-600/30 dark:bg-sky-500/15 dark:text-sky-400"
+                    : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
           }`}
-          style={isAvail ? { boxShadow: "0 0 10px 1px rgba(16,185,129,0.55)" } : undefined}
+          style={isAvail ? { boxShadow: "0 0 10px 1px rgba(16,185,129,0.55)" } : isPlanDispose ? { boxShadow: "0 0 10px 1px rgba(244,63,94,0.55)" } : undefined}
         >
           {value}
         </span>
