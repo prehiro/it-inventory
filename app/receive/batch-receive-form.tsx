@@ -156,7 +156,7 @@ export function BatchReceiveForm({
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
             style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }}
-            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
 
