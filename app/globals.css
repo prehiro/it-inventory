@@ -138,10 +138,13 @@ body {
   background: conic-gradient(from var(--angle), #066fd1, oklch(86.5% 0.127 207.078), #066fd1);
   z-index: -1;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 @keyframes spin-angle {
   to { --angle: 360deg; }
 }
 .rainbow-border:focus-within::before {
+  opacity: 1;
   animation: spin-angle 2s linear infinite;
 }
