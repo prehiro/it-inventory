@@ -54,7 +54,7 @@ export default async function DashboardPage() {
     const cat = catMap.get(g.modelId) ?? "OTHER";
     catAgg.set(cat, (catAgg.get(cat) ?? 0) + g._count._all);
   }
-  const donut = ["FA", "NCA", "OTHER"].map((c) => ({ name: c, value: catAgg.get(c) ?? 0 }));
+  const donut = ["FA", "NCA", "GENERAL"].map((c) => ({ name: c, value: catAgg.get(c) ?? 0 }));
   const bar = byDeptAgg
     .filter((d) => d.assigneeDept)
     .map((d) => ({ dept: d.assigneeDept as string, count: d._count._all }))
