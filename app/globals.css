@@ -53,17 +53,22 @@ body {
 }
 .animate-rotate-border::before {
   content: "";
-  background: conic-gradient(
-    from var(--rotate-angle),
-    #f59e0b,
-    #fbbf24,
-    #fef3c7,
-    #fbbf24,
-    #f59e0b
-  );
-  z-index: -1;
+  position: absolute;
+  inset: -2px;
   border-radius: 10px;
+  background: conic-gradient(from var(--rotate-angle), #f59e0b, #fbbf24, #fef3c7, #fbbf24, #f59e0b);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 2px;
   animation: rotate-border 2s linear infinite;
+  z-index: 0;
+}
+/* Fix z-index stacking so the pseudo sits under button text */
+.animate-rotate-border {
+  z-index: 0;
 }
 
 @keyframes fade-in {
