@@ -85,6 +85,17 @@ body {
 }
 .animate-text-glow-breath { animation: text-glow-breath 1.8s ease-in-out infinite; }
 
+/* Breathing border glow — smooth, GPU-composited */
+@keyframes breathing-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(6, 111, 209, 0.2); }
+  50% { box-shadow: 0 0 5px 1.5px rgba(6, 111, 209, 0.35); }
+}
+.animate-breathing-border:focus {
+  animation: breathing-border 3s ease-in-out infinite;
+  will-change: box-shadow;
+  backface-visibility: hidden;
+}
+
 .nav-link-active {
   background: #e0f2fe; /* sky-50 */
   color: #066fd1; /* primary */

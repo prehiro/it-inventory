@@ -120,7 +120,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
         <input name="serialNumber" required value={snValue} onChange={onSerialChange} className={`w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-1 dark:bg-slate-800 dark:text-slate-100 ${
           showSnError
             ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500 dark:border-rose-500/60"
-            : "border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-700"
+            : "border-slate-300 focus:border-[#066fd1] focus:ring-[#066fd1]/50 animate-breathing-border dark:border-slate-700"
         }`} placeholder="SN-..." />
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -139,7 +139,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
               if (el.selectionStart !== null && el.selectionStart < PO_PREFIX.length) e.preventDefault();
             }}
             placeholder="PTCAP__"
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:ring-1 focus:ring-[#066fd1]/50 animate-breathing-border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <input type="hidden" name="poNumber" value={po} />
         </div>
@@ -155,7 +155,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks</label>
-        <input name="remarks" onChange={(e) => { e.target.value = e.target.value; }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+        <input name="remarks" onChange={(e) => { e.target.value = e.target.value; }} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:ring-1 focus:ring-[#066fd1]/50 animate-breathing-border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
       </div>
       {state && !state.ok && !state.duplicateSerial && (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{state.error}</p>
