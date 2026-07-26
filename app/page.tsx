@@ -105,8 +105,8 @@ export default async function DashboardPage() {
           <DepartmentBar data={bar} />
         </div>
         <div className="lg:col-span-1">
-          <div className="lg:sticky lg:top-6">
-            <h2 className="mb-3 text-lg font-medium text-slate-900">Recent Activity</h2>
+          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 lg:sticky lg:top-6">
+            <h3 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">Recent Activity</h3>
             <RecentActivity items={recent} />
           </div>
         </div>

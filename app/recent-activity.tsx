@@ -10,12 +10,12 @@ export function RecentActivity({
     return <p className="text-sm text-slate-400">No activity yet.</p>;
 
   return (
-    <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:divide-slate-800 dark:bg-slate-900 dark:ring-slate-800">
+    <ul className="divide-y divide-slate-100 dark:divide-slate-800">
       {items.map((r) => {
         const v = auditView(r.action, r.details);
         const Icon = v.icon;
         return (
-          <li key={r.id} className="row-hover flex items-center gap-3 px-5 py-3.5">
+          <li key={r.id} className="row-hover flex items-center gap-3 px-0 py-3.5 first:pt-0 last:pb-0">
             <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>
               <Icon className="h-4 w-4" />
             </span>
