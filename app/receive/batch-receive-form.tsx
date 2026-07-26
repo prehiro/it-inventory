@@ -107,7 +107,7 @@ export function BatchReceiveForm({
             onChange={(e) => setRaw(e.target.value.toUpperCase())}
             rows={10}
             placeholder={"SN-LAP-001\nSN-LAP-002\nSN-LAP-003\netc.."}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <p className="mt-1 text-xs text-slate-400">Total {count} SN</p>
         </div>
@@ -130,7 +130,8 @@ export function BatchReceiveForm({
                 if (el.selectionStart !== null && el.selectionStart < PO_PREFIX.length) e.preventDefault();
               }}
               placeholder="PTCAP__"
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }}
+              className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
             <input type="hidden" name="poNumber" value={poNumber} />
           </div>
@@ -154,7 +155,8 @@ export function BatchReceiveForm({
           <input
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }}
+            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
 
