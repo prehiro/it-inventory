@@ -118,3 +118,20 @@ body {
   background: rgba(6, 111, 209, 0.15); /* primary/15 */
   color: #38bdf8; /* sky-400 */
 }
+
+/* Running text marquee */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-content {
+  display: inline-flex;
+  animation: marquee-scroll 25s linear infinite;
+}
+.marquee-content:hover {
+  animation-play-state: paused;
+}
