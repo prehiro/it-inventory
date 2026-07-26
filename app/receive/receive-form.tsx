@@ -117,7 +117,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
             </span>
           )}
         </div>
-        <input name="serialNumber" required value={snValue} onChange={onSerialChange} style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }} className={`input-glow w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${
+        <input name="serialNumber" required value={snValue} onChange={onSerialChange} style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }} className={`${showSnError ? "input-glow-error" : "input-glow"} w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${
           showSnError
             ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500 dark:border-rose-500/60"
             : "border-slate-300 focus:border-[#066fd1] dark:border-slate-700"

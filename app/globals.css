@@ -99,6 +99,16 @@ body {
   50% { box-shadow: 0 0 3px 1px rgba(6,111,209,0.5); }
 }
 
+/* Red breathing glow for duplicate/error serial */
+.input-glow-error:focus {
+  animation: input-breath-error 1.6s ease-in-out infinite;
+  will-change: box-shadow;
+}
+@keyframes input-breath-error {
+  0%, 100% { box-shadow: 0 0 3px 1px rgba(244,63,94,0.2); }
+  50% { box-shadow: 0 0 3px 1px rgba(244,63,94,0.5); }
+}
+
 .nav-link-active {
   background: #e0f2fe; /* sky-50 */
   color: #066fd1; /* primary */
