@@ -63,7 +63,7 @@ export default async function DashboardPage() {
 
   const lowStock = lowStockRaw
     .filter((m) => m._count.items <= 2)
-    .map((m) => ({ model: m.model, available: m._count.items }));
+    .map((m) => ({ model: m.model, brand: m.brand, available: m._count.items }));
 
   const cards = [
     { label: "Total Items", value: total, tone: "text-slate-900" },
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
                     <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                     <path d="M12 9v4m0 4h.01" />
                   </svg>
-                  {l.model}
+                  {l.brand} {l.model}
                   <span className="font-semibold">{l.available}</span>
                 </span>
               ))}
