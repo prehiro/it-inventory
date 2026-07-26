@@ -87,7 +87,7 @@ export function BatchReceiveForm({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
       {/* LEFT: input form */}
-      <div className="max-w-lg space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <div className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Item Type / Model

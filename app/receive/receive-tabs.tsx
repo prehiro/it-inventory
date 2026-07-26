@@ -33,13 +33,13 @@ export function ReceiveTabs({
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`relative z-10 flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`relative z-10 flex flex-1 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${
               tab === t.id
                 ? "text-white"
                 : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
             }`}
           >
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center justify-center gap-1.5">
               {t.icon === "cube" ? (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />

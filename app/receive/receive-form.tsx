@@ -79,7 +79,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
   return (
     <form
       action={formAction}
-      className={`max-w-lg space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 transition dark:bg-slate-900 ${
+      className={`space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 transition dark:bg-slate-900 ${
         showSnError
           ? "border border-rose-400 ring-rose-400/40 dark:border-rose-500/60 dark:ring-rose-500/30"
           : "ring-slate-200 dark:ring-slate-800"
