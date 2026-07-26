@@ -118,3 +118,19 @@ body {
   background: rgba(6, 111, 209, 0.15); /* primary/15 */
   color: #38bdf8; /* sky-400 */
 }
+
+/* Rainbow border for search input */
+.input-rainbow:focus {
+  animation: rainbow-border 2s linear infinite;
+  outline: none;
+}
+@keyframes rainbow-border {
+  0% { border-color: #ff6b6b; box-shadow: 0 0 0 1px #ff6b6b; }
+  14% { border-color: #ffa502; box-shadow: 0 0 0 1px #ffa502; }
+  28% { border-color: #ffd93d; box-shadow: 0 0 0 1px #ffd93d; }
+  42% { border-color: #6bcf7f; box-shadow: 0 0 0 1px #6bcf7f; }
+  57% { border-color: #4dabf7; box-shadow: 0 0 0 1px #4dabf7; }
+  71% { border-color: #7c6bf7; box-shadow: 0 0 0 1px #7c6bf7; }
+  85% { border-color: #e06bf7; box-shadow: 0 0 0 1px #e06bf7; }
+  100% { border-color: #ff6b6b; box-shadow: 0 0 0 1px #ff6b6b; }
+}
