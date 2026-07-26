@@ -201,20 +201,31 @@ export function ReleaseForm() {
           <div>
             <div className="mb-1.5 flex items-center gap-3">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Serial Number</label>
-              <button
-                type="button"
-                onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
-                className={`relative flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition before:pointer-events-none before:absolute before:-inset-[2px] before:rounded-[10px] before:opacity-0 before:transition-opacity before:duration-300 ${
-                  batchMode
-                    ? "border-amber-400 bg-amber-50 text-amber-700 before:animate-rotate-border before:opacity-100 dark:border-amber-500/50 dark:bg-amber-500/15 dark:text-amber-300"
-                    : "border-slate-200 bg-white text-slate-500 before:opacity-0 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
-                }`}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-                Batch SN
-              </button>
+              {batchMode ? (
+                <button
+                  type="button"
+                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
+                  className="animate-rotate-border items-center gap-1 rounded-lg p-[1.5px]"
+                >
+                  <span className="flex items-center gap-1 rounded-[7px] bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Batch SN
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
+                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                  Batch SN
+                </button>
+              )}
             </div>
 
             {batchMode ? (
