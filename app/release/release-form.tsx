@@ -2,7 +2,6 @@
 
 import { useActionState, useEffect, useState, useRef } from "react";
 import { releaseAction, type ActionResult } from "@/app/actions/inventory";
-import { Toast } from "@/components/toast";
 import { SectionCombobox } from "@/components/section-combobox";
 import { HOSTNAME_TYPES } from "@/lib/types";
 
@@ -36,7 +35,6 @@ export function ReleaseForm() {
     async (_prev, formData) => releaseAction(Object.fromEntries(formData.entries())),
     null,
   );
-  const [toast, setToast] = useState<string | null>(null);
   const [serial, setSerial] = useState("");
   const [lookup, setLookup] = useState<Lookup | null>(null);
   const [lookupErr, setLookupErr] = useState<string | null>(null);
@@ -69,7 +67,6 @@ export function ReleaseForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
       formRef.current?.reset();
-      setToast("Item released");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -179,7 +176,6 @@ export function ReleaseForm() {
         {state && !state.ok && (
           <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{state.error}</p>
         )}
-        {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       </div>
 
       {/* RIGHT: preview */}
