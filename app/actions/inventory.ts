@@ -7,6 +7,7 @@ import {
   releaseItem,
   returnItem,
   receiveBatch,
+  releaseBatch,
   isDuplicateSerialError,
   type BatchResult,
 } from "@/lib/inventory";
@@ -15,6 +16,7 @@ import {
   releaseSchema,
   returnSchema,
   batchReceiveSchema,
+  batchReleaseSchema,
 } from "@/lib/validation";
 
 export type ActionResult = { ok: true; releasedAt?: string; txnAt?: string } | { ok: false; error: string; duplicateSerial?: boolean };
@@ -64,6 +66,33 @@ export async function releaseAction(
     revalidatePath("/release");
     revalidatePath("/pc-ledger");
     return { ok: true, releasedAt: result.date.toISOString() };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+export async function releaseBatchAction(
+  data: Record<string, unknown>,
+): Promise<BatchActionResult> {
+  const session = await auth();
+  if (!session?.user) return { ok: false, error: "Unauthorized" };
+
+  const parsed = batchReleaseSchema.safeParse(data);
+  if (!parsed.success)
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+
+  try {
+    const serials = parsed.data.serials.map((s) => s.trim()).filter(Boolean);
+    if (serials.length === 0) return { ok: false, error: "No serials provided" };
+    const results = await releaseBatch(
+      { ...parsed.data, serials },
+      session.user.id,
+    );
+    revalidatePath("/");
+    revalidatePath("/reports");
+    revalidatePath("/release");
+    revalidatePath("/pc-ledger");
+    return { ok: true, results };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };
   }

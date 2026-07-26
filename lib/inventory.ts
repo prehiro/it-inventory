@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
-import type { ReceiveInput, ReleaseInput, ReturnInput } from "@/lib/validation";
+import type { ReceiveInput, ReleaseInput, ReturnInput, BatchReleaseInput } from "@/lib/validation";
 import { HOSTNAME_TYPES, type ItemType } from "@/lib/types";
 
 /** Friendly error message for a batch receive failure (no raw Prisma stack). */
@@ -151,6 +151,49 @@ export async function releaseItem(input: ReleaseInput, operatorId: string) {
 
     return txn;
   });
+}
+
+/** Describe a release failure for batch UI (no raw Prisma/stack). */
+function describeReleaseError(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  return "Failed to release";
+}
+
+export async function releaseBatch(
+  input: BatchReleaseInput,
+  operatorId: string,
+): Promise<BatchResult[]> {
+  const results: BatchResult[] = [];
+  for (const serial of input.serials) {
+    try {
+      // Look up item
+      const item = await prisma.item.findFirst({
+        where: { serialNumber: serial, isDeleted: false },
+        include: { model: true },
+      });
+      if (!item) { results.push({ serial, ok: false, error: "Serial not found" }); continue; }
+      if (item.status !== "AVAILABLE" && item.status !== "RETURNED_KEEP") {
+        results.push({ serial, ok: false, error: `Item is ${item.status}` }); continue;
+      }
+      await releaseItem(
+        {
+          itemId: item.id,
+          assigneeEmpNumber: input.assigneeEmpNumber,
+          assigneeName: input.assigneeName,
+          assigneeDept: input.assigneeDept,
+          gid: input.gid,
+          email: input.email,
+          hostname: input.hostname,
+          remarks: input.remarks,
+        },
+        operatorId,
+      );
+      results.push({ serial, ok: true });
+    } catch (e) {
+      results.push({ serial, ok: false, error: describeReleaseError(e) });
+    }
+  }
+  return results;
 }
 
 export async function returnItem(input: ReturnInput, operatorId: string) {

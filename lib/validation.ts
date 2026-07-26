@@ -43,7 +43,18 @@ export const releaseSchema = z.object({
 });
 export type ReleaseInput = z.infer<typeof releaseSchema>;
 
-// Return (item comes back)
+// Batch Release (multiple serials, shared assignee)
+export const batchReleaseSchema = z.object({
+  serials: z.array(z.string().min(1).max(200)),
+  assigneeEmpNumber: z.string().min(1).max(50),
+  assigneeName: z.string().min(1).max(200),
+  assigneeDept: z.string().max(200).optional().or(z.literal("")),
+  gid: z.string().min(1, "GID required").max(100),
+  email: z.string().email("Invalid email").max(200),
+  hostname: z.string().max(200).optional().or(z.literal("")),
+  remarks: z.string().max(500).optional().or(z.literal("")),
+});
+export type BatchReleaseInput = z.infer<typeof batchReleaseSchema>;
 export const returnSchema = z.object({
   itemId: z.string().uuid("Invalid item"),
   disposition: z.enum(["KEEP", "REPAIR", "DISPOSE"]),
