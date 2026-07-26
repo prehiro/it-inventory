@@ -69,6 +69,8 @@ export function ReleaseForm() {
   const [batchResults, setBatchResults] = useState<BatchActionResult | null>(null);
   const [batchRunId, setBatchRunId] = useState(0);
   const [toast, setToast] = useState<{ ok: number; fail: number } | null>(null);
+  const [singleToast, setSingleToast] = useState(false);
+  const [remarksBatch, setRemarksBatch] = useState("");
   const batchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Batch: debounced lookup for each serial
@@ -115,6 +117,8 @@ export function ReleaseForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
       formRef.current?.reset();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSingleToast(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -172,6 +176,7 @@ export function ReleaseForm() {
         gid: "",
         email: "",
         hostname: "N/A",
+        remarks: remarksBatch,
       });
       setBatchResults(res);
       setBatchRunId((n) => n + 1);
@@ -188,6 +193,36 @@ export function ReleaseForm() {
 
   return (
     <>
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
+      {batchMode && (
+        <div aria-hidden className="snow-particle" />
+      )}
       <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* LEFT: inputs */}
         <div className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
@@ -201,14 +236,14 @@ export function ReleaseForm() {
                 onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
                 className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition ${
                   batchMode
-                    ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500/50 dark:bg-indigo-500/15 dark:text-indigo-300"
+                    ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-500/50 dark:bg-amber-500/15 dark:text-amber-300"
                     : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
                 }`}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
-                Batch
+                Batch SN
               </button>
             </div>
 
@@ -336,6 +371,10 @@ export function ReleaseForm() {
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
                 <SectionCombobox name="" value={dept} onChange={setDept} />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks <span className="font-normal text-slate-400">(optional)</span></label>
+                <input value={remarksBatch} onChange={(e) => setRemarksBatch(e.target.value)} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
               </div>
               <button
                 type="button"
@@ -480,6 +519,39 @@ export function ReleaseForm() {
                     setBatchWarnings([]);
                     setBatchResults(null);
                   }}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
+                >
+                  Selesai
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUCCESS MODAL (single) */}
+      {singleToast && (
+        <div
+          onClick={() => setSingleToast(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-sm animate-fade-in rounded-2xl bg-white p-6 text-center shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
+          >
+            <div className="animate-fade-in">
+              <div className="mx-auto mb-4 flex h-14 w-14 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-7 w-7" strokeLinecap="round" strokeLinejoin="round">
+                  <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Item released</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Item has been released successfully</p>
+              <div className="mt-5 flex justify-center">
+                <button
+                  onClick={() => setSingleToast(false)}
                   className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
                 >
                   Selesai
