@@ -140,7 +140,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
             }}
             placeholder="PTCAP__"
             style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }}
-            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <input type="hidden" name="poNumber" value={po} />
         </div>
@@ -156,7 +156,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks</label>
-        <input name="remarks" onChange={(e) => { e.target.value = e.target.value; }} style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+        <input name="remarks" onChange={(e) => { e.target.value = e.target.value; }} style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:border-2 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
       </div>
       {state && !state.ok && !state.duplicateSerial && (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{state.error}</p>

@@ -67,7 +67,7 @@ body {
 
 @keyframes neon-breath {
   0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(6,111,209,0.3)); }
-  50% { box-shadow: 0 0 10px 2px var(--neon, rgba(6,111,209,0.5)); }
+  50% { box-shadow: 0 0 5px 1px var(--neon, rgba(6,111,209,0.45)); }
 }
 /* Color-driven breathing glow (uses --neon) */
 @keyframes status-breath {
