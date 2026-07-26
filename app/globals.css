@@ -42,32 +42,29 @@ body {
   animation: check-draw 0.7s ease-out 0.35s forwards;
 }
 
-/* Snow particle effect */
-@keyframes snow-fall {
-  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+/* Rotating gradient border for Batch SN toggle */
+@property --rotate-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
-.snow-particle {
-  position: fixed;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.7);
-  pointer-events: none;
-  animation: snow-fall linear infinite;
+@keyframes rotate-border {
+  to { --rotate-angle: 360deg; }
 }
-.snow-particle:nth-child(1)  { left: 10%; animation-duration: 8s; animation-delay: 0s; width: 3px; height: 3px; }
-.snow-particle:nth-child(2)  { left: 20%; animation-duration: 11s; animation-delay: 1s; width: 5px; height: 5px; }
-.snow-particle:nth-child(3)  { left: 30%; animation-duration: 9s; animation-delay: 2s; width: 3px; height: 3px; }
-.snow-particle:nth-child(4)  { left: 40%; animation-duration: 13s; animation-delay: 0.5s; width: 4px; height: 4px; }
-.snow-particle:nth-child(5)  { left: 50%; animation-duration: 10s; animation-delay: 3s; width: 3px; height: 3px; }
-.snow-particle:nth-child(6)  { left: 60%; animation-duration: 12s; animation-delay: 1.5s; width: 5px; height: 5px; }
-.snow-particle:nth-child(7)  { left: 70%; animation-duration: 8.5s; animation-delay: 2.5s; width: 3px; height: 3px; }
-.snow-particle:nth-child(8)  { left: 80%; animation-duration: 14s; animation-delay: 0.8s; width: 4px; height: 4px; }
-.snow-particle:nth-child(9)  { left: 90%; animation-duration: 9.5s; animation-delay: 1.8s; width: 3px; height: 3px; }
-.snow-particle:nth-child(10) { left: 95%; animation-duration: 11.5s; animation-delay: 3.5s; width: 4px; height: 4px; }
+.animate-rotate-border::before {
+  content: "";
+  background: conic-gradient(
+    from var(--rotate-angle),
+    #f59e0b,
+    #fbbf24,
+    #fef3c7,
+    #fbbf24,
+    #f59e0b
+  );
+  z-index: -1;
+  border-radius: 10px;
+  animation: rotate-border 2s linear infinite;
+}
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px) scale(0.99); }

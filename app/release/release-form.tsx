@@ -193,36 +193,6 @@ export function ReleaseForm() {
 
   return (
     <>
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
-      {batchMode && (
-        <div aria-hidden className="snow-particle" />
-      )}
       <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* LEFT: inputs */}
         <div className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
@@ -234,10 +204,10 @@ export function ReleaseForm() {
               <button
                 type="button"
                 onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
-                className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition ${
+                className={`relative flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition before:pointer-events-none before:absolute before:-inset-[2px] before:rounded-[10px] before:opacity-0 before:transition-opacity before:duration-300 ${
                   batchMode
-                    ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-500/50 dark:bg-amber-500/15 dark:text-amber-300"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
+                    ? "border-amber-400 bg-amber-50 text-amber-700 before:animate-rotate-border before:opacity-100 dark:border-amber-500/50 dark:bg-amber-500/15 dark:text-amber-300"
+                    : "border-slate-200 bg-white text-slate-500 before:opacity-0 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
                 }`}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
