@@ -4,7 +4,16 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#4f46e5", "#0ea5e9", "#f59e0b", "#10b981", "#f43f5e"];
+const CATEGORY_COLORS: Record<string, string> = {
+  FA: "#10b981",
+  NCA: "#f59e0b",
+  GENERAL: "#8b5cf6",
+};
+const DONUT_COLORS = ["#10b981", "#f59e0b", "#8b5cf6", "#4f46e5", "#f43f5e"];
+
+function getColor(name: string, i: number): string {
+  return CATEGORY_COLORS[name] ?? DONUT_COLORS[i % DONUT_COLORS.length];
+}
 
 export function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
@@ -17,8 +26,8 @@ export function CategoryDonut({ data }: { data: { name: string; value: number }[
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
             <Pie data={data} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={2}>
-              {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              {data.map((d, i) => (
+                <Cell key={i} fill={getColor(d.name, i)} />
               ))}
             </Pie>
             <Tooltip />
@@ -28,7 +37,7 @@ export function CategoryDonut({ data }: { data: { name: string; value: number }[
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
         {data.map((d, i) => (
           <span key={d.name} className="flex items-center gap-1.5 text-xs text-slate-500">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: getColor(d.name, i) }} />
             {d.name} ({d.value})
           </span>
         ))}
