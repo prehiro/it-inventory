@@ -38,7 +38,7 @@ export function TopbarLowStock() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Low stock items"
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg text-amber-500 transition hover:bg-amber-50 dark:hover:bg-amber-500/10"
+        className="relative flex h-9 w-9 items-center justify-center rounded-lg text-amber-500 transition hover:bg-amber-50 dark:hover:bg-amber-500/10 icon-shake"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
           <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
