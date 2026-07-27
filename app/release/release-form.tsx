@@ -78,6 +78,7 @@ export function ReleaseForm() {
     results: BatchLookup[];
     outcomes: { serial: string; ok: boolean; error?: string }[];
     assignee: string;
+    dupCount: number;
   } | null>(null);
   const batchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -172,13 +173,22 @@ export function ReleaseForm() {
     const list = batchSerials.split("\n").map((s) => s.trim()).filter(Boolean);
     if (list.length === 0) return;
 
+    // Deduplicate
+    const seen = new Set<string>();
+    const uniq: string[] = [];
+    for (const s of list) {
+      if (!seen.has(s)) { seen.add(s); uniq.push(s); }
+    }
+    const dupCount = list.length - uniq.length;
+    if (uniq.length === 0) return;
+
     setBatchPending(true);
     setBatchResults(null);
     setToast(null);
     setBatchErr(null);
     try {
       const res = await releaseBatchAction({
-        serials: list,
+        serials: uniq,
         assigneeEmpNumber: empNumber,
         assigneeName,
         assigneeDept: dept,
@@ -194,6 +204,7 @@ export function ReleaseForm() {
           results: batchLookups,
           outcomes: res.results,
           assignee: assigneeName || empNumber,
+          dupCount,
         });
         setBatchSerials("");
         setBatchLookups([]);
@@ -475,6 +486,9 @@ export function ReleaseForm() {
                           <span className="font-medium text-emerald-600 dark:text-emerald-400">✅ {ok} released</span>
                           {fail > 0 && (
                             <span className="ml-2 font-medium text-rose-500">❌ {fail} failed</span>
+                          )}
+                          {batchCompleted.dupCount > 0 && (
+                            <span className="ml-2 text-slate-400">({batchCompleted.dupCount} duplicate SN removed)</span>
                           )}
                         </span>
                       </div>
