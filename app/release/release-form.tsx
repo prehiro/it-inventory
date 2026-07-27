@@ -423,7 +423,7 @@ export function ReleaseForm() {
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
-          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="overflow-y-auto pr-1 scrollbar-thin">
+          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="overflow-y-auto min-h-0 pr-1 scrollbar-thin">
             {batchMode && batchCompleted ? (
               <div className="space-y-1.5">
                 {/* Timeline receipt header */}
