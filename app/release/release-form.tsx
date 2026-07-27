@@ -418,13 +418,13 @@ export function ReleaseForm() {
         </div>
 
         {/* RIGHT: preview / results */}
-        <div className="rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <h3 className="mb-4 shrink-0 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
-          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="animate-panel-in">
+          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="min-h-0 flex-1 animate-panel-in">
             {batchMode && batchCompleted ? (
-              <div className="max-h-[22rem] space-y-1.5 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="max-h-full space-y-1.5 overflow-y-auto pr-1 scrollbar-thin">
                 {/* Timeline receipt header */}
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
@@ -497,7 +497,7 @@ export function ReleaseForm() {
                 })()}
               </div>
             ) : batchMode && batchLookups.length > 0 ? (
-              <div className="max-h-[22rem] space-y-1.5 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="max-h-full space-y-1.5 overflow-y-auto pr-1 scrollbar-thin">
                 {/* Summary badge */}
                 <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
                   <span>Total {batchLookups.length}</span>
