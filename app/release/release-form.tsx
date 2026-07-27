@@ -277,59 +277,71 @@ export function ReleaseForm() {
               )}
             </div>
 
-            {batchMode ? (
-              <>
-                <textarea
-                  value={batchSerials}
-                  onChange={(e) => setBatchSerials(e.target.value.toUpperCase())}
-                  rows={5}
-                  placeholder={"SN-001\nSN-002\nSN-003"}
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                />
-                <p className="mt-1 text-xs text-slate-400">Total {batchCount} SN</p>
-                {hasWarnings && (
-                  <div className="mt-1 space-y-0.5">
-                    {batchWarnings.map((w, i) => (
-                      <p key={i} className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5 shrink-0" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 9v4M12 17h.01" />
-                          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                        </svg>
-                        {w}
-                      </p>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <input
-                  name="serialNumber"
-                  value={serial}
-                  onChange={onSerialChange}
-                  required
-                  placeholder="Scan or type serial…"
-                  className={`${blockedStatus ? "input-glow-error" : "input-glow"} w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${blockedStatus
-                    ? "border-rose-400 focus:border-rose-500 dark:border-rose-500/60"
-                    : "border-slate-300 focus:border-[#066fd1] dark:border-slate-700"
-                    }`}
-                />
-                {checking && <p className="mt-1 text-xs text-slate-400">Checking…</p>}
-                {lookupErr && <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">{lookupErr}</p>}
-                {released ? (
-                  <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item released</p>
-                ) : lookup && blockedStatus ? (
-                  <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">✗ {blockedStatus} — cannot be released</p>
-                ) : lookup ? (
-                  <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item found — ready to release</p>
-                ) : null}
-              </>
-            )}
+          {/* INPUT AREA */}
+          <div className="overflow-hidden">
+            <div className={`transition-all duration-300 ease-out ${
+              batchMode
+                ? "max-h-[400px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}>
+              <textarea
+                value={batchSerials}
+                onChange={(e) => setBatchSerials(e.target.value.toUpperCase())}
+                rows={5}
+                placeholder={"SN-001\nSN-002\nSN-003"}
+                className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              />
+              <p className="mt-1 text-xs text-slate-400">Total {batchCount} SN</p>
+              {hasWarnings && (
+                <div className="mt-1 space-y-0.5">
+                  {batchWarnings.map((w, i) => (
+                    <p key={i} className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5 shrink-0" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 9v4M12 17h.01" />
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                      </svg>
+                      {w}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className={`transition-all duration-300 ease-out ${
+              !batchMode
+                ? "max-h-[200px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}>
+              <input
+                name="serialNumber"
+                value={serial}
+                onChange={onSerialChange}
+                required
+                placeholder="Scan or type serial…"
+                className={`${blockedStatus ? "input-glow-error" : "input-glow"} w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${blockedStatus
+                  ? "border-rose-400 focus:border-rose-500 dark:border-rose-500/60"
+                  : "border-slate-300 focus:border-[#066fd1] dark:border-slate-700"
+                  }`}
+              />
+              {checking && <p className="mt-1 text-xs text-slate-400">Checking…</p>}
+              {lookupErr && <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">{lookupErr}</p>}
+              {released ? (
+                <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item released</p>
+              ) : lookup && blockedStatus ? (
+                <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">✗ {blockedStatus} — cannot be released</p>
+              ) : lookup ? (
+                <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ Item found — ready to release</p>
+              ) : null}
+            </div>
           </div>
 
-          {!batchMode && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
+          {/* ASSIGNEE FIELDS */}
+          <div className="overflow-hidden">
+            <div className={`transition-all duration-300 ease-out ${
+              !batchMode
+                ? "max-h-[500px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}>
+              <div className="mt-4 grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Emp #</label>
                   <input name="assigneeEmpNumber" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); setEmpNumber(e.target.value.toUpperCase()); }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
@@ -377,17 +389,15 @@ export function ReleaseForm() {
                 disabled={pending || !lookup || !!blockedStatus}
                 className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
               >
-                {pending ? "Saving…" : "Release Item"}
+                {pending ? "Releasing…" : "Release Item"}
               </button>
-              {state && !state.ok && (
-                <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{state.error}</p>
-              )}
-            </>
-          )}
-
-          {batchMode && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
+            </div>
+            <div className={`transition-all duration-300 ease-out ${
+              batchMode
+                ? "max-h-[500px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}>
+              <div className="mt-4 grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Emp #</label>
                   <input value={empNumber} onChange={(e) => setEmpNumber(e.target.value.toUpperCase())} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
@@ -431,8 +441,9 @@ export function ReleaseForm() {
               {batchErr && (
                 <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{batchErr}</p>
               )}
-            </>
-          )}
+            </div>
+          </div>
+        </div>
         </div>
 
         {/* RIGHT: preview / results */}
