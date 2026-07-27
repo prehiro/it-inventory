@@ -441,40 +441,6 @@ export function ReleaseForm() {
                     <p className="text-xs text-slate-400 dark:text-slate-500">Assignee: {batchCompleted.assignee}</p>
                   </div>
                 </div>
-                {/* Duplicate serials notice */}
-                {batchCompleted.dupSerials.length > 0 && (
-                  <div className="animate-fade-in rounded-xl border border-amber-200/70 bg-amber-50/60 px-4 py-3 dark:border-amber-500/25 dark:bg-amber-500/10">
-                    <div className="flex items-start gap-2.5">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                          {batchCompleted.dupSerials.length} duplicate serial{batchCompleted.dupSerials.length !== 1 ? "s" : ""} removed
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {batchCompleted.dupSerials.slice(0, 8).map((s, i) => (
-                            <span
-                              key={i}
-                              className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 font-mono text-[11px] leading-4 text-amber-700 line-through decoration-amber-400/70 dark:bg-amber-500/20 dark:text-amber-300 dark:decoration-amber-400/40"
-                              style={{ animationDelay: `${i * 60}ms`, animationFillMode: "both" }}
-                            >
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-2.5 w-2.5 shrink-0 text-amber-400" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M18 6L6 18M6 6l12 12" />
-                              </svg>
-                              {s}
-                            </span>
-                          ))}
-                          {batchCompleted.dupSerials.length > 8 && (
-                            <span className="inline-flex items-center rounded-md bg-amber-100/60 px-2 py-0.5 text-[11px] leading-4 text-amber-500 dark:bg-amber-500/10 dark:text-amber-400">
-                              +{batchCompleted.dupSerials.length - 8} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 {/* Timeline items */}
                 {(() => {
                   const ok = batchCompleted.outcomes.filter((r) => r.ok).length;
@@ -519,16 +485,37 @@ export function ReleaseForm() {
                         );
                       })}
                       {/* Footer */}
-                      <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
-                        <span className="text-slate-400 dark:text-slate-500">
+                      <div className="mt-4 border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
+                        <div className="mb-2 flex items-center gap-2 text-slate-400 dark:text-slate-500">
                           <span className="font-medium text-emerald-600 dark:text-emerald-400">✅ {ok} released</span>
                           {fail > 0 && (
-                            <span className="ml-2 font-medium text-rose-500">❌ {fail} failed</span>
+                            <span className="font-medium text-rose-500">❌ {fail} failed</span>
                           )}
                           {batchCompleted.dupSerials.length > 0 && (
-                            <span className="ml-2 text-slate-400">{batchCompleted.dupSerials.length} duplicate SN removed</span>
+                            <span className="font-medium text-amber-500">⚠ {batchCompleted.dupSerials.length} duplicate{batchCompleted.dupSerials.length !== 1 ? "s" : ""}</span>
                           )}
-                        </span>
+                        </div>
+                        {batchCompleted.dupSerials.length > 0 && (
+                          <div className="mt-1 flex flex-wrap gap-1.5">
+                            {batchCompleted.dupSerials.slice(0, 12).map((s, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex animate-fade-in items-center gap-1 rounded-md bg-amber-50 px-2 py-[3px] font-mono text-[11px] leading-4 text-amber-600 ring-1 ring-amber-200/60 line-through decoration-amber-400/60 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20 dark:decoration-amber-400/30"
+                                style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-2.5 w-2.5 shrink-0 text-amber-400" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M18 6L6 18M6 6l12 12" />
+                                </svg>
+                                {s}
+                              </span>
+                            ))}
+                            {batchCompleted.dupSerials.length > 12 && (
+                              <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-[3px] text-[11px] leading-4 text-amber-400 ring-1 ring-amber-200/40 dark:bg-amber-500/5 dark:text-amber-400 dark:ring-amber-500/15">
+                                +{batchCompleted.dupSerials.length - 12} more
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </>
                   );
