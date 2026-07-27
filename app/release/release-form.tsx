@@ -403,43 +403,79 @@ export function ReleaseForm() {
           </h3>
           <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="animate-panel-in">
             {batchMode && batchLookups.length > 0 ? (
-              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-                {batchLookups.map((bl, i) => (
-                  <li key={i} className="flex animate-fade-in items-center justify-between gap-3 py-2.5 text-sm" style={{ animationDelay: `${Math.min(i, 10) * 40}ms`, animationFillMode: "both" }}>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-mono text-xs text-slate-700 dark:text-slate-300">{bl.serial}</p>
-                      {bl.item ? (
-                        <p className="truncate text-xs text-slate-400">
-                          {bl.item.type} · {bl.item.brand} · {bl.item.model}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-rose-400">{bl.error}</p>
-                      )}
-                    </div>
-                    <div>
-                      {bl.item ? (
-                        <span
-                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                            bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP"
-                              ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400"
-                              : "bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400"
-                          }`}
-                        >
-                          {(bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP") ? (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M5 13l4 4L19 7" />
-                            </svg>
-                          ) : (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M6 6l12 12M18 6 6 18" />
-                            </svg>
-                          )}
+              <div className="space-y-1.5">
+                {/* Summary badge */}
+                <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                  <span>Total {batchLookups.length}</span>
+                  <span className="text-slate-300 dark:text-slate-600">·</span>
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+                    {batchLookups.filter(bl => bl.item && (bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP")).length} ready
+                  </span>
+                  {(() => {
+                    const blocked = batchLookups.filter(bl => !bl.item || (bl.item.status !== "AVAILABLE" && bl.item.status !== "RETURNED_KEEP")).length;
+                    return blocked > 0 ? (
+                      <>
+                        <span className="text-slate-300 dark:text-slate-600">·</span>
+                        <span className="flex items-center gap-1 text-rose-500 dark:text-rose-400">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                          {blocked} blocked
                         </span>
-                      ) : null}
+                      </>
+                    ) : null;
+                  })()}
+                </div>
+                {batchLookups.map((bl, i) => (
+                  <div
+                    key={i}
+                    className={`animate-fade-in rounded-xl border-l-4 px-4 py-3 text-sm transition ${
+                      !bl.item
+                        ? "border-l-rose-400 bg-rose-50/40 dark:border-l-rose-500/60 dark:bg-rose-500/5"
+                        : bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP"
+                          ? "border-l-emerald-400 bg-emerald-50/40 dark:border-l-emerald-500/60 dark:bg-emerald-500/5"
+                          : "border-l-rose-400 bg-rose-50/40 dark:border-l-rose-500/60 dark:bg-rose-500/5"
+                    }`}
+                    style={{ animationDelay: `${Math.min(i, 15) * 45}ms`, animationFillMode: "both" }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{bl.serial}</p>
+                        {bl.item ? (
+                          <>
+                            <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                              {bl.item.type} · {bl.item.brand} · {bl.item.model}
+                            </p>
+                            {bl.item.location && (
+                              <p className="mt-0.5 truncate text-[11px] text-slate-400 dark:text-slate-500">
+                                📍 {bl.item.location}
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="mt-0.5 text-xs text-rose-500">{bl.error}</p>
+                        )}
+                      </div>
+                      <div className="shrink-0 pt-0.5">
+                        {bl.item ? (
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${
+                              bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP"
+                                ? "bg-emerald-50 text-emerald-700 ring-emerald-600/30 dark:bg-emerald-500/15 dark:text-emerald-400"
+                                : "bg-rose-50 text-rose-700 ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400"
+                            }`}
+                          >
+                            {bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP" ? "Ready" : bl.item.status}
+                          </span>
+                        ) : (
+                          <span className="inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-600 ring-1 ring-inset ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400">
+                            Not found
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : batchMode && batchCount > 0 && batchLookups.length === 0 ? (
               <p className="text-sm text-slate-400 animate-pulse">Looking up items…</p>
             ) : released && releasedItem ? (
