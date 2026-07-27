@@ -12,8 +12,12 @@ export async function GET(req: NextRequest) {
 
   const item = await prisma.item.findFirst({
     where: { serialNumber: serial, isDeleted: false },
-    select: { id: true },
+    select: { id: true, status: true, poNumber: true, location: true },
   });
 
-  return NextResponse.json({ exists: !!item });
+  return NextResponse.json({
+    exists: !!item,
+    status: item?.status ?? null,
+    item: item ? { id: item.id } : null,
+  });
 }

@@ -196,6 +196,47 @@ export async function releaseBatch(
   return results;
 }
 
+/** Restore an IN_REPAIR item back to AVAILABLE after repair is done.
+ * Keeps the original PO number and Location (IT Store) — no overwrite.
+ * Creates a RESTORE txn and audit log.
+ */
+export async function restoreFromRepair(itemId: string, operatorId: string) {
+  return prisma.$transaction(async (tx) => {
+    const item = await tx.item.findUnique({ where: { id: itemId } });
+    if (!item || item.isDeleted) throw new Error("Item not found");
+    if (item.status !== "IN_REPAIR")
+      throw new Error(`Item is ${item.status}, cannot restore from repair`);
+
+    await tx.item.update({
+      where: { id: item.id },
+      data: { status: "AVAILABLE" },
+    });
+
+    await tx.itemTxn.create({
+      data: {
+        type: "RECEIVE",
+        itemId: item.id,
+        operatorId,
+        statusAfter: "AVAILABLE",
+        remarks: "Repair completed — restored to available",
+      },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        action: "RECEIVED_ITEM",
+        details: JSON.stringify({
+          serialNumber: item.serialNumber,
+          note: "Restored from repair to available",
+        }),
+        userId: operatorId,
+      },
+    });
+
+    return item;
+  });
+}
+
 export async function returnItem(input: ReturnInput, operatorId: string) {
   return prisma.$transaction(async (tx) => {
     const item = await tx.item.findUnique({ where: { id: input.itemId } });

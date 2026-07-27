@@ -8,6 +8,7 @@ import {
   returnItem,
   receiveBatch,
   releaseBatch,
+  restoreFromRepair,
   isDuplicateSerialError,
   type BatchResult,
 } from "@/lib/inventory";
@@ -20,6 +21,7 @@ import {
 } from "@/lib/validation";
 
 export type ActionResult = { ok: true; releasedAt?: string; txnAt?: string } | { ok: false; error: string; duplicateSerial?: boolean };
+export type RepairRestoreResult = { ok: true } | { ok: false; error: string };
 export type BatchActionResult =
   | { ok: true; results: BatchResult[] }
   | { ok: false; error: string };
@@ -150,6 +152,20 @@ export async function receiveBatchAction(
     revalidatePath("/");
     revalidatePath("/reports");
     return { ok: true, results };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Failed" };
+  }
+}
+
+export async function repairRestoreAction(data: { itemId: string }): Promise<RepairRestoreResult> {
+  const session = await auth();
+  if (!session?.user) return { ok: false, error: "Unauthorized" };
+
+  try {
+    await restoreFromRepair(data.itemId, session.user.id);
+    revalidatePath("/");
+    revalidatePath("/reports");
+    return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };
   }
