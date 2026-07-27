@@ -126,6 +126,12 @@ export function ReleaseForm() {
       setLookup(null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEmpNumber("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAssigneeName("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDept("");
       formRef.current?.reset();
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSingleToast(true);
@@ -212,6 +218,12 @@ export function ReleaseForm() {
         setBatchSerials("");
         setBatchLookups([]);
         setBatchWarnings([]);
+        setEmpNumber("");
+        setAssigneeName("");
+        setDept("");
+        setRemarksBatch("");
+        setBatchGid("");
+        setBatchEmail("");
         setToast({ ok: res.results.filter((r) => r.ok).length, fail: res.results.filter((r) => !r.ok).length });
       } else if (!res.ok) {
         setBatchErr(res.error);
