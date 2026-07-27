@@ -419,8 +419,8 @@ export function ReleaseForm() {
         </div>
 
         {/* RIGHT: preview / results */}
-        <div className="min-h-0">
-          <div className="h-full overflow-y-auto rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+        <div className="relative min-h-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <div className="absolute inset-0 overflow-y-auto p-7">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
