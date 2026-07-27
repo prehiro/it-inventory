@@ -423,9 +423,9 @@ export function ReleaseForm() {
           <h3 className="mb-4 shrink-0 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
-          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="min-h-0 flex-1 animate-panel-in">
+          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="min-h-0 flex-1 overflow-y-auto pr-1 scrollbar-thin">
             {batchMode && batchCompleted ? (
-              <div className="max-h-full space-y-1.5 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="space-y-1.5">
                 {/* Timeline receipt header */}
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
@@ -498,7 +498,7 @@ export function ReleaseForm() {
                 })()}
               </div>
             ) : batchMode && batchLookups.length > 0 ? (
-              <div className="max-h-full space-y-1.5 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="space-y-1.5">
                 {/* Summary badge */}
                 <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
                   <span>Total {batchLookups.length}</span>
