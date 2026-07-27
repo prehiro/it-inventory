@@ -71,6 +71,9 @@ export function ReleaseForm() {
   const [toast, setToast] = useState<{ ok: number; fail: number } | null>(null);
   const [singleToast, setSingleToast] = useState(false);
   const [remarksBatch, setRemarksBatch] = useState("");
+  const [batchGid, setBatchGid] = useState("");
+  const [batchEmail, setBatchEmail] = useState("");
+  const [batchErr, setBatchErr] = useState<string | null>(null);
   const batchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Batch: debounced lookup for each serial
@@ -167,14 +170,15 @@ export function ReleaseForm() {
     setBatchPending(true);
     setBatchResults(null);
     setToast(null);
+    setBatchErr(null);
     try {
       const res = await releaseBatchAction({
         serials: list,
         assigneeEmpNumber: empNumber,
         assigneeName,
         assigneeDept: dept,
-        gid: "",
-        email: "",
+        gid: batchGid,
+        email: batchEmail,
         hostname: "N/A",
         remarks: remarksBatch,
       });
@@ -182,6 +186,11 @@ export function ReleaseForm() {
       setBatchRunId((n) => n + 1);
       if (res.ok && res.results) {
         setToast({ ok: res.results.filter((r) => r.ok).length, fail: res.results.filter((r) => !r.ok).length });
+        setBatchSerials("");
+        setBatchLookups([]);
+        setBatchWarnings([]);
+      } else if (!res.ok) {
+        setBatchErr(res.error);
       }
     } finally {
       setBatchPending(false);
@@ -217,7 +226,7 @@ export function ReleaseForm() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
+                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setBatchErr(null); }}
                   className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
@@ -353,6 +362,16 @@ export function ReleaseForm() {
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
                 <SectionCombobox name="" value={dept} onChange={setDept} />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">GID</label>
+                  <input value={batchGid} onChange={(e) => setBatchGid(e.target.value.toUpperCase())} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+                  <input value={batchEmail} onChange={(e) => setBatchEmail(e.target.value)} type="email" required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                </div>
+              </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks <span className="font-normal text-slate-400">(optional)</span></label>
                 <input value={remarksBatch} onChange={(e) => setRemarksBatch(e.target.value)} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
@@ -369,6 +388,9 @@ export function ReleaseForm() {
                 <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
                   ⚠ PC/Laptop/Tablet items cannot be batch released. Remove them above.
                 </p>
+              )}
+              {batchErr && (
+                <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{batchErr}</p>
               )}
             </>
           )}
