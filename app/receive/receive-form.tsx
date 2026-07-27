@@ -100,8 +100,7 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
       const m = models.find((x) => x.id === modelId);
       const label = m ? `${m.type} ${m.brand} ${m.model}`.toUpperCase() : "ITEM";
       setToast(label);
-      // reset fields so the user is ready for the next item
-      setModelId("");
+      // clear only SN so user can scan next serial for the same model
       setSnValue("");
       setSnExists(false);
       setSnChecking(false);
