@@ -44,6 +44,7 @@ export function ReleaseForm() {
   const [checking, setChecking] = useState(false);
   const [released, setReleased] = useState(false);
   const [releasedItem, setReleasedItem] = useState<Lookup | null>(null);
+  const [releasedSnapshot, setReleasedSnapshot] = useState<{ emp: string; name: string; section: string; hostname: string } | null>(null);
   const [dept, setDept] = useState("");
   const [hostname, setHostname] = useState("BAL");
 
@@ -119,6 +120,8 @@ export function ReleaseForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReleasedItem({ ...lookup, releasedAt: state.releasedAt ?? new Date().toISOString() });
       // eslint-disable-next-line react-hooks/set-state-in-effect
+      setReleasedSnapshot({ emp: empNumber, name: assigneeName, section: dept, hostname: hostname });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReleased(true);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSerial("");
@@ -167,6 +170,7 @@ export function ReleaseForm() {
     setSerial(v);
     setReleased(false);
     setReleasedItem(null);
+    setReleasedSnapshot(null);
     setHostname("BAL");
     setEmpNumber("");
     setAssigneeName("");
@@ -433,7 +437,7 @@ export function ReleaseForm() {
 
         {/* RIGHT: preview / results */}
         <div className="relative min-h-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-          <div className="absolute inset-0 overflow-y-auto p-7">
+          <div className={`absolute inset-0 p-7 ${batchMode ? "overflow-y-auto" : ""}`}>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
             </h3>
@@ -616,12 +620,12 @@ export function ReleaseForm() {
                   <dl className="w-full space-y-3 text-left text-sm">
                     <Row label="Item" value={`${releasedItem.type} ${releasedItem.brand} ${releasedItem.model}`.toUpperCase()} />
                     {releasedItem.type && HOSTNAME_TYPES.includes(releasedItem.type as (typeof HOSTNAME_TYPES)[number]) && (
-                      <Row label="Hostname" value={hostname || "—"} />
+                      <Row label="Hostname" value={releasedSnapshot?.hostname || "—"} />
                     )}
                     <Row label="Serial" value={releasedItem.serialNumber} />
-                    <Row label="Assignee Emp #" value={empNumber || "—"} />
-                    <Row label="Assignee Name" value={assigneeName || "—"} />
-                    <Row label="Section" value={dept || "—"} />
+                    <Row label="Assignee Emp #" value={releasedSnapshot?.emp || "—"} />
+                    <Row label="Assignee Name" value={releasedSnapshot?.name || "—"} />
+                    <Row label="Section" value={releasedSnapshot?.section || "—"} />
                     <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
                     <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
                     <Row label="Status" value="RELEASED" badge />
