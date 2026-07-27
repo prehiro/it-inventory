@@ -419,8 +419,8 @@ export function ReleaseForm() {
         </div>
 
         {/* RIGHT: preview / results */}
-        <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-          <h3 className="mb-4 shrink-0 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <div className="min-h-0 overflow-y-auto rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
           <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="min-h-0 flex-1 overflow-y-auto pr-1 scrollbar-thin">
