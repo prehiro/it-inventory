@@ -253,20 +253,18 @@ export function ReleaseForm() {
               {batchMode ? (
                 <button
                   type="button"
-                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); }}
-                  className="animate-rotate-border items-center gap-1 rounded-lg p-[1.5px]"
+                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setReleased(false); setReleasedItem(null); setReleasedSnapshot(null); setLookup(null); setLookupErr(null); setSerial(""); }}
+                  className="flex items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200/60 transition hover:bg-amber-100 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/25"
                 >
-                  <span className="flex items-center gap-1 rounded-[7px] bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                    </svg>
-                    Batch Input
-                  </span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                  Batch Input
                 </button>
               ) : (
                 <button
                   type="button"
-                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setBatchErr(null); setBatchCompleted(null); }}
+                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setBatchErr(null); setBatchCompleted(null); setReleased(false); setReleasedItem(null); setReleasedSnapshot(null); setLookup(null); setLookupErr(null); setSerial(""); }}
                   className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
