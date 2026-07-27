@@ -64,7 +64,22 @@ export default async function ItemPage({
                   <td className="whitespace-nowrap px-5 py-3 text-slate-500 dark:text-slate-400">{t.date.toLocaleString()}</td>
                   <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{typeLabel[t.type] ?? t.type}</td>
                   <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{t.operator.name}</td>
-                  <td className="px-5 py-3 text-slate-400 dark:text-slate-500">{t.assigneeName ?? t.returningPicName ?? t.remarks ?? "—"}</td>
+                  <td className="px-5 py-3 text-slate-400 dark:text-slate-500">
+                    {(() => {
+                      const lines: string[] = [];
+                      if (t.assigneeName) lines.push(`To: ${t.assigneeName}`);
+                      if (t.assigneeEmpNumber) lines.push(`Emp: ${t.assigneeEmpNumber}`);
+                      if (t.assigneeDept) lines.push(`Dept: ${t.assigneeDept}`);
+                      if (t.gid) lines.push(`GID: ${t.gid}`);
+                      if (t.email) lines.push(`Email: ${t.email}`);
+                      if (t.returningPicName) lines.push(`Returned by: ${t.returningPicName}`);
+                      if (t.returnReason) lines.push(`Reason: ${t.returnReason}`);
+                      if (t.remarks) lines.push(t.remarks);
+                      return lines.length > 0
+                        ? lines.map((l, i) => <div key={i}>{l}</div>)
+                        : "—";
+                    })()}
+                  </td>
                 </tr>
               ))}
             </tbody>
