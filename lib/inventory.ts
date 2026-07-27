@@ -108,7 +108,7 @@ export async function releaseItem(input: ReleaseInput, operatorId: string) {
       include: { model: true },
     });
     if (!item || item.isDeleted) throw new Error("Item not found");
-    if (item.status !== "AVAILABLE")
+    if (item.status !== "AVAILABLE" && item.status !== "RETURNED_KEEP")
       throw new Error(`Item is ${item.status}, cannot release`);
 
     // Hostname required for PC/Laptop/Tablet, auto N/A otherwise.
