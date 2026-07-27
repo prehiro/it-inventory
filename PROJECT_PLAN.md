@@ -181,6 +181,12 @@ a double-action guard so the same serial can't be double-released.
 - [x] **Hostname locked prefix `BAL`** on release (PC/Laptop/Tablet only): controlled input, prefix undeletable (Backspace/Delete/paste blocked inside prefix), user appends after it; resets to `BAL` on new serial. Mirrors PO `PTCAP__` behaviour on receive.
 - **Commit:** `7124316`
 
+### ✅ UI Tune-up 7 — Release form polish: scroll fix + duplicate SN info + field reset
+- [x] **Right panel height fix**: grid row was expanding with content → used `absolute inset-0 overflow-y-auto` inside `relative min-h-0 overflow-hidden` so right panel scrolls without stretching the row. Left+right panels now same height always.
+- [x] **Duplicate serial tracking**: `onSubmitBatch` captures exact duplicate serials in `dupSerials[]` (not just count). Displayed as amber strikethrough chips with alert icon below footer stats (`✅ N released · ❌ N failed · ⚠ N duplicates`), max 12 chips + `+N more`.
+- [x] **All fields reset after submit**: single release now resets `empNumber`, `assigneeName`, `dept` in addition to `serial`/`lookup`. Batch release resets `empNumber`, `assigneeName`, `dept`, `remarksBatch`, `batchGid`, `batchEmail` in addition to `batchSerials`/`batchLookups`.
+- **Commits:** `a6f3def` (scroll fix) · `39396be` (dup tracking) · `c37366f` (chips in footer) · `033ccbc` (field reset)
+
 ---
 
 ## 4. Pending / Next
