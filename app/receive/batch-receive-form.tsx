@@ -259,7 +259,7 @@ export function BatchReceiveForm({
                   onClick={() => setToast(null)}
                   className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
                 >
-                  Selesai
+                  Done
                 </button>
               </div>
             </div>

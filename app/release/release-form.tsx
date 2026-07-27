@@ -254,12 +254,14 @@ export function ReleaseForm() {
                 <button
                   type="button"
                   onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setReleased(false); setReleasedItem(null); setReleasedSnapshot(null); setLookup(null); setLookupErr(null); setSerial(""); }}
-                  className="flex items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200/60 transition hover:bg-amber-100 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/25"
+                  className="animate-rotate-border items-center gap-1 rounded-lg p-[1.5px]"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
-                  Batch Input
+                  <span className="flex items-center gap-1 rounded-[7px] bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Batch Input
+                  </span>
                 </button>
               ) : (
                 <button
