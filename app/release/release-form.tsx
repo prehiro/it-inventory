@@ -256,7 +256,7 @@ export function ReleaseForm() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                     </svg>
-                    Batch SN
+                    Batch Input
                   </span>
                 </button>
               ) : (
@@ -268,7 +268,7 @@ export function ReleaseForm() {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                   </svg>
-                  Batch SN
+                  Batch Input
                 </button>
               )}
             </div>
@@ -305,11 +305,10 @@ export function ReleaseForm() {
                   onChange={onSerialChange}
                   required
                   placeholder="Scan or type serial…"
-                  className={`${blockedStatus ? "input-glow-error" : "input-glow"} w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${
-                    blockedStatus
-                      ? "border-rose-400 focus:border-rose-500 dark:border-rose-500/60"
-                      : "border-slate-300 focus:border-[#066fd1] dark:border-slate-700"
-                  }`}
+                  className={`${blockedStatus ? "input-glow-error" : "input-glow"} w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-0 dark:bg-slate-800 dark:text-slate-100 ${blockedStatus
+                    ? "border-rose-400 focus:border-rose-500 dark:border-rose-500/60"
+                    : "border-slate-300 focus:border-[#066fd1] dark:border-slate-700"
+                    }`}
                 />
                 {checking && <p className="mt-1 text-xs text-slate-400">Checking…</p>}
                 {lookupErr && <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">{lookupErr}</p>}
@@ -394,10 +393,6 @@ export function ReleaseForm() {
                   <input value={assigneeName} onChange={(e) => setAssigneeName(titleCase(e.target.value))} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
-                <SectionCombobox name="" value={dept} onChange={setDept} />
-              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">GID</label>
@@ -407,6 +402,10 @@ export function ReleaseForm() {
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
                   <input value={batchEmail} onChange={(e) => setBatchEmail(e.target.value)} type="email" required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Section</label>
+                <SectionCombobox name="" value={dept} onChange={setDept} />
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks <span className="font-normal text-slate-400">(optional)</span></label>
@@ -435,227 +434,224 @@ export function ReleaseForm() {
         {/* RIGHT: preview / results */}
         <div className="relative min-h-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <div className="absolute inset-0 overflow-y-auto p-7">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
-          </h3>
-          <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="space-y-1.5">
-            {batchMode && batchCompleted ? (
-              <div className="space-y-1.5">
-                {/* Timeline receipt header */}
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
-                      <path className="animate-check-draw" d="M5 13l4 4L19 7" />
-                    </svg>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
+            </h3>
+            <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="space-y-1.5">
+              {batchMode && batchCompleted ? (
+                <div className="space-y-1.5">
+                  {/* Timeline receipt header */}
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
+                        <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Batch Release Complete</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">Assignee: {batchCompleted.assignee}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Batch Release Complete</p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">Assignee: {batchCompleted.assignee}</p>
-                  </div>
-                </div>
-                {/* Timeline items */}
-                {(() => {
-                  const ok = batchCompleted.outcomes.filter((r) => r.ok).length;
-                  const fail = batchCompleted.outcomes.filter((r) => !r.ok).length;
-                  return (
-                    <>
-                      {batchCompleted.outcomes.map((outcome, i) => {
-                        const bl = batchCompleted.results.find((r) => r.serial === outcome.serial);
-                        return (
-                          <div
-                            key={i}
-                            className={`animate-fade-in rounded-xl border-l-4 px-4 py-3 text-sm ${
-                              outcome.ok
+                  {/* Timeline items */}
+                  {(() => {
+                    const ok = batchCompleted.outcomes.filter((r) => r.ok).length;
+                    const fail = batchCompleted.outcomes.filter((r) => !r.ok).length;
+                    return (
+                      <>
+                        {batchCompleted.outcomes.map((outcome, i) => {
+                          const bl = batchCompleted.results.find((r) => r.serial === outcome.serial);
+                          return (
+                            <div
+                              key={i}
+                              className={`animate-fade-in rounded-xl border-l-4 px-4 py-3 text-sm ${outcome.ok
                                 ? "border-l-emerald-400 bg-emerald-50/40 dark:border-l-emerald-500/60 dark:bg-emerald-500/5"
                                 : "border-l-rose-400 bg-rose-50/40 dark:border-l-rose-500/60 dark:bg-rose-500/5"
-                            }`}
-                            style={{ animationDelay: `${Math.min(i, 15) * 45}ms`, animationFillMode: "both" }}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
+                                }`}
+                              style={{ animationDelay: `${Math.min(i, 15) * 45}ms`, animationFillMode: "both" }}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    {outcome.ok ? (
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+                                    ) : (
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5 shrink-0 text-rose-500" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                                    )}
+                                    <p className="font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{outcome.serial}</p>
+                                  </div>
+                                  {bl && bl.item ? (
+                                    <p className="ml-5 truncate text-xs text-slate-500 dark:text-slate-400">
+                                      {bl.item.type} · {bl.item.brand} · {bl.item.model}
+                                    </p>
+                                  ) : null}
                                   {outcome.ok ? (
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+                                    <p className="ml-5 text-[11px] text-emerald-600 dark:text-emerald-400">→ Released to {batchCompleted.assignee}</p>
                                   ) : (
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5 shrink-0 text-rose-500" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                                    <p className="ml-5 text-[11px] text-rose-500">{outcome.error || "Failed"}</p>
                                   )}
-                                  <p className="font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{outcome.serial}</p>
                                 </div>
-                                {bl && bl.item ? (
-                                  <p className="ml-5 truncate text-xs text-slate-500 dark:text-slate-400">
-                                    {bl.item.type} · {bl.item.brand} · {bl.item.model}
-                                  </p>
-                                ) : null}
-                                {outcome.ok ? (
-                                  <p className="ml-5 text-[11px] text-emerald-600 dark:text-emerald-400">→ Released to {batchCompleted.assignee}</p>
-                                ) : (
-                                  <p className="ml-5 text-[11px] text-rose-500">{outcome.error || "Failed"}</p>
-                                )}
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                      {/* Footer */}
-                      <div className="mt-4 border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
-                        <div className="mb-2 flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                          <span className="font-medium text-emerald-600 dark:text-emerald-400">✅ {ok} released</span>
-                          {fail > 0 && (
-                            <span className="font-medium text-rose-500">❌ {fail} failed</span>
-                          )}
-                          {batchCompleted.dupSerials.length > 0 && (
-                            <span className="font-medium text-amber-500">⚠ {batchCompleted.dupSerials.length} duplicate{batchCompleted.dupSerials.length !== 1 ? "s" : ""}</span>
-                          )}
-                        </div>
-                        {batchCompleted.dupSerials.length > 0 && (
-                          <div className="mt-1 flex flex-wrap gap-1.5">
-                            {batchCompleted.dupSerials.slice(0, 12).map((s, i) => (
-                              <span
-                                key={i}
-                                className="inline-flex animate-fade-in items-center gap-1 rounded-md bg-amber-50 px-2 py-[3px] font-mono text-[11px] leading-4 text-amber-600 ring-1 ring-amber-200/60 line-through decoration-amber-400/60 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20 dark:decoration-amber-400/30"
-                                style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
-                              >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-2.5 w-2.5 shrink-0 text-amber-400" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M18 6L6 18M6 6l12 12" />
-                                </svg>
-                                {s}
-                              </span>
-                            ))}
-                            {batchCompleted.dupSerials.length > 12 && (
-                              <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-[3px] text-[11px] leading-4 text-amber-400 ring-1 ring-amber-200/40 dark:bg-amber-500/5 dark:text-amber-400 dark:ring-amber-500/15">
-                                +{batchCompleted.dupSerials.length - 12} more
-                              </span>
+                          );
+                        })}
+                        {/* Footer */}
+                        <div className="mt-4 border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
+                          <div className="mb-2 flex items-center gap-2 text-slate-400 dark:text-slate-500">
+                            <span className="font-medium text-emerald-600 dark:text-emerald-400">✅ {ok} released</span>
+                            {fail > 0 && (
+                              <span className="font-medium text-rose-500">❌ {fail} failed</span>
+                            )}
+                            {batchCompleted.dupSerials.length > 0 && (
+                              <span className="font-medium text-amber-500">⚠ {batchCompleted.dupSerials.length} duplicate{batchCompleted.dupSerials.length !== 1 ? "s" : ""}</span>
                             )}
                           </div>
-                        )}
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            ) : batchMode && batchLookups.length > 0 ? (
-              <div className="space-y-1.5">
-                {/* Summary badge */}
-                <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
-                  <span>Total {batchLookups.length}</span>
-                  <span className="text-slate-300 dark:text-slate-600">·</span>
-                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
-                    {batchLookups.filter(bl => bl.item && (bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP")).length} ready
-                  </span>
-                  {(() => {
-                    const blocked = batchLookups.filter(bl => !bl.item || (bl.item.status !== "AVAILABLE" && bl.item.status !== "RETURNED_KEEP")).length;
-                    return blocked > 0 ? (
-                      <>
-                        <span className="text-slate-300 dark:text-slate-600">·</span>
-                        <span className="flex items-center gap-1 text-rose-500 dark:text-rose-400">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
-                          {blocked} blocked
-                        </span>
+                          {batchCompleted.dupSerials.length > 0 && (
+                            <div className="mt-1 flex flex-wrap gap-1.5">
+                              {batchCompleted.dupSerials.slice(0, 12).map((s, i) => (
+                                <span
+                                  key={i}
+                                  className="inline-flex animate-fade-in items-center gap-1 rounded-md bg-amber-50 px-2 py-[3px] font-mono text-[11px] leading-4 text-amber-600 ring-1 ring-amber-200/60 line-through decoration-amber-400/60 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20 dark:decoration-amber-400/30"
+                                  style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+                                >
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-2.5 w-2.5 shrink-0 text-amber-400" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 6L6 18M6 6l12 12" />
+                                  </svg>
+                                  {s}
+                                </span>
+                              ))}
+                              {batchCompleted.dupSerials.length > 12 && (
+                                <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-[3px] text-[11px] leading-4 text-amber-400 ring-1 ring-amber-200/40 dark:bg-amber-500/5 dark:text-amber-400 dark:ring-amber-500/15">
+                                  +{batchCompleted.dupSerials.length - 12} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </>
-                    ) : null;
+                    );
                   })()}
                 </div>
-                {batchLookups.map((bl, i) => (
-                  <div
-                    key={i}
-                    className={`animate-fade-in rounded-xl border-l-4 px-4 py-3 text-sm transition ${
-                      !bl.item
+              ) : batchMode && batchLookups.length > 0 ? (
+                <div className="space-y-1.5">
+                  {/* Summary badge */}
+                  <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                    <span>Total {batchLookups.length}</span>
+                    <span className="text-slate-300 dark:text-slate-600">·</span>
+                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+                      {batchLookups.filter(bl => bl.item && (bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP")).length} ready
+                    </span>
+                    {(() => {
+                      const blocked = batchLookups.filter(bl => !bl.item || (bl.item.status !== "AVAILABLE" && bl.item.status !== "RETURNED_KEEP")).length;
+                      return blocked > 0 ? (
+                        <>
+                          <span className="text-slate-300 dark:text-slate-600">·</span>
+                          <span className="flex items-center gap-1 text-rose-500 dark:text-rose-400">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                            {blocked} blocked
+                          </span>
+                        </>
+                      ) : null;
+                    })()}
+                  </div>
+                  {batchLookups.map((bl, i) => (
+                    <div
+                      key={i}
+                      className={`animate-fade-in rounded-xl border-l-4 px-4 py-3 text-sm transition ${!bl.item
                         ? "border-l-rose-400 bg-rose-50/40 dark:border-l-rose-500/60 dark:bg-rose-500/5"
                         : bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP"
                           ? "border-l-emerald-400 bg-emerald-50/40 dark:border-l-emerald-500/60 dark:bg-emerald-500/5"
                           : "border-l-rose-400 bg-rose-50/40 dark:border-l-rose-500/60 dark:bg-rose-500/5"
-                    }`}
-                    style={{ animationDelay: `${Math.min(i, 15) * 45}ms`, animationFillMode: "both" }}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{bl.serial}</p>
-                        {bl.item ? (
-                          <>
-                            <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
-                              {bl.item.type} · {bl.item.brand} · {bl.item.model}
-                            </p>
-                            {bl.item.location && (
-                              <p className="mt-0.5 truncate text-[11px] text-slate-400 dark:text-slate-500">
-                                📍 {bl.item.location}
+                        }`}
+                      style={{ animationDelay: `${Math.min(i, 15) * 45}ms`, animationFillMode: "both" }}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{bl.serial}</p>
+                          {bl.item ? (
+                            <>
+                              <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                                {bl.item.type} · {bl.item.brand} · {bl.item.model}
                               </p>
-                            )}
-                          </>
-                        ) : (
-                          <p className="mt-0.5 text-xs text-rose-500">{bl.error}</p>
-                        )}
-                      </div>
-                      <div className="shrink-0 pt-0.5">
-                        {bl.item ? (
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${
-                              bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP"
+                              {bl.item.location && (
+                                <p className="mt-0.5 truncate text-[11px] text-slate-400 dark:text-slate-500">
+                                  📍 {bl.item.location}
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <p className="mt-0.5 text-xs text-rose-500">{bl.error}</p>
+                          )}
+                        </div>
+                        <div className="shrink-0 pt-0.5">
+                          {bl.item ? (
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP"
                                 ? "bg-emerald-50 text-emerald-700 ring-emerald-600/30 dark:bg-emerald-500/15 dark:text-emerald-400"
                                 : "bg-rose-50 text-rose-700 ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400"
-                            }`}
-                          >
-                            {bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP" ? "Ready" : bl.item.status}
-                          </span>
-                        ) : (
-                          <span className="inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-600 ring-1 ring-inset ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400">
-                            Not found
-                          </span>
-                        )}
+                                }`}
+                            >
+                              {bl.item.status === "AVAILABLE" || bl.item.status === "RETURNED_KEEP" ? "Ready" : bl.item.status}
+                            </span>
+                          ) : (
+                            <span className="inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-600 ring-1 ring-inset ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400">
+                              Not found
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : batchMode && batchCount > 0 && batchLookups.length === 0 ? (
-              <p className="text-sm text-slate-400 animate-pulse">Looking up items…</p>
-            ) : released && releasedItem ? (
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-8 w-8" strokeLinecap="round" strokeLinejoin="round">
-                    <path className="animate-check-draw" d="M5 13l4 4L19 7" />
-                  </svg>
+                  ))}
                 </div>
-                <p className="mb-4 text-sm font-medium text-emerald-600 dark:text-emerald-400">Item released</p>
-                <dl className="w-full space-y-3 text-left text-sm">
-                  <Row label="Item" value={`${releasedItem.type} ${releasedItem.brand} ${releasedItem.model}`.toUpperCase()} />
-                  {releasedItem.type && HOSTNAME_TYPES.includes(releasedItem.type as (typeof HOSTNAME_TYPES)[number]) && (
-                    <Row label="Hostname" value={hostname || "—"} />
-                  )}
-                  <Row label="Serial" value={releasedItem.serialNumber} />
-                  <Row label="Assignee Emp #" value={empNumber || "—"} />
-                  <Row label="Assignee Name" value={assigneeName || "—"} />
-                  <Row label="Section" value={dept || "—"} />
-                  <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
-                  <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
-                  <Row label="Status" value="RELEASED" badge />
+              ) : batchMode && batchCount > 0 && batchLookups.length === 0 ? (
+                <p className="text-sm text-slate-400 animate-pulse">Looking up items…</p>
+              ) : released && releasedItem ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-8 w-8" strokeLinecap="round" strokeLinejoin="round">
+                      <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="mb-4 text-sm font-medium text-emerald-600 dark:text-emerald-400">Item released</p>
+                  <dl className="w-full space-y-3 text-left text-sm">
+                    <Row label="Item" value={`${releasedItem.type} ${releasedItem.brand} ${releasedItem.model}`.toUpperCase()} />
+                    {releasedItem.type && HOSTNAME_TYPES.includes(releasedItem.type as (typeof HOSTNAME_TYPES)[number]) && (
+                      <Row label="Hostname" value={hostname || "—"} />
+                    )}
+                    <Row label="Serial" value={releasedItem.serialNumber} />
+                    <Row label="Assignee Emp #" value={empNumber || "—"} />
+                    <Row label="Assignee Name" value={assigneeName || "—"} />
+                    <Row label="Section" value={dept || "—"} />
+                    <Row label="Received" value={formatDate(releasedItem.receivedAt)} />
+                    <Row label="Released" value={formatDate(releasedItem.releasedAt ?? null)} />
+                    <Row label="Status" value="RELEASED" badge />
+                  </dl>
+                </div>
+              ) : lookup ? (
+                <dl className="space-y-3 text-sm">
+                  <Row label="Serial" value={lookup.serialNumber} />
+                  <Row label="Type" value={lookup.type} />
+                  <Row label="Brand" value={lookup.brand} />
+                  <Row label="Model" value={lookup.model} />
+                  <Row label="Location" value={lookup.location} />
+                  <Row label="Received" value={formatDate(lookup.receivedAt)} />
+                  <Row label="Status" value={lookup.status} badge />
                 </dl>
-              </div>
-            ) : lookup ? (
-              <dl className="space-y-3 text-sm">
-                <Row label="Serial" value={lookup.serialNumber} />
-                <Row label="Type" value={lookup.type} />
-                <Row label="Brand" value={lookup.brand} />
-                <Row label="Model" value={lookup.model} />
-                <Row label="Location" value={lookup.location} />
-                <Row label="Received" value={formatDate(lookup.receivedAt)} />
-                <Row label="Status" value={lookup.status} badge />
-              </dl>
-            ) : (
-              <div className="flex min-h-[18rem] flex-col items-center justify-center py-6 text-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/illustrations/list-items.png"
-                  alt="Enter a serial number"
-                  className="mb-4 h-28 w-auto opacity-80"
-                />
-                <p className="text-sm text-slate-400">
-                  {lookupErr ? "Item not available for release." : "Enter a serial number to preview item details."}
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="flex min-h-[18rem] flex-col items-center justify-center py-6 text-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/illustrations/list-items.png"
+                    alt="Enter a serial number"
+                    className="mb-4 h-28 w-auto opacity-80"
+                  />
+                  <p className="text-sm text-slate-400">
+                    {lookupErr ? "Item not available for release." : "Enter a serial number to preview item details."}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         </div>
       </form>
 
@@ -746,17 +742,16 @@ function Row({ label, value, badge }: { label: string; value: string; badge?: bo
       <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
       {badge ? (
         <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
-            isAvail
-              ? "bg-emerald-50 text-emerald-700 ring-emerald-600/30 dark:bg-emerald-500/15 dark:text-emerald-400"
-              : isPlanDispose
-                ? "bg-rose-50 text-rose-700 ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400"
-                : isInRepair
-                  ? "bg-amber-50 text-amber-700 ring-amber-600/30 dark:bg-amber-500/15 dark:text-amber-400"
-                  : isReleased
-                    ? "bg-sky-50 text-sky-700 ring-sky-600/30 dark:bg-sky-500/15 dark:text-sky-400"
-                    : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
-          }`}
+          className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${isAvail
+            ? "bg-emerald-50 text-emerald-700 ring-emerald-600/30 dark:bg-emerald-500/15 dark:text-emerald-400"
+            : isPlanDispose
+              ? "bg-rose-50 text-rose-700 ring-rose-600/30 dark:bg-rose-500/15 dark:text-rose-400"
+              : isInRepair
+                ? "bg-amber-50 text-amber-700 ring-amber-600/30 dark:bg-amber-500/15 dark:text-amber-400"
+                : isReleased
+                  ? "bg-sky-50 text-sky-700 ring-sky-600/30 dark:bg-sky-500/15 dark:text-sky-400"
+                  : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
+            }`}
           style={isAvail ? { boxShadow: "0 0 10px 1px rgba(16,185,129,0.55)" } : isPlanDispose ? { boxShadow: "0 0 10px 1px rgba(244,63,94,0.55)" } : undefined}
         >
           {value}
