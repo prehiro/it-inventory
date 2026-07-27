@@ -74,6 +74,11 @@ export function ReleaseForm() {
   const [batchGid, setBatchGid] = useState("");
   const [batchEmail, setBatchEmail] = useState("");
   const [batchErr, setBatchErr] = useState<string | null>(null);
+  const [batchCompleted, setBatchCompleted] = useState<{
+    results: BatchLookup[];
+    outcomes: { serial: string; ok: boolean; error?: string }[];
+    assignee: string;
+  } | null>(null);
   const batchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Batch: debounced lookup for each serial
@@ -185,10 +190,15 @@ export function ReleaseForm() {
       setBatchResults(res);
       setBatchRunId((n) => n + 1);
       if (res.ok && res.results) {
-        setToast({ ok: res.results.filter((r) => r.ok).length, fail: res.results.filter((r) => !r.ok).length });
+        setBatchCompleted({
+          results: batchLookups,
+          outcomes: res.results,
+          assignee: assigneeName || empNumber,
+        });
         setBatchSerials("");
         setBatchLookups([]);
         setBatchWarnings([]);
+        setToast({ ok: res.results.filter((r) => r.ok).length, fail: res.results.filter((r) => !r.ok).length });
       } else if (!res.ok) {
         setBatchErr(res.error);
       }
@@ -226,7 +236,7 @@ export function ReleaseForm() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setBatchErr(null); }}
+                  onClick={() => { setBatchMode((b) => !b); setBatchSerials(""); setBatchLookups([]); setBatchWarnings([]); setBatchErr(null); setBatchCompleted(null); }}
                   className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
@@ -402,7 +412,77 @@ export function ReleaseForm() {
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
           <div key={batchMode ? `b-${batchRunId}` : released && releasedItem ? `r-${releasedItem.serialNumber}` : lookup ? `l-${lookup.serialNumber}` : "empty"} className="animate-panel-in">
-            {batchMode && batchLookups.length > 0 ? (
+            {batchMode && batchCompleted ? (
+              <div className="space-y-1.5">
+                {/* Timeline receipt header */}
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
+                      <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Batch Release Complete</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">Assignee: {batchCompleted.assignee}</p>
+                  </div>
+                </div>
+                {/* Timeline items */}
+                {(() => {
+                  const ok = batchCompleted.outcomes.filter((r) => r.ok).length;
+                  const fail = batchCompleted.outcomes.filter((r) => !r.ok).length;
+                  return (
+                    <>
+                      {batchCompleted.outcomes.map((outcome, i) => {
+                        const bl = batchCompleted.results.find((r) => r.serial === outcome.serial);
+                        return (
+                          <div
+                            key={i}
+                            className={`animate-fade-in rounded-xl border-l-4 px-4 py-3 text-sm ${
+                              outcome.ok
+                                ? "border-l-emerald-400 bg-emerald-50/40 dark:border-l-emerald-500/60 dark:bg-emerald-500/5"
+                                : "border-l-rose-400 bg-rose-50/40 dark:border-l-rose-500/60 dark:bg-rose-500/5"
+                            }`}
+                            style={{ animationDelay: `${Math.min(i, 15) * 45}ms`, animationFillMode: "both" }}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  {outcome.ok ? (
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+                                  ) : (
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5 shrink-0 text-rose-500" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                                  )}
+                                  <p className="font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{outcome.serial}</p>
+                                </div>
+                                {bl && bl.item ? (
+                                  <p className="ml-5 truncate text-xs text-slate-500 dark:text-slate-400">
+                                    {bl.item.type} · {bl.item.brand} · {bl.item.model}
+                                  </p>
+                                ) : null}
+                                {outcome.ok ? (
+                                  <p className="ml-5 text-[11px] text-emerald-600 dark:text-emerald-400">→ Released to {batchCompleted.assignee}</p>
+                                ) : (
+                                  <p className="ml-5 text-[11px] text-rose-500">{outcome.error || "Failed"}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {/* Footer */}
+                      <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
+                        <span className="text-slate-400 dark:text-slate-500">
+                          <span className="font-medium text-emerald-600 dark:text-emerald-400">✅ {ok} released</span>
+                          {fail > 0 && (
+                            <span className="ml-2 font-medium text-rose-500">❌ {fail} failed</span>
+                          )}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            ) : batchMode && batchLookups.length > 0 ? (
               <div className="space-y-1.5">
                 {/* Summary badge */}
                 <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
