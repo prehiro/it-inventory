@@ -74,8 +74,6 @@ export function ReleaseForm() {
   const [batchGid, setBatchGid] = useState("");
   const [batchEmail, setBatchEmail] = useState("");
   const [batchErr, setBatchErr] = useState<string | null>(null);
-  const [leftPanelHeight, setLeftPanelHeight] = useState<number | null>(null);
-  const leftPanelRef = useRef<HTMLDivElement>(null);
   const batchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [batchCompleted, setBatchCompleted] = useState<{
@@ -141,20 +139,6 @@ export function ReleaseForm() {
       setHostname((prev) => prev.toUpperCase());
     }
   }, [lookup]);
-
-  // Measure left panel height so right panel matches
-  useEffect(() => {
-    const el = leftPanelRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setLeftPanelHeight(entry.contentRect.height);
-      }
-    });
-    ro.observe(el);
-    setLeftPanelHeight(el.offsetHeight);
-    return () => ro.disconnect();
-  }, []);
 
   function runLookup(s: string) {
     const q = s.trim();
@@ -240,9 +224,9 @@ export function ReleaseForm() {
 
   return (
     <>
-      <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
+      <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* LEFT: inputs */}
-        <div ref={leftPanelRef} className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+        <div className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <input type="hidden" name="itemId" value={lookup?.id ?? ""} />
           {/* SERIAL NUMBER + BATCH TOGGLE */}
           <div>
@@ -435,7 +419,7 @@ export function ReleaseForm() {
         </div>
 
         {/* RIGHT: preview / results */}
-        <div style={{ height: leftPanelHeight ? `${leftPanelHeight}px` : "auto" }} className="flex flex-col rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+        <div className="flex h-full flex-col rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <h3 className="mb-4 shrink-0 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {batchMode ? "ITEMS DETAILS" : "ITEM DETAILS"}
           </h3>
