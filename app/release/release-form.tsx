@@ -223,7 +223,7 @@ export function ReleaseForm() {
 
   return (
     <>
-      <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
         {/* LEFT: inputs */}
         <div className="space-y-5 rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
           <input type="hidden" name="itemId" value={lookup?.id ?? ""} />
