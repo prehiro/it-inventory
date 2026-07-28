@@ -47,7 +47,7 @@ export async function createUserAction(
         userId,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/admin/users");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };
@@ -73,7 +73,7 @@ export async function updateUserRoleAction(
         userId,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/admin/users");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };
@@ -96,7 +96,7 @@ export async function deleteUserAction(
         userId,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/admin/users");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed" };

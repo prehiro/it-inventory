@@ -8,7 +8,6 @@ import type { Role } from "@/lib/types";
 // RBAC: which roles may access which route prefixes.
 const ROLE_ROUTES: Record<string, Role[]> = {
   "/admin": ["ADMIN"],
-  "/master-data": ["ADMIN"],
   "/reports": ["ADMIN", "MANAGER"],
 };
 

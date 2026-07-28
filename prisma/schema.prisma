@@ -112,3 +112,19 @@ model AuditLog {
   @@index([action])
   @@index([userId])
 }
+
+// 6. Employee/GID Reference Data (from HR Excel)
+model GidList {
+  id          String   @id @default(uuid())
+  employeeNo  String   @unique
+  name        String
+  globalId    String
+  email       String
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employeeNo])
+  @@index([globalId])
+  @@index([isDeleted])
+}

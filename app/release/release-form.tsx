@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState, useRef } from "react";
 import { releaseAction, releaseBatchAction, type ActionResult, type BatchActionResult } from "@/app/actions/inventory";
+import { useGidLookup } from "@/hooks/use-gid-lookup";
 import { SectionCombobox } from "@/components/section-combobox";
 import { HOSTNAME_TYPES } from "@/lib/types";
 
@@ -55,8 +56,20 @@ export function ReleaseForm() {
   }
   const [empNumber, setEmpNumber] = useState("");
   const [assigneeName, setAssigneeName] = useState("");
+  const [singleGid, setSingleGid] = useState("");
+  const [singleEmail, setSingleEmail] = useState("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Auto-fill assignee details from GID lookup
+  const { data: gidData } = useGidLookup(empNumber);
+  useEffect(() => {
+    setAssigneeName(gidData?.name ?? "");
+    setSingleGid(gidData?.globalId ?? "");
+    setSingleEmail(gidData?.email ?? "");
+    setBatchGid(gidData?.globalId ?? "");
+    setBatchEmail(gidData?.email ?? "");
+  }, [gidData]);
 
   const BLOCKED_STATUSES = ["RELEASED", "PLAN_DISPOSE", "IN_REPAIR"];
   const blockedStatus = lookup && BLOCKED_STATUSES.includes(lookup.status) ? lookup.status : null;
@@ -174,6 +187,8 @@ export function ReleaseForm() {
     setHostname("BAL");
     setEmpNumber("");
     setAssigneeName("");
+    setSingleGid("");
+    setSingleEmail("");
     setDept("");
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => runLookup(v), 300);
@@ -332,21 +347,21 @@ export function ReleaseForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Emp #</label>
-                  <input name="assigneeEmpNumber" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); setEmpNumber(e.target.value.toUpperCase()); }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="assigneeEmpNumber" value={empNumber} required onChange={(e) => setEmpNumber(e.target.value.toUpperCase())} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Name</label>
-                  <input name="assigneeName" required onChange={(e) => { e.target.value = titleCase(e.target.value); setAssigneeName(e.target.value); }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="assigneeName" value={assigneeName} required onChange={(e) => { setAssigneeName(titleCase(e.target.value)); }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">GID</label>
-                  <input name="gid" required onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="gid" value={singleGid} onChange={(e) => { e.target.value = e.target.value.toUpperCase(); setSingleGid(e.target.value.toUpperCase()); }} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
-                  <input name="email" type="email" required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="email" type="email" value={singleEmail} onChange={(e) => setSingleEmail(e.target.value)} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
               <div>

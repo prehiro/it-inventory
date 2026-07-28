@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState, useRef } from "react";
 import { returnAction, type ActionResult } from "@/app/actions/inventory";
 import { statusLabel } from "@/lib/types";
+import { useGidLookup } from "@/hooks/use-gid-lookup";
 import { Toast } from "@/components/toast";
 import { SectionCombobox } from "@/components/section-combobox";
 
@@ -55,6 +56,14 @@ export function ReturnForm() {
   const [returnedDisposition, setReturnedDisposition] = useState<"KEEP" | "REPAIR" | "DISPOSE" | "">("");
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Auto-fill PIC details from GID lookup
+  const { data: gidData, loading: gidLoading } = useGidLookup(picEmp);
+  useEffect(() => {
+    setPicName(gidData?.name ?? "");
+    setPicGid(gidData?.globalId ?? "");
+    setPicEmail(gidData?.email ?? "");
+  }, [gidData]);
 
   useEffect(() => {
     if (state?.ok && lookup) {

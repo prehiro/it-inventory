@@ -24,7 +24,7 @@ export default async function MasterDataPage() {
 
   return (
     <div>
-      <PageHeader title="Master Data" subtitle="Item models in your catalog" />
+      <PageHeader title="Master Data Item" subtitle="Item models in your catalog" />
       <CreateModelForm />
       <MasterDataTable models={rows} />
     </div>
