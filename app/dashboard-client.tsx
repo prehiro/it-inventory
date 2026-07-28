@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { auditView, TONE_CLASS } from "@/lib/audit-format";
@@ -22,6 +23,8 @@ interface DashboardData {
   recent: { id: string; action: string; details: string; timestamp: Date; userName: string }[];
   lowStock: { model: string; brand: string; available: number }[];
   role: Role;
+  statusData: { name: string; value: number; color: string }[];
+  modelTypes: { type: string; count: number }[];
 }
 
 const QUICK_ACTIONS = [
@@ -105,11 +108,17 @@ export function DashboardClient({ data }: { data: DashboardData }) {
         </div>
       </div>
 
-      {/* ── Charts + Sidebar ── */}
+      {/* ── Charts Row 1: Donuts ── */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <CategoryDonut data={data.donut} />
+        <StatusDonut data={data.statusData} total={data.total} />
+      </div>
+
+      {/* ── Charts Row 2: Bar + Sidebar ── */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          <CategoryDonut data={data.donut} />
           <DepartmentBar data={data.bar} />
+          <ModelTypeBar data={data.modelTypes} />
         </div>
         <div className="space-y-4 lg:col-span-1">
           <LowStockAlert items={data.lowStock} />
@@ -151,6 +160,16 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
    ───────────────────────────────────── */
 function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const handleMouseEnter = (_: any, index: number) => {
+    setActiveIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveIndex(null);
+  };
+
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
       <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Assets by Category</h3>
@@ -158,16 +177,64 @@ function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
         <p className="py-8 text-center text-sm text-slate-400">No data</p>
       ) : (
         <div className="flex items-center gap-6">
-          <ResponsiveContainer width="60%" height={200}>
-            <PieChart>
-              <Pie data={data} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                {data.map((d) => (
-                  <Cell key={d.name} fill={DONUT_COLORS[d.name] ?? "#64748b"} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="relative h-[200px] w-[200px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={2}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {data.map((d, i) => (
+                    <Cell
+                      key={d.name}
+                      fill={`url(#gradient-${d.name})`}
+                      stroke={activeIndex === i ? "#066fd1" : "none"}
+                      strokeWidth={activeIndex === i ? 2 : 0}
+                    />
+                  ))}
+                </Pie>
+                <defs>
+                  {data.map((d) => (
+                    <linearGradient key={d.name} id={`gradient-${d.name}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={DONUT_COLORS[d.name] ?? "#64748b"} />
+                      <stop offset="100%" stopColor={DONUT_COLORS[d.name] ?? "#64748b"} stopOpacity={0.7} />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      const percent = Math.round((data.value / total) * 100);
+                      return (
+                        <div className="rounded-lg bg-white p-2 shadow-lg ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                          <div className="flex items-center gap-2">
+                            <span className="h-3 w-3 rounded-full" style={{ background: DONUT_COLORS[data.name] ?? "#64748b" }} />
+                            <span className="font-medium">{data.name}</span>
+                          </div>
+                          <div className="mt-1 flex items-center gap-2 text-xs">
+                            <span className="font-bold">{data.value}</span>
+                            <span className="text-slate-500 dark:text-slate-400">({percent}%)</span>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{total}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Total</span>
+            </div>
+          </div>
           <div className="flex flex-col gap-2.5">
             {data.map((d) => (
               <div key={d.name} className="flex items-center gap-2.5">
@@ -186,6 +253,9 @@ function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
 }
 
 function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
+  const total = data.reduce((s, d) => s + d.count, 0);
+  const [activeBar, setActiveBar] = useState<string | null>(null);
+
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
       <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Released by Department</h3>
@@ -193,14 +263,183 @@ function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
         <p className="py-8 text-center text-sm text-slate-400">No released items</p>
       ) : (
         <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={data} margin={{ left: -20 }}>
-            <XAxis dataKey="dept" tick={{ fontSize: 11, fill: "#64748b" }} />
-            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#64748b" }} />
-            <Tooltip />
-            <Bar dataKey="count" fill="#066fd1" radius={[4, 4, 0, 0]} />
+          <BarChart
+            data={data}
+            layout="vertical"
+            margin={{ left: 0, right: 20, top: 0, bottom: 0 }}
+            barCategoryGap="20%"
+          >
+            <XAxis type="number" hide />
+            <YAxis
+              type="category"
+              dataKey="dept"
+              tick={{ fontSize: 11, fill: "#64748b" }}
+              width={40}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const d = payload[0].payload;
+                  const percent = Math.round((d.count / total) * 100);
+                  return (
+                    <div className="rounded-lg bg-white p-2 shadow-lg ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400">{d.dept}</p>
+                      <div className="mt-1 flex items-center gap-2 text-xs">
+                        <span className="font-bold">{d.count}</span>
+                        <span className="text-slate-500 dark:text-slate-400">({percent}%)</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Bar
+              dataKey="count"
+              radius={[0, 4, 4, 0]}
+              maxBarSize={24}
+              onMouseEnter={(d: any) => setActiveBar(d.dept)}
+              onMouseLeave={() => setActiveBar(null)}
+            >
+              {data.map((d) => (
+                <Cell
+                  key={d.dept}
+                  fill={activeBar === d.dept ? "#4f46e5" : "#066fd1"}
+                  fillOpacity={activeBar === d.dept ? 1 : 0.7}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────
+   Status Distribution donut (same style as Category)
+   ───────────────────────────────────── */
+function StatusDonut({ data, total }: { data: { name: string; value: number; color: string }[]; total: number }) {
+  if (data.length === 0) return null;
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  return (
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Status Distribution</h3>
+      <div className="flex items-center gap-6">
+        <div className="relative h-[200px] w-[200px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={2}
+                onMouseEnter={(_: any, index: number) => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+              >
+                {data.map((d, i) => (
+                  <Cell
+                    key={d.name}
+                    fill={`url(#status-gradient-${d.name.replace(/\s+/g, "")})`}
+                    stroke={activeIndex === i ? "#066fd1" : "none"}
+                    strokeWidth={activeIndex === i ? 2 : 0}
+                  />
+                ))}
+              </Pie>
+              <defs>
+                {data.map((d) => (
+                  <linearGradient key={d.name} id={`status-gradient-${d.name.replace(/\s+/g, "")}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor={d.color} />
+                    <stop offset="100%" stopColor={d.color} stopOpacity={0.7} />
+                  </linearGradient>
+                ))}
+              </defs>
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const d = payload[0].payload;
+                    const pct = Math.round((d.value / total) * 100);
+                    return (
+                      <div className="rounded-lg bg-white p-2 shadow-lg ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                        <div className="flex items-center gap-2">
+                          <span className="h-3 w-3 rounded-full" style={{ background: d.color }} />
+                          <span className="font-medium">{d.name}</span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-2 text-xs">
+                          <span className="font-bold">{d.value}</span>
+                          <span className="text-slate-500 dark:text-slate-400">({pct}%)</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{total}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Items</span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2.5">
+          {data.map((d) => (
+            <div key={d.name} className="flex items-center gap-2.5">
+              <span className="h-3 w-3 rounded-full" style={{ background: d.color }} />
+              <div>
+                <p className="text-xs font-medium text-slate-600 dark:text-slate-400">{d.name}</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{d.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────
+   Model Type breakdown horizontal bars
+   ───────────────────────────────────── */
+const TYPE_ICONS: Record<string, string> = {
+  PC: "🖥️", Laptop: "💻", Tablet: "📱", Mouse: "🖱️",
+  Keyboard: "⌨️", Monitor: "🖥️", Projector: "📽️",
+  Camera: "📷", CCTV: "📹", Printer: "🖨️",
+  Kensington: "🔒", Adaptor: "🔌",
+};
+
+function ModelTypeBar({ data }: { data: { type: string; count: number }[] }) {
+  const total = data.reduce((s, d) => s + d.count, 0);
+  if (data.length === 0) return null;
+  return (
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Items by Type</h3>
+      <div className="space-y-1.5">
+        {data.map((d) => {
+          const pct = Math.round((d.count / total) * 100);
+          return (
+            <div key={d.type} className="group flex items-center gap-3">
+              <span className="w-5 text-center text-xs">{TYPE_ICONS[d.type] ?? "📦"}</span>
+              <span className="w-20 shrink-0 text-xs font-medium text-slate-600 dark:text-slate-400">{d.type}</span>
+              <div className="flex-1">
+                <div className="h-5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  <div
+                    className="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-[#066fd1] to-indigo-500 px-2 transition-all duration-500"
+                    style={{ width: `${Math.max(pct, 8)}%` }}
+                  >
+                    <span className="text-[10px] font-semibold text-white">{d.count}</span>
+                  </div>
+                </div>
+              </div>
+              <span className="w-8 text-right text-[10px] text-slate-400">{pct}%</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
