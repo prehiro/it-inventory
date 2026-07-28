@@ -117,6 +117,13 @@ body {
 }
 .animate-text-glow-breath { animation: text-glow-breath 1.8s ease-in-out infinite; }
 
+/* Icon breathing glow for solid fill SVG (uses --neon) */
+@keyframes icon-breath {
+  0%, 100% { filter: drop-shadow(0 0 3px var(--neon, rgba(6,111,209,0.3))); }
+  50% { filter: drop-shadow(0 0 12px 5px var(--neon, rgba(6,111,209,0.65))); }
+}
+.animate-icon-breath { animation: icon-breath 1.8s ease-in-out infinite; }
+
 /* Input breathing glow — hardcoded rgba, no --neon dependency */
 .input-glow {
   transition-property: border-color, color, background-color, outline;
