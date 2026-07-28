@@ -110,6 +110,14 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
+  // Auto-dismiss toast after 3s
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   const dupError = state && !state.ok && state.duplicateSerial ? state.error : null;
   const showSnError = snExists || !!dupError;
 
