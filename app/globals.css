@@ -59,6 +59,13 @@ body {
 }
 
 /* ── Professional global scrollbar ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+html {
+  scrollbar-gutter: stable;
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -80,12 +87,6 @@ body {
 }
 .dark ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, #475569, #64748b);
-}
-
-/* Also use thin scrollbar in Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
 }
 
 /* ── Thicker scrollbar for scrollable card containers ── */

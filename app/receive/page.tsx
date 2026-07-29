@@ -12,7 +12,7 @@ export default async function ReceivePage() {
   });
 
   return (
-    <div className="flex max-w-5xl flex-col overflow-hidden" style={{ height: "calc(100vh - 8.5rem)" }}>
+    <div className="flex flex-col" style={{ height: "calc(100vh - 8.5rem)" }}>
       <PageHeader
         title="Receive Item"
         subtitle="Log incoming IT items from logistics & suppliers"

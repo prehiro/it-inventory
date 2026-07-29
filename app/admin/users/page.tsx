@@ -13,7 +13,7 @@ export default async function UsersPage() {
   });
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <PageHeader title="User Management" subtitle="Create, manage, and control access for system users" />
       <UsersPageClient initialUsers={users} />
     </div>

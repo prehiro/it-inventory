@@ -6,7 +6,7 @@ export default async function ReturnPage() {
   await requireAuth();
 
   return (
-    <div className="max-w-4xl">
+    <div>
       <PageHeader title="Return Item" subtitle="Scan a deployed serial to preview, then record the return" />
       <ReturnForm />
     </div>
