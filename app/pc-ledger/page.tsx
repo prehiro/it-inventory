@@ -58,8 +58,8 @@ export default async function PcLedgerPage() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round">
             <rect x="4" y="4" width="16" height="16" rx="2" />
             <path d="M8 9h8" className="animate-ledger-pulse" />
-            <path d="M8 13h8" className="animate-ledger-pulse" />
-            <path d="M8 17h5" className="animate-ledger-pulse" />
+            <path d="M8 13h8" className="animate-ledger-pulse" style={{ animationDelay: "0.6s" }} />
+            <path d="M8 17h5" className="animate-ledger-pulse" style={{ animationDelay: "1.2s" }} />
           </svg>
         }
       />
