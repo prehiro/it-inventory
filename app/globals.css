@@ -149,6 +149,16 @@ html {
 .animate-ledger-pulse {
   animation: ledger-pulse 1.8s ease-in-out infinite;
 }
+
+/* ── Bar pulse animation for Reports icon ── */
+@keyframes report-bar-pulse {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.55); }
+}
+.animate-report-bar {
+  animation: report-bar-pulse 1.2s ease-in-out infinite;
+  transform-origin: center bottom;
+}
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
 /* Color-driven breathing glow (uses --neon) */

@@ -36,7 +36,18 @@ export default async function ReportsPage({
 
   return (
     <div>
-      <PageHeader title="Reports" subtitle="Movement history with filters & export" />
+      <PageHeader
+        title="Reports"
+        subtitle="Movement history with filters & export"
+        icon={
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round">
+            <path d="M9 17V9" className="animate-report-bar" style={{ animationDelay: "0s" }} />
+            <path d="M13 17V5" className="animate-report-bar" style={{ animationDelay: "0.4s" }} />
+            <path d="M17 17v-6" className="animate-report-bar" style={{ animationDelay: "0.8s" }} />
+            <path d="M4 4h16v16H4z" />
+          </svg>
+        }
+      />
       <ReportsFilter initial={filter} count={txns.length} />
 
       <div className="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
