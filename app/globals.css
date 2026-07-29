@@ -212,7 +212,16 @@ html {
 }
 .animate-emp-check {
   animation: emp-check-pulse 1.6s ease-in-out infinite;
-  transform-origin: 20px 12px;
+  transform-origin: center;
+}
+
+/* ── Shield glow for Audit Trail icon ── */
+@keyframes shield-glow {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px currentColor); }
+  50% { opacity: 0.55; filter: drop-shadow(0 0 5px currentColor); }
+}
+.animate-shield {
+  animation: shield-glow 2s ease-in-out infinite;
 }
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
