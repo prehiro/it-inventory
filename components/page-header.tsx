@@ -17,7 +17,7 @@ export function PageHeader({
         <div className="flex items-center gap-2.5">
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{title}</h1>
           {icon && (
-            <span className="text-slate-400 dark:text-slate-500 animate-icon-bounce">
+            <span className="text-slate-400 dark:text-slate-500">
               {icon}
             </span>
           )}
