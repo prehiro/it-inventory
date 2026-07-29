@@ -204,6 +204,16 @@ html {
 .animate-master-line-3 {
   animation: master-scan-3 2s ease-in-out infinite;
 }
+
+/* ── Verified pulse for Employee No List icon ── */
+@keyframes emp-check-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+.animate-emp-check {
+  animation: emp-check-pulse 1.6s ease-in-out infinite;
+  transform-origin: 20px 12px;
+}
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
 /* Color-driven breathing glow (uses --neon) */
