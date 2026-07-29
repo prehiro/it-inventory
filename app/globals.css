@@ -131,6 +131,15 @@ html {
 .animate-icon-bounce {
   animation: icon-bounce 1s ease-in-out infinite;
 }
+
+/* ── Slide animation for Return page icon ── */
+@keyframes return-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-3px); }
+}
+.animate-return-nudge {
+  animation: return-nudge 1s ease-in-out infinite;
+}
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
 /* Color-driven breathing glow (uses --neon) */
