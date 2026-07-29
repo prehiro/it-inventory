@@ -6,6 +6,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveCo
 import { auditView, TONE_CLASS } from "@/lib/audit-format";
 import type { AuditView } from "@/lib/audit-format";
 import type { Role } from "@/lib/types";
+import BackgroundScene from "@/components/ui/background-scene";
 
 /* ─────────────────────────────────────
    Types
@@ -52,6 +53,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
       {/* ── Welcome banner ── */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-6 shadow-md sm:px-8 sm:py-7">
+        <BackgroundScene beamCount={40} />
         <div className="absolute right-0 top-0 -mr-12 -mt-12 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl" />
         <div className="absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-emerald-500/5 blur-3xl" />
         <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
