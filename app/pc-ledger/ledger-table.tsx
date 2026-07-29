@@ -43,8 +43,8 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
   ];
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div className="-mx-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 sm:mx-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 dark:border-slate-800">
         <p className="text-sm text-slate-500 dark:text-slate-400">
           {rows.length} device{rows.length === 1 ? "" : "s"}
         </p>
@@ -63,14 +63,14 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
           </a>
         </div>
       </div>
-      <div className="max-h-[70vh] overflow-auto">
-        <table className="w-full min-w-[1100px] border-collapse text-sm">
+      <div className="overflow-auto custom-scrollbar">
+        <table className="w-full border-collapse text-sm">
           <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800/80">
             <tr>
               {headers.map((h) => (
                 <th
                   key={h}
-                  className="whitespace-nowrap border-b border-slate-200 px-3 py-2.5 text-left font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300"
+                  className="whitespace-nowrap border-b border-slate-200 px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:border-slate-700 dark:text-slate-300"
                 >
                   {h}
                 </th>
@@ -80,19 +80,19 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
           <tbody>
             {filtered.map((r) => (
               <tr key={r.serialNumber} className="border-b border-slate-100 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50">
-                <td className="px-3 py-2.5 font-mono text-xs">{r.empNumber}</td>
-                <td className="px-3 py-2.5">{r.picName}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{r.gid}</td>
-                <td className="px-3 py-2.5 text-xs">{r.email}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{r.hostname}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{r.serialNumber}</td>
-                <td className="px-3 py-2.5">{r.type}</td>
-                <td className="px-3 py-2.5">{r.brand}</td>
-                <td className="px-3 py-2.5">{r.model}</td>
-                <td className="px-3 py-2.5">{r.section}</td>
-                <td className="px-3 py-2.5 max-w-[200px] truncate" title={r.remarks}>{r.remarks}</td>
-                <td className="px-3 py-2.5">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_TONE[r.status] ?? ""}`}>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{r.empNumber}</td>
+                <td className="whitespace-nowrap px-4 py-3">{r.picName}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{r.gid}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-xs max-w-[180px] truncate" title={r.email}>{r.email}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{r.hostname}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{r.serialNumber}</td>
+                <td className="whitespace-nowrap px-4 py-3">{r.type}</td>
+                <td className="whitespace-nowrap px-4 py-3">{r.brand}</td>
+                <td className="whitespace-nowrap px-4 py-3">{r.model}</td>
+                <td className="whitespace-nowrap px-4 py-3">{r.section}</td>
+                <td className="max-w-[200px] truncate px-4 py-3 text-xs text-slate-500 dark:text-slate-400" title={r.remarks}>{r.remarks}</td>
+                <td className="whitespace-nowrap px-4 py-3">
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_TONE[r.status] ?? ""}`}>
                     {statusLabel(r.status)}
                   </span>
                 </td>
