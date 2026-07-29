@@ -122,6 +122,15 @@ html {
   0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(6,111,209,0.2)); }
   50% { box-shadow: 0 0 14px 4px var(--neon, rgba(6,111,209,0.5)); }
 }
+
+/* ── Bounce animation for Receive page icon ── */
+@keyframes icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+.animate-icon-bounce {
+  animation: icon-bounce 1s ease-in-out infinite;
+}
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
 /* Color-driven breathing glow (uses --neon) */
