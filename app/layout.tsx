@@ -24,7 +24,7 @@ export default async function RootLayout({
   if (!session?.user) {
     return (
       <html lang="en" className={inter.variable} suppressHydrationWarning>
-        <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950">
+        <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950" style={{ scrollbarGutter: "stable" }}>
           <ThemeProvider>{children}</ThemeProvider>
         </body>
       </html>
@@ -33,7 +33,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950">
+      <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950" style={{ scrollbarGutter: "stable" }}>
         <ThemeProvider>
           <Sidebar role={role!} />
           <div className="pl-60">
