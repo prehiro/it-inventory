@@ -74,12 +74,6 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          {hasLowStock && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-700/40">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-              {data.lowStock.length} low stock
-            </span>
-          )}
           <div className="hidden sm:flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
             {health}% utilization
