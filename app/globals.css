@@ -159,6 +159,21 @@ html {
   animation: report-bar-pulse 1.2s ease-in-out infinite;
   transform-origin: center bottom;
 }
+
+/* ── Alternate fade for Users icon ── */
+@keyframes user-alt-fade {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 1; }
+  50% { opacity: 0.15; }
+  95% { opacity: 0.15; }
+}
+.animate-user-alt {
+  animation: user-alt-fade 2.4s ease-in-out infinite;
+}
+.animate-user-alt-delayed {
+  animation: user-alt-fade 2.4s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
 .animate-neon-breath { animation: neon-breath 1.6s ease-in-out infinite; }
 
 /* Color-driven breathing glow (uses --neon) */
