@@ -43,7 +43,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
   ];
 
   return (
-    <div className="-mx-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 sm:mx-0">
+    <div className="-mx-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 dark:border-slate-800">
         <p className="text-sm text-slate-500 dark:text-slate-400">
           {rows.length} device{rows.length === 1 ? "" : "s"}
