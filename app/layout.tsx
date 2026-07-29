@@ -33,12 +33,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="min-h-full bg-slate-50 antialiased dark:bg-slate-950" style={{ scrollbarGutter: "stable" }}>
+      <body className="flex min-h-screen bg-slate-50 antialiased dark:bg-slate-950" style={{ scrollbarGutter: "stable" }}>
         <ThemeProvider>
           <Sidebar role={role!} />
-          <div className="pl-60">
+          <div className="flex min-h-screen flex-1 flex-col pl-60">
             <Topbar name={name} role={role!} />
-            <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+            <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
           </div>
         </ThemeProvider>
       </body>

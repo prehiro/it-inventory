@@ -50,7 +50,7 @@ export default async function PcLedgerPage() {
   });
 
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <PageHeader
         title="PC Ledger"
         subtitle="PC, Laptop & Tablet inventory with PIC, hostname and deployment info"
@@ -64,7 +64,9 @@ export default async function PcLedgerPage() {
           </svg>
         }
       />
-      <LedgerTable rows={rows} />
+      <div className="flex-1 min-h-0">
+        <LedgerTable rows={rows} />
+      </div>
     </div>
   );
 }
