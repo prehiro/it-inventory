@@ -28,9 +28,9 @@ export function ParticlesBg({
       h = canvas.height = window.innerHeight;
     }
 
-    const count = contained ? 30 : 140;
-    const connectionDist = contained ? 100 : 150;
-    const mouseConnectionDist = contained ? 150 : 220;
+    const count = contained ? 20 : 100;
+    const connectionDist = contained ? 80 : 130;
+    const mouseConnectionDist = contained ? 120 : 200;
     const colors = isDark
       ? { particle: "rgba(0,245,255,", line: "rgba(0,217,255," }
       : { particle: "rgba(2,119,189,", line: "rgba(2,136,209," };
@@ -42,18 +42,30 @@ export function ParticlesBg({
       dots.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * (contained ? 0.8 : 1.2),
-        vy: (Math.random() - 0.5) * (contained ? 0.8 : 1.2),
-        r: (contained ? 0.8 : 1) + Math.random() * (contained ? 1.5 : 2.5),
+        vx: (Math.random() - 0.5) * (contained ? 0.3 : 0.7),
+        vy: (Math.random() - 0.5) * (contained ? 0.3 : 0.7),
+        r: (contained ? 0.6 : 0.8) + Math.random() * (contained ? 1 : 2),
       });
     }
 
     const mouse = mouseRef.current;
 
+    // Throttle: skip every other frame for contained mode
+    let skipFrame = false;
+
     function animate() {
       ctx!.clearRect(0, 0, w, h);
 
-      // draw connections between particles
+      // For contained (sidebar), skip every other frame = ~30fps
+      if (contained) {
+        skipFrame = !skipFrame;
+        if (skipFrame) {
+          animRef.current = requestAnimationFrame(animate);
+          return;
+        }
+      }
+
+      // draw connections — only every 2nd frame for contained
       for (let i = 0; i < dots.length; i++) {
         for (let j = i + 1; j < dots.length; j++) {
           const dx = dots[i].x - dots[j].x;
@@ -63,17 +75,16 @@ export function ParticlesBg({
             ctx!.beginPath();
             ctx!.moveTo(dots[i].x, dots[i].y);
             ctx!.lineTo(dots[j].x, dots[j].y);
-            ctx!.strokeStyle = colors.line + (contained ? 0.2 : 0.3) * (1 - dist / connectionDist) + ")";
-            ctx!.lineWidth = contained ? 0.4 : 0.5;
+            ctx!.strokeStyle = colors.line + (contained ? 0.15 : 0.25) * (1 - dist / connectionDist) + ")";
+            ctx!.lineWidth = contained ? 0.3 : 0.4;
             ctx!.stroke();
           }
         }
       }
 
-      // draw connections to mouse
+      // draw connections to mouse — only if mouse is in bounds
       let mx = mouse.x;
       let my = mouse.y;
-      // For contained mode, subtract canvas offset because mouse is tracked in window coords
       if (contained) {
         const rect = canvas.getBoundingClientRect();
         mx -= rect.left;
@@ -91,13 +102,13 @@ export function ParticlesBg({
         }
         nearest.sort((a, b) => a.dist - b.dist);
 
-        for (let i = 0; i < Math.min(4, nearest.length); i++) {
+        for (let i = 0; i < Math.min(2, nearest.length); i++) {
           const n = nearest[i];
           ctx!.beginPath();
           ctx!.moveTo(mx, my);
           ctx!.lineTo(n.dot.x, n.dot.y);
-          ctx!.strokeStyle = colors.line + (contained ? 0.35 : 0.5) * (1 - n.dist / mouseConnectionDist) + ")";
-          ctx!.lineWidth = contained ? 0.7 : 1;
+          ctx!.strokeStyle = colors.line + (contained ? 0.25 : 0.4) * (1 - n.dist / mouseConnectionDist) + ")";
+          ctx!.lineWidth = contained ? 0.5 : 0.8;
           ctx!.stroke();
         }
       }
@@ -111,14 +122,15 @@ export function ParticlesBg({
 
         ctx!.beginPath();
         ctx!.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx!.fillStyle = colors.particle + (contained ? 0.4 : 0.6) + ")";
+        ctx!.fillStyle = colors.particle + (contained ? 0.3 : 0.5) + ")";
         ctx!.fill();
       }
 
       animRef.current = requestAnimationFrame(animate);
     }
 
-    animate();
+    // Defer first frame to allow React to paint
+    animRef.current = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animRef.current);
@@ -151,9 +163,6 @@ export function ParticlesBg({
       mouseRef.current.y = -9999;
     };
 
-    // For login page (fullscreen), mouse is on window
-    // For sidebar (contained), mouse is on parent — but we need to capture on window
-    // since canvas has pointer-events-none in fullscreen mode
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseleave", onMouseLeave);
 
@@ -182,4 +191,3 @@ export function ParticlesBg({
     />
   );
 }
-

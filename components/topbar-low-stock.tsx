@@ -13,6 +13,7 @@ export function TopbarLowStock() {
   const router = useRouter();
   const [items, setItems] = useState<LowStockItem[]>([]);
   const [open, setOpen] = useState(false);
+  const [shake, setShake] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,6 +21,11 @@ export function TopbarLowStock() {
       .then((r) => r.json())
       .then((data) => setItems(data.items ?? []))
       .catch(() => {});
+  }, []);
+  useEffect(() => {
+    // stop shake after 8 seconds
+    const t = setTimeout(() => setShake(false), 8000);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
@@ -40,9 +46,9 @@ export function TopbarLowStock() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Low stock items"
-        className="group relative flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-rose-50 dark:hover:bg-rose-500/10 animate-warning-shake"
+        className={`group relative flex h-9 w-9 items-center justify-center rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 ${shake ? "animate-warning-shake" : ""}`}
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4 text-rose-400 transition group-hover:text-rose-500" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4 text-rose-400" strokeLinecap="round" strokeLinejoin="round">
           <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
           <path d="M12 9v4m0 4h.01" />
         </svg>
@@ -53,7 +59,6 @@ export function TopbarLowStock() {
 
       {open && (
         <div className="absolute left-1/2 top-full z-50 mt-2 w-72 -translate-x-1/2 animate-slide-up-flip overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-800">
-          {/* ── Header with accent bar ── */}
           <div className="relative overflow-hidden bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-transparent px-4 py-3">
             <div className="absolute inset-y-0 left-0 w-0.5 rounded-full bg-rose-400" />
             <div className="flex items-center gap-2.5">
@@ -72,7 +77,6 @@ export function TopbarLowStock() {
             </div>
           </div>
 
-          {/* ── Items list ── */}
           <div className="max-h-56 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700/50">
             {items.map((item) => (
               <div

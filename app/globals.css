@@ -169,16 +169,16 @@ body {
   50% { box-shadow: 0 0 10px 2px rgba(251, 191, 36, 0.4); }
 }
 
-/* Warning icon shake — aggressive felt alert */
+/* Warning icon shake — aggressive felt alert, GPU-accelerated */
 @keyframes warning-shake {
-  0%, 80% { transform: rotate(0deg); }
-  82% { transform: rotate(-10deg) scale(1.08); }
-  84% { transform: rotate(10deg) scale(1.08); }
-  86% { transform: rotate(-6deg); }
-  88% { transform: rotate(6deg); }
-  90% { transform: rotate(-3deg); }
-  92% { transform: rotate(3deg); }
-  94%, 100% { transform: rotate(0deg); }
+  0%, 80% { transform: rotateZ(0deg); }
+  82% { transform: rotateZ(-10deg) scale(1.08); }
+  84% { transform: rotateZ(10deg) scale(1.08); }
+  86% { transform: rotateZ(-6deg); }
+  88% { transform: rotateZ(6deg); }
+  90% { transform: rotateZ(-3deg); }
+  92% { transform: rotateZ(3deg); }
+  94%, 100% { transform: rotateZ(0deg); }
 }
 .animate-warning-shake {
   animation: warning-shake 3.5s ease-in-out infinite;
@@ -186,12 +186,14 @@ body {
 
 /* Premium popover entry */
 @keyframes slide-up-flip {
-  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.94); }
-  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  0% { opacity: 0; transform: translateY(8px) scale(0.94); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 .animate-slide-up-flip {
   animation: slide-up-flip 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Remove gpu-layer class — was forcing unnecessary compositor layers that hurt performance */
 
 /* Popover entry animation */
 .low-stock-popover {
