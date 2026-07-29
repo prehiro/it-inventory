@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useTransition, useRef } from "react";
+import { useState, useEffect, useTransition, useRef, useMemo } from "react";
 import { receiveBatchAction, type BatchActionResult } from "@/app/actions/inventory";
-import { ModelSelectorGrid } from "./model-selector-grid";
+import { ModelSearchBar, ModelCardList } from "./model-selector-grid";
 import { TypeIcon } from "./model-selector-grid";
 
 type RowResult = { serial: string; ok: boolean; error?: string };
@@ -15,8 +15,21 @@ export function BatchReceiveForm({
   const [modelId, setModelId] = useState("");
   const [step, setStep] = useState<"select" | "form">("select");
   const [formKey, setFormKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const selectedModel = models.find((m) => m.id === modelId);
+
+  const filteredCount = useMemo(() => {
+    if (!searchQuery.trim()) return models.length;
+    const q = searchQuery.toLowerCase();
+    return models.filter(
+      (m) =>
+        m.type.toLowerCase().includes(q) ||
+        m.brand.toLowerCase().includes(q) ||
+        m.model.toLowerCase().includes(q) ||
+        m.category.toLowerCase().includes(q)
+    ).length;
+  }, [models, searchQuery]);
 
   function handleSelect(id: string) {
     setModelId(id);
@@ -31,9 +44,31 @@ export function BatchReceiveForm({
 
   if (step === "select") {
     return (
-      <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-        <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">Choose Item Type / Model</h2>
-        <ModelSelectorGrid models={models} onSelect={handleSelect} />
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Choose Item Type &amp; Model
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                Select the model you&apos;re receiving
+              </p>
+            </div>
+            <div className="w-full sm:min-w-[340px] sm:w-auto">
+              <ModelSearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                resultCount={filteredCount}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="p-5 pt-0">
+          <div className="max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
+            <ModelCardList models={models} searchQuery={searchQuery} onSelect={handleSelect} />
+          </div>
+        </div>
       </div>
     );
   }

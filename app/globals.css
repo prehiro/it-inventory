@@ -58,19 +58,40 @@ body {
   padding: 1.5px;
 }
 
-/* Thin custom scrollbar */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+/* ── Professional global scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-.scrollbar-thin::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: transparent;
 }
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 9999px;
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
+  border-radius: 999px;
+  border: none;
+  transition: background 0.2s;
 }
-.dark .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #475569;
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #94a3b8, #64748b);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #334155, #475569);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #475569, #64748b);
+}
+
+/* Also use thin scrollbar in Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* ── Thicker scrollbar for scrollable card containers ── */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 @keyframes fade-in {
