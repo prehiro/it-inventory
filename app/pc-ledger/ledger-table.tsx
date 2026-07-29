@@ -53,7 +53,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
     : rows;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="-mx-6 rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       {/* ── Toolbar ── */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 dark:border-slate-800">
         <div className="flex items-center gap-2.5">
