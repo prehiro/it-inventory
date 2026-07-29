@@ -50,7 +50,13 @@ export default async function PcLedgerPage() {
   });
 
   return (
-    <div>
+    <div
+      className="relative"
+      style={{
+        width: "calc(100vw - 15rem - 0.5rem)",
+        left: "calc(-50vw + 50% + 21rem)",
+      }}
+    >
       <PageHeader
         title="PC Ledger"
         subtitle="PC, Laptop & Tablet inventory with PIC, hostname and deployment info"
