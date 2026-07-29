@@ -16,6 +16,12 @@ export default async function ReceivePage() {
       <PageHeader
         title="Receive Item"
         subtitle="Log incoming IT items from logistics & suppliers"
+        icon={
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+          </svg>
+        }
         action={
           <span className="hidden sm:flex items-center gap-1.5 rounded-md bg-[#066fd1]/5 px-3 py-1.5 text-xs font-medium text-[#066fd1] dark:bg-[#066fd1]/10 dark:text-[#066fd1]">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
