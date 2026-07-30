@@ -20,6 +20,14 @@ export async function GET(req: NextRequest) {
       { user: { name: { contains: q } } },
     ];
   }
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  if (from || to) {
+    const tsWhere: Record<string, unknown> = {};
+    if (from) tsWhere.gte = new Date(from);
+    if (to) tsWhere.lte = new Date(`${to}T23:59:59.999Z`);
+    where.timestamp = tsWhere;
+  }
 
   const [logs, total] = await Promise.all([
     prisma.auditLog.findMany({

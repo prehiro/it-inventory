@@ -54,7 +54,7 @@ export function StatusBar({
                 minWidth: d.value > 0 ? 4 : 0,
                 backgroundColor: d.color,
                 opacity: isActive ? 1 : 0.25,
-                transition: `width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.15 + i * 0.1}s, opacity 0.25s`,
+                transition: `width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.6 + i * 0.15}s, opacity 0.25s`,
               }}
             >
               {/* Thin white highlight at top only */}
@@ -89,7 +89,7 @@ export function StatusBar({
                 transform: mounted
                   ? "translateX(0)"
                   : "translateX(-12px)",
-                transition: `all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.4 + i * 0.08}s`,
+                transition: `all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.7 + i * 0.12}s`,
                 background:
                   hovered === d.name
                     ? `${d.color}0d`
@@ -106,7 +106,7 @@ export function StatusBar({
                     className="absolute inset-0 animate-ping rounded-full"
                     style={{
                       background: d.color,
-                      animation: `scale-in 0.4s ease ${0.5 + i * 0.1}s both`,
+                      animation: `scale-in 0.6s ease ${0.6 + i * 0.12}s both`,
                     }}
                   />
                 )}
@@ -126,7 +126,7 @@ export function StatusBar({
                       ? `${Math.max(2, barPct)}%`
                       : "0%",
                     backgroundColor: d.color,
-                    transition: `width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.5 + i * 0.1}s`,
+                    transition: `width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.8 + i * 0.14}s`,
                   }}
                 />
               </div>

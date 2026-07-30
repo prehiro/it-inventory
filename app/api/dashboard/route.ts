@@ -17,7 +17,7 @@ export async function GET() {
       prisma.itemModel.count({ where: { isDeleted: false } }),
       prisma.auditLog.findMany({
         orderBy: { timestamp: "desc" },
-        take: 10,
+        take: 500,
         include: { user: { select: { name: true } } },
       }),
     ]);

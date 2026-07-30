@@ -25,7 +25,7 @@ export default async function DashboardPage() {
       _count: { _all: true },
     }),
     prisma.auditLog.findMany({
-      orderBy: { timestamp: "desc" }, take: 5,
+      orderBy: { timestamp: "desc" }, take: 500,
       include: { user: { select: { name: true } } },
     }),
     prisma.itemModel.findMany({
