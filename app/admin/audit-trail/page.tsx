@@ -24,8 +24,7 @@ export default function AuditTrailPage() {
   const [total, setTotal] = useState(0);
   const [filterAction, setFilterAction] = useState("");
   const [search, setSearch] = useState("");
-  const [from, setFrom] = useState<string | null>(null);
-  const [to, setTo] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<{ from: string; to: string } | null>(null);
 
   const fetchLogs = useCallback(async () => {
     setBusy(true);
@@ -33,12 +32,11 @@ export default function AuditTrailPage() {
       const params = new URLSearchParams({ page: String(page) });
       if (filterAction) params.set("action", filterAction);
       if (search.trim()) params.set("q", search.trim());
-      // Read from/from URL every time to handle heatmap redirect on first load
       const sp = new URLSearchParams(window.location.search);
       const f = sp.get("from");
       const t = sp.get("to");
-      if (f) { params.set("from", f); if (!from) setFrom(f); }
-      if (t) { params.set("to", t); if (!to) setTo(t); }
+      if (f && t) params.set("from", f), params.set("to", t);
+      if (f && t && !dateFilter) setDateFilter({ from: f, to: t });
       const res = await fetch(`/api/audit-logs?${params}`);
       const json = await res.json();
       if (json.ok) {
@@ -52,7 +50,7 @@ export default function AuditTrailPage() {
     } finally {
       setBusy(false);
     }
-  }, [page, filterAction, search, from, to]);
+  }, [page, filterAction, search, dateFilter]);
 
   useEffect(() => {
     fetchLogs();
@@ -95,13 +93,13 @@ export default function AuditTrailPage() {
         }
       />
 
-      {(from || to) && (
+      {dateFilter && (
         <div className="mb-4 flex items-center gap-2 rounded-lg bg-indigo-50 px-4 py-2 text-sm dark:bg-indigo-500/10">
           <span className="text-indigo-600 dark:text-indigo-400">
-            Showing activity from {from || "the beginning"} to {to || "today"}
+            Showing activity from {dateFilter.from} to {dateFilter.to}
           </span>
           <button
-            onClick={() => { setFrom(null); setTo(null); window.history.replaceState({}, "", "/admin/audit-trail"); }}
+            onClick={() => { setDateFilter(null); window.history.replaceState({}, "", "/admin/audit-trail"); }}
             className="ml-auto text-xs font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
           >
             Clear
