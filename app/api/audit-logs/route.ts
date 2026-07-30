@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
   // Gather distinct actions for the filter UI
   const actions = await prisma.auditLog.groupBy({
     by: ["action"],
+    where: where as any,
     _count: { action: true },
     orderBy: { _count: { action: "desc" } },
   });
