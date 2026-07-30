@@ -24,16 +24,8 @@ export default function AuditTrailPage() {
   const [total, setTotal] = useState(0);
   const [filterAction, setFilterAction] = useState("");
   const [search, setSearch] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const f = params.get("from");
-    const t = params.get("to");
-    if (f) setFrom(f);
-    if (t) setTo(t);
-  }, []);
+  const [from, setFrom] = useState<string | null>(null);
+  const [to, setTo] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
     setBusy(true);
@@ -41,8 +33,12 @@ export default function AuditTrailPage() {
       const params = new URLSearchParams({ page: String(page) });
       if (filterAction) params.set("action", filterAction);
       if (search.trim()) params.set("q", search.trim());
-      if (from) params.set("from", from);
-      if (to) params.set("to", to);
+      // Read from/from URL every time to handle heatmap redirect on first load
+      const sp = new URLSearchParams(window.location.search);
+      const f = sp.get("from");
+      const t = sp.get("to");
+      if (f) { params.set("from", f); if (!from) setFrom(f); }
+      if (t) { params.set("to", t); if (!to) setTo(t); }
       const res = await fetch(`/api/audit-logs?${params}`);
       const json = await res.json();
       if (json.ok) {
@@ -105,7 +101,7 @@ export default function AuditTrailPage() {
             Showing activity from {from || "the beginning"} to {to || "today"}
           </span>
           <button
-            onClick={() => { setFrom(""); setTo(""); window.history.replaceState({}, "", "/admin/audit-trail"); }}
+            onClick={() => { setFrom(null); setTo(null); window.history.replaceState({}, "", "/admin/audit-trail"); }}
             className="ml-auto text-xs font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
           >
             Clear
