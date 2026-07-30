@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { auditView, TONE_CLASS } from "@/lib/audit-format";
-import { StatusSankey } from "@/components/status-sankey";
+import { StatusBar } from "@/components/status-bar";
 import type { Role } from "@/lib/types";
 
 /* ─────────────────────────────────────
@@ -98,7 +98,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <CategoryDonut data={data.donut} />
         </Card>
         <Card title="Status Distribution">
-          <StatusSankey data={data.statusData} total={data.total} />
+          <StatusBar data={data.statusData} total={data.total} />
         </Card>
       </div>
 
