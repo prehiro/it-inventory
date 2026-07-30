@@ -33,7 +33,7 @@ export function StatusBar({
   return (
     <div className="space-y-3">
       {/* ── Stacked bar ── */}
-      <div className="relative flex h-8 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+      <div className="relative flex h-8 w-full overflow-hidden rounded-full">
         {/* Background shimmer */}
         <div
           className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_ease-in-out_forwards] rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent"
@@ -48,7 +48,7 @@ export function StatusBar({
               key={d.name}
               onMouseEnter={() => setHovered(d.name)}
               onMouseLeave={() => setHovered(null)}
-              className="relative h-full first:rounded-l-full last:rounded-r-full"
+              className="relative h-full"
               style={{
                 width: mounted ? `${pct}%` : "0%",
                 minWidth: d.value > 0 ? 4 : 0,
@@ -57,11 +57,15 @@ export function StatusBar({
                 transition: `width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.15 + i * 0.1}s, opacity 0.25s`,
               }}
             >
-              {pct > 12 && mounted && (
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-white drop-shadow-sm">
-                  {d.value}
-                </span>
-              )}
+              {/* Thin white highlight at top only */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 40%)",
+                  pointerEvents: "none",
+                }}
+              />
             </div>
           );
         })}
@@ -92,7 +96,7 @@ export function StatusBar({
                     : "transparent",
               }}
             >
-              {/* Color dot w/ pulse entrance */}
+              {/* Color dot */}
               <span
                 className="relative h-2.5 w-2.5 shrink-0 rounded-full"
                 style={{ background: d.color }}
