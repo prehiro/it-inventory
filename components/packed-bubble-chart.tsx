@@ -1,4 +1,5 @@
 "use client";
+
 import { useRef, useEffect, useState, useMemo } from "react";
 
 interface BubbleDatum {
@@ -7,60 +8,77 @@ interface BubbleDatum {
   color: string;
 }
 
-/* Simple circle-packing via greedy placement */
+/* Deterministic greedy circle packing — no Math.random, no overlap */
 function packCircles(
   data: BubbleDatum[],
   width: number,
   height: number,
 ): { x: number; y: number; r: number; d: BubbleDatum }[] {
-  const items = data
-    .filter((d) => d.value > 0)
-    .map((d) => ({ d, r: Math.sqrt(d.value) * 6 + 16 }))
+  const filtered = data.filter((d) => d.value > 0);
+  if (filtered.length === 0) return [];
+
+  // Scale radii so the largest bubble fills ~40% of the smaller dimension
+  const maxVal = Math.max(...filtered.map((d) => d.value));
+  const scale = Math.min(width, height) * 0.38 / Math.sqrt(maxVal);
+  const items = filtered
+    .map((d) => ({ d, r: Math.max(14, Math.sqrt(d.value) * scale) }))
     .sort((a, b) => b.r - a.r);
 
-  const placed: { x: number; y: number; r: number }[] = [];
-  const margin = 6;
+  const pad = 3;
   const cx = width / 2;
-  const cy = height / 2 - 10;
+  const cy = height / 2 - 8;
+  const placed: { x: number; y: number; r: number }[] = [];
 
   return items.map((item) => {
-    let x = cx;
-    let y = cy;
+    const r = item.r;
 
-    // Try to place near center, push outward if overlapping
-    let iterations = 0;
-    while (iterations < 300) {
-      let overlap = false;
+    // First item → center
+    if (placed.length === 0) {
+      placed.push({ x: cx, y: cy, r });
+      return { x: cx, y: cy, r, d: item.d };
+    }
+
+    // Subsequent items: spiral search outward from center
+    let bestX = cx + r;
+    let bestY = cy;
+    let bestDist = Infinity;
+
+    for (let angle = 0; angle < Math.PI * 16; angle += 0.15) {
+      const spiralR = 2 + angle * r * 0.12;
+      const x = cx + Math.cos(angle) * spiralR;
+      const y = cy + Math.sin(angle) * spiralR;
+
+      // Bounds check
+      if (x - r < 2 || x + r > width - 2 || y - r < 2 || y + r > height - 2)
+        continue;
+
+      let ok = true;
+      let minDist = Infinity;
       for (const p of placed) {
         const dx = x - p.x;
         const dy = y - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const minDist = item.r + p.r + margin;
-        if (dist < minDist) {
-          overlap = true;
-          // Push away
-          if (dist < 1) {
-            x += Math.random() * 10 - 5;
-            y += Math.random() * 10 - 5;
-          } else {
-            const push = (minDist - dist) * 0.5;
-            x += (dx / dist) * -push;
-            y += (dy / dist) * -push;
-          }
-          break;
-        }
+        const minGap = r + p.r + pad;
+        if (dist < minGap) { ok = false; break; }
+        if (dist < minDist) minDist = dist;
       }
-      if (!overlap) break;
-      iterations++;
+
+      if (ok) {
+        placed.push({ x, y, r });
+        return { x, y, r, d: item.d };
+      }
+
+      // Track the "least bad" position as fallback
+      if (minDist! > bestDist) {
+        bestDist = minDist!;
+        bestX = x;
+        bestY = y;
+      }
     }
 
-    // Clamp to bounds
-    const half = item.r + margin;
-    x = Math.max(half, Math.min(width - half, x));
-    y = Math.max(half, Math.min(height - half, y));
-
-    placed.push({ x, y, r: item.r });
-    return { x, y, r: item.r, d: item.d };
+    // Fallback: compress at best available spot (allow slight overlap)
+    placed.push({ x: bestX, y: bestY, r });
+    return { x: bestX, y: bestY, r, d: item.d };
   });
 }
 
@@ -73,8 +91,15 @@ export function PackedBubbleChart({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dim, setDim] = useState({ w: 300, h: 200 });
+  const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState<string | null>(null);
 
+  // Mount only on client to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Resize observer
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -102,79 +127,82 @@ export function PackedBubbleChart({
 
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: 220 }}>
-      <svg width={dim.w} height={dim.h} className="overflow-visible">
-        {bubbles.map((b) => {
-          const isActive = active === null || active === b.d.name;
-          const fontSize = Math.max(9, Math.min(b.r * 0.52, 16));
-          const showValue = b.r > 18;
+      {mounted ? (
+        <svg width={dim.w} height={dim.h} className="overflow-visible">
+          {bubbles.map((b) => {
+            const isActive = active === null || active === b.d.name;
+            const fontSize = Math.max(10, Math.min(b.r * 0.5, 16));
+            const showValue = b.r > 20;
 
-          return (
-            <g
-              key={b.d.name}
-              cursor="pointer"
-              onMouseEnter={() => setActive(b.d.name)}
-              onMouseLeave={() => setActive(null)}
-              style={{ transition: "opacity 0.2s" }}
-            >
-              {/* Shadow circle */}
-              <circle
-                cx={b.x}
-                cy={b.y}
-                r={b.r}
-                fill="transparent"
-                opacity={isActive ? 1 : 0.25}
-                style={{ transition: "opacity 0.25s ease" }}
-              />
-              {/* Main circle */}
-              <circle
-                cx={b.x}
-                cy={b.y}
-                r={b.r}
-                fill={b.d.color}
-                opacity={isActive ? 1 : 0.25}
-                style={{
-                  transition: "opacity 0.25s ease",
-                  filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.12))",
-                }}
-              />
-              {/* Label */}
-              <text
-                x={b.x}
-                y={b.y - (showValue ? 5 : 1)}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="#fff"
-                fontSize={fontSize}
-                fontWeight={600}
-                fontFamily="Inter, system-ui, sans-serif"
-                pointerEvents="none"
-                opacity={isActive ? 1 : 0.25}
-                style={{ transition: "opacity 0.25s ease" }}
+            return (
+              <g
+                key={b.d.name}
+                cursor="pointer"
+                onMouseEnter={() => setActive(b.d.name)}
+                onMouseLeave={() => setActive(null)}
+                style={{ transition: "opacity 0.2s" }}
               >
-                {b.d.name}
-              </text>
-              {/* Value */}
-              {showValue && (
+                {/* Invisible hit area */}
+                <circle
+                  cx={b.x}
+                  cy={b.y}
+                  r={b.r + 4}
+                  fill="transparent"
+                  opacity={0}
+                />
+                {/* Bubble */}
+                <circle
+                  cx={b.x}
+                  cy={b.y}
+                  r={b.r}
+                  fill={b.d.color}
+                  opacity={isActive ? 0.95 : 0.2}
+                  style={{
+                    transition: "opacity 0.25s ease",
+                    filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
+                  }}
+                />
+                {/* Label */}
                 <text
                   x={b.x}
-                  y={b.y + fontSize * 0.5 + 6}
+                  y={b.y - (showValue ? 5 : 0)}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill="#fff"
-                  fontSize={Math.max(8, Math.min(b.r * 0.28, 12))}
-                  fontWeight={400}
+                  fontSize={fontSize}
+                  fontWeight={700}
                   fontFamily="Inter, system-ui, sans-serif"
                   pointerEvents="none"
-                  opacity={isActive ? 0.85 : 0.2}
+                  opacity={isActive ? 1 : 0.2}
                   style={{ transition: "opacity 0.25s ease" }}
                 >
-                  {b.d.value}
+                  {b.d.name}
                 </text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
+                {/* Value */}
+                {showValue && (
+                  <text
+                    x={b.x}
+                    y={b.y + fontSize * 0.55 + 4}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#fff"
+                    fontSize={Math.max(9, Math.min(b.r * 0.26, 12))}
+                    fontWeight={400}
+                    fontFamily="Inter, system-ui, sans-serif"
+                    pointerEvents="none"
+                    opacity={isActive ? 0.9 : 0.15}
+                    style={{ transition: "opacity 0.25s ease" }}
+                  >
+                    {b.d.value}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      ) : (
+        <div style={{ height: dim.h }} />
+      )}
 
       {/* Legend */}
       <div className="absolute inset-x-0 bottom-1 flex flex-wrap items-center justify-center gap-4">
@@ -190,7 +218,7 @@ export function PackedBubbleChart({
               style={{ opacity: isActive ? 1 : 0.25 }}
             >
               <span
-                className="h-2 w-2 rounded-full"
+                className="h-2.5 w-2.5 rounded-full"
                 style={{ background: d.color }}
               />
               <span className="font-medium text-slate-600 dark:text-slate-400">
