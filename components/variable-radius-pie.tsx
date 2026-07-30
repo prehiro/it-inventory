@@ -63,12 +63,16 @@ export function VariableRadiusPie({
     });
 
     // Variable radius adapter — each slice's radius proportional to its value
+    // but never smaller than 30% of max radius so tiny slices stay visible
     series.slices.template.adapters.add("radius", (radius, target) => {
       const dataItem = target.dataItem;
       const high = series.getPrivate("valueHigh");
       if (dataItem && high && radius != null) {
         const value = (dataItem.get("valueWorking" as any) as number) ?? 0;
-        return (radius * value) / high;
+        const ratio = value / high;
+        // Clamp ratio so smallest slice is at least 0.35 of max
+        const clamped = Math.max(0.35, ratio);
+        return radius * clamped;
       }
       return radius;
     });
