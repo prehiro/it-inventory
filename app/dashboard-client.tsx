@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { auditView, TONE_CLASS } from "@/lib/audit-format";
-import { PackedBubbleChart } from "@/components/packed-bubble-chart";
+import { VariableRadiusPie } from "@/components/variable-radius-pie";
 import type { Role } from "@/lib/types";
 
 /* ─────────────────────────────────────
@@ -98,7 +98,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <CategoryDonut data={data.donut} />
         </Card>
         <Card title="Status Distribution">
-          <PackedBubbleChart data={data.statusData} total={data.total} />
+          <VariableRadiusPie data={data.statusData} total={data.total} />
         </Card>
       </div>
 
