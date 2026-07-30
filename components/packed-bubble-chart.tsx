@@ -1,12 +1,67 @@
 "use client";
-
-import { useRef, useEffect, useState } from "react";
-import * as d3Hierarchy from "d3-hierarchy";
+import { useRef, useEffect, useState, useMemo } from "react";
 
 interface BubbleDatum {
   name: string;
   value: number;
   color: string;
+}
+
+/* Simple circle-packing via greedy placement */
+function packCircles(
+  data: BubbleDatum[],
+  width: number,
+  height: number,
+): { x: number; y: number; r: number; d: BubbleDatum }[] {
+  const items = data
+    .filter((d) => d.value > 0)
+    .map((d) => ({ d, r: Math.sqrt(d.value) * 6 + 16 }))
+    .sort((a, b) => b.r - a.r);
+
+  const placed: { x: number; y: number; r: number }[] = [];
+  const margin = 6;
+  const cx = width / 2;
+  const cy = height / 2 - 10;
+
+  return items.map((item) => {
+    let x = cx;
+    let y = cy;
+
+    // Try to place near center, push outward if overlapping
+    let iterations = 0;
+    while (iterations < 300) {
+      let overlap = false;
+      for (const p of placed) {
+        const dx = x - p.x;
+        const dy = y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = item.r + p.r + margin;
+        if (dist < minDist) {
+          overlap = true;
+          // Push away
+          if (dist < 1) {
+            x += Math.random() * 10 - 5;
+            y += Math.random() * 10 - 5;
+          } else {
+            const push = (minDist - dist) * 0.5;
+            x += (dx / dist) * -push;
+            y += (dy / dist) * -push;
+          }
+          break;
+        }
+      }
+      if (!overlap) break;
+      iterations++;
+    }
+
+    // Clamp to bounds
+    const half = item.r + margin;
+    x = Math.max(half, Math.min(width - half, x));
+    y = Math.max(half, Math.min(height - half, y));
+
+    placed.push({ x, y, r: item.r });
+    return { x, y, r: item.r, d: item.d };
+  });
 }
 
 export function PackedBubbleChart({
@@ -17,155 +72,111 @@ export function PackedBubbleChart({
   total: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [dim, setDim] = useState({ w: 0, h: 0 });
+  const [dim, setDim] = useState({ w: 300, h: 200 });
   const [active, setActive] = useState<string | null>(null);
 
-  // Resize observer
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-
     const ro = new ResizeObserver((entries) => {
       for (const e of entries) {
         const { width, height } = e.contentRect;
-        setDim({ w: Math.floor(width), h: Math.floor(height) });
+        if (width > 0 && height > 0)
+          setDim({ w: Math.floor(width), h: Math.floor(height) });
       }
     });
     ro.observe(el);
-    setDim({ w: el.clientWidth, h: el.clientHeight });
+    const { clientWidth, clientHeight } = el;
+    if (clientWidth > 0 && clientHeight > 0)
+      setDim({ w: clientWidth, h: clientHeight });
     return () => ro.disconnect();
   }, []);
 
-  // Draw bubbles
-  useEffect(() => {
-    if (!svgRef.current || dim.w === 0 || dim.h === 0 || data.length === 0)
-      return;
-
-    const filtered = data.filter((d) => d.value > 0);
-    if (filtered.length === 0) return;
-
-    const pack = d3Hierarchy.pack<BubbleDatum>().size([dim.w - 4, dim.h - 4]).padding(4);
-
-    const root = d3Hierarchy
-      .hierarchy<BubbleDatum>(
-        { name: "root", value: 0, color: "" } as BubbleDatum,
-        (d) => {
-          // Return children only for the artificial root
-          return (d as any).__children ?? undefined;
-        },
-      )
-      .sum((d) => d.value ?? 0);
-
-    // Inject children into root via a separate property
-    (root.data as any).__children = filtered;
-
-    const nodes = pack(root).leaves();
-    const svg = svgRef.current;
-    const ns = "http://www.w3.org/2000/svg";
-
-    // Clear
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-    // Defs for subtle shadow
-    const defs = document.createElementNS(ns, "defs");
-    const filter = document.createElementNS(ns, "filter");
-    filter.setAttribute("id", "bubble-shadow");
-    filter.setAttribute("x", "-10%");
-    filter.setAttribute("y", "-10%");
-    filter.setAttribute("width", "130%");
-    filter.setAttribute("height", "130%");
-    const feDropShadow = document.createElementNS(ns, "feDropShadow");
-    feDropShadow.setAttribute("dx", "0");
-    feDropShadow.setAttribute("dy", "2");
-    feDropShadow.setAttribute("stdDeviation", "3");
-    feDropShadow.setAttribute("flood-opacity", "0.12");
-    filter.appendChild(feDropShadow);
-    defs.appendChild(filter);
-    svg.appendChild(defs);
-
-    nodes.forEach((node) => {
-      const d = node.data as BubbleDatum;
-      const r = node.r;
-      const cx = node.x;
-      const cy = node.y;
-      const isActive = active === null || active === d.name;
-
-      // Group for hover effect
-      const g = document.createElementNS(ns, "g");
-      g.setAttribute("cursor", "pointer");
-
-      // Circle
-      const circle = document.createElementNS(ns, "circle");
-      circle.setAttribute("cx", String(cx));
-      circle.setAttribute("cy", String(cy));
-      circle.setAttribute("r", String(r));
-      circle.setAttribute("fill", d.color);
-      circle.setAttribute("opacity", String(isActive ? 1 : 0.25));
-      circle.setAttribute("filter", "url(#bubble-shadow)");
-      circle.style.transition = "opacity 0.25s ease";
-
-      // Hover events
-      g.addEventListener("mouseenter", () => setActive(d.name));
-      g.addEventListener("mouseleave", () => setActive(null));
-
-      g.appendChild(circle);
-
-      // Text
-      const text = document.createElementNS(ns, "text");
-      text.setAttribute("x", String(cx));
-      text.setAttribute("y", String(cy));
-      text.setAttribute("text-anchor", "middle");
-      text.setAttribute("dominant-baseline", "central");
-      text.setAttribute("fill", "#fff");
-      text.setAttribute("font-size", String(Math.max(9, Math.min(r * 0.55, 16))));
-      text.setAttribute("font-weight", "600");
-      text.setAttribute("font-family", "Inter, system-ui, sans-serif");
-      text.setAttribute("pointer-events", "none");
-      text.setAttribute("opacity", String(isActive ? 1 : 0.25));
-      text.style.transition = "opacity 0.25s ease";
-      text.textContent = d.name;
-      g.appendChild(text);
-
-      // Value label
-      const valText = document.createElementNS(ns, "text");
-      valText.setAttribute("x", String(cx));
-      valText.setAttribute("y", String(cy + (r > 24 ? 12 : 0)));
-      valText.setAttribute("text-anchor", "middle");
-      valText.setAttribute("dominant-baseline", "central");
-      valText.setAttribute("fill", "#fff");
-      valText.setAttribute("font-size", String(Math.max(8, Math.min(r * 0.3, 13))));
-      valText.setAttribute("font-weight", "400");
-      valText.setAttribute("font-family", "Inter, system-ui, sans-serif");
-      valText.setAttribute("pointer-events", "none");
-      valText.setAttribute("opacity", String(isActive ? 0.85 : 0.2));
-      valText.style.transition = "opacity 0.25s ease";
-
-      if (r > 30) {
-        valText.textContent = `${d.value} items`;
-      } else if (r > 16) {
-        valText.textContent = String(d.value);
-      }
-      g.appendChild(valText);
-
-      svg.appendChild(g);
-    });
-  }, [dim, data, active]);
+  const bubbles = useMemo(
+    () => packCircles(data, dim.w, dim.h),
+    [data, dim.w, dim.h],
+  );
 
   if (data.length === 0)
-    return (
-      <p className="py-8 text-center text-sm text-slate-400">No data</p>
-    );
+    return <p className="py-8 text-center text-sm text-slate-400">No data</p>;
 
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: 220 }}>
-      <svg
-        ref={svgRef}
-        width={dim.w}
-        height={dim.h}
-        className="overflow-visible"
-      />
-      {/* Legend row */}
+      <svg width={dim.w} height={dim.h} className="overflow-visible">
+        {bubbles.map((b) => {
+          const isActive = active === null || active === b.d.name;
+          const fontSize = Math.max(9, Math.min(b.r * 0.52, 16));
+          const showValue = b.r > 18;
+
+          return (
+            <g
+              key={b.d.name}
+              cursor="pointer"
+              onMouseEnter={() => setActive(b.d.name)}
+              onMouseLeave={() => setActive(null)}
+              style={{ transition: "opacity 0.2s" }}
+            >
+              {/* Shadow circle */}
+              <circle
+                cx={b.x}
+                cy={b.y}
+                r={b.r}
+                fill="transparent"
+                opacity={isActive ? 1 : 0.25}
+                style={{ transition: "opacity 0.25s ease" }}
+              />
+              {/* Main circle */}
+              <circle
+                cx={b.x}
+                cy={b.y}
+                r={b.r}
+                fill={b.d.color}
+                opacity={isActive ? 1 : 0.25}
+                style={{
+                  transition: "opacity 0.25s ease",
+                  filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.12))",
+                }}
+              />
+              {/* Label */}
+              <text
+                x={b.x}
+                y={b.y - (showValue ? 5 : 1)}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="#fff"
+                fontSize={fontSize}
+                fontWeight={600}
+                fontFamily="Inter, system-ui, sans-serif"
+                pointerEvents="none"
+                opacity={isActive ? 1 : 0.25}
+                style={{ transition: "opacity 0.25s ease" }}
+              >
+                {b.d.name}
+              </text>
+              {/* Value */}
+              {showValue && (
+                <text
+                  x={b.x}
+                  y={b.y + fontSize * 0.5 + 6}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="#fff"
+                  fontSize={Math.max(8, Math.min(b.r * 0.28, 12))}
+                  fontWeight={400}
+                  fontFamily="Inter, system-ui, sans-serif"
+                  pointerEvents="none"
+                  opacity={isActive ? 0.85 : 0.2}
+                  style={{ transition: "opacity 0.25s ease" }}
+                >
+                  {b.d.value}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* Legend */}
       <div className="absolute inset-x-0 bottom-1 flex flex-wrap items-center justify-center gap-4">
         {data.map((d) => {
           const pct = total > 0 ? Math.round((d.value / total) * 100) : 0;
@@ -188,7 +199,9 @@ export function PackedBubbleChart({
               <span className="font-semibold text-slate-900 dark:text-slate-100">
                 {d.value}
               </span>
-              <span className="text-slate-400 dark:text-slate-500">({pct}%)</span>
+              <span className="text-slate-400 dark:text-slate-500">
+                ({pct}%)
+              </span>
             </button>
           );
         })}
