@@ -430,3 +430,15 @@ html {
   pointer-events: none;
 }
 
+/* ── Seamless shimmer sweep ── */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── Scale-in burst ── */
+@keyframes scale-in {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
