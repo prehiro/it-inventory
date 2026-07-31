@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { PageHeader } from "@/components/page-header";
 import { auditView, TONE_CLASS } from "@/lib/audit-format";
 import type { AuditView } from "@/lib/audit-format";
@@ -13,6 +13,12 @@ type LogEntry = {
   user: string;
   serialNumber?: string;
   assignee?: string;
+  model?: string;
+  disposition?: string;
+  poNumber?: string;
+  dept?: string;
+  reason?: string;
+  raw?: Record<string, unknown>;
 };
 
 type ActionMeta = { action: string; count: number };
@@ -27,6 +33,30 @@ function parseDetails(details: string): Record<string, unknown> {
   }
 }
 
+/** Deterministic status flow per action — the "story" of the item. */
+function statusFlow(action: string): string[] | null {
+  switch (action) {
+    case "RECEIVED_ITEM":
+      return ["AVAILABLE"];
+    case "RELEASED_ITEM":
+      return ["AVAILABLE", "RELEASED"];
+    case "RETURNED_ITEM":
+      return ["RELEASED", "RETURNED"];
+    case "CREATED_MODEL":
+      return ["MODEL CREATED"];
+    case "DELETED_MODEL":
+      return ["MODEL DELETED"];
+    case "CREATED_USER":
+      return ["USER CREATED"];
+    case "DELETED_USER":
+      return ["USER DELETED"];
+    case "UPDATED_USER_ROLE":
+      return ["ROLE CHANGED"];
+    default:
+      return null;
+  }
+}
+
 export default function AuditTrailPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [actions, setActions] = useState<ActionMeta[]>([]);
@@ -34,9 +64,11 @@ export default function AuditTrailPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [allTotal, setAllTotal] = useState(0);
   const [filterAction, setFilterAction] = useState("");
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState<{ from: string; to: string } | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
     setBusy(true);
@@ -60,12 +92,19 @@ export default function AuditTrailPage() {
           return {
             ...l,
             serialNumber: parsed.serialNumber as string | undefined,
-            assignee: parsed.assignee as string | undefined,
+            assignee: (parsed.assignee ?? parsed.pic) as string | undefined,
+            model: parsed.model as string | undefined,
+            disposition: (parsed.disposition ?? parsed.reason) as string | undefined,
+            poNumber: parsed.poNumber as string | undefined,
+            dept: parsed.assigneeDept as string | undefined,
+            reason: parsed.reason as string | undefined,
+            raw: parsed,
           };
         });
         setLogs(enriched);
         setTotalPages(json.totalPages);
         setTotal(json.total);
+        setAllTotal(json.allTotal ?? json.total);
         if (json.actions) setActions(json.actions);
       }
     } catch {
@@ -83,13 +122,32 @@ export default function AuditTrailPage() {
     setPage(1);
   }, [filterAction, search]);
 
+  const groupedLogs = useMemo(() => {
+    const groups: { label: string; items: LogEntry[] }[] = [];
+    for (const log of logs) {
+      const d = new Date(log.timestamp);
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const startOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      const dayDiff = Math.round((startOfToday - startOfDay) / 86400000);
+      let label: string;
+      if (dayDiff === 0) label = "Today";
+      else if (dayDiff === 1) label = "Yesterday";
+      else label = d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+      const last = groups[groups.length - 1];
+      if (last && last.label === label) last.items.push(log);
+      else groups.push({ label, items: [log] });
+    }
+    return groups;
+  }, [logs]);
+
   return (
     <div>
       <PageHeader
         title="Audit Trail"
         subtitle={`${total} events recorded`}
         icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4 animate-shield" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
         }
@@ -126,25 +184,42 @@ export default function AuditTrailPage() {
         </div>
       )}
 
-      {/* Filter pills */}
+      {/* Filter pills — single-select */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <button
           onClick={() => setFilterAction("")}
-          className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${!filterAction ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"}`}
+          className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors ${
+            !filterAction
+              ? "border-[#066fd1] bg-[#066fd1] text-white shadow-sm"
+              : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+          }`}
         >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.5" y2="16.5" />
+          </svg>
           All
+          <span className={`ml-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${!filterAction ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300"}`}>
+            {allTotal}
+          </span>
         </button>
         {actions.map((a) => {
           const v = auditView(a.action, "{}");
+          const Icon = v.icon;
           const active = filterAction === a.action;
           return (
             <button
               key={a.action}
               onClick={() => setFilterAction(active ? "" : a.action)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${active ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"}`}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors ${
+                active
+                  ? "border-[#066fd1] bg-[#066fd1] text-white shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+              }`}
             >
+              <Icon className={`h-3.5 w-3.5 ${active ? "" : TONE_CLASS[v.tone].replace("bg-", "text-")}`} />
               {v.label}
-              <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${active ? "bg-indigo-500 text-white" : "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400"}`}>
+              <span className={`ml-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300"}`}>
                 {a.count}
               </span>
             </button>
@@ -168,53 +243,113 @@ export default function AuditTrailPage() {
           </div>
         ) : (
           <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-            {logs.map((log) => {
-              const v: AuditView = auditView(log.action, log.details);
-              const Icon = v.icon;
-              const date = new Date(log.timestamp);
-              const timeAgo = formatTimeAgo(date);
-              return (
-                <li key={log.id} className="group flex items-start gap-4 px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  {/* Icon container */}
-                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${TONE_CLASS[v.tone]} bg-opacity-10`}>
-                    <Icon className={`h-6 w-6 ${TONE_CLASS[v.tone].replace("bg-", "text-")}`} />
-                  </span>
-                  {/* Content */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>
-                        {v.label}
-                      </span>
-                      {log.serialNumber && (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
-                          {log.serialNumber}
-                        </span>
-                      )}
-                      {v.summary && v.summary !== "—" && (
-                        <span className="truncate text-sm text-slate-600 dark:text-slate-300">{v.summary}</span>
-                      )}
-                    </div>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
-                      <span className="font-medium text-slate-500 dark:text-slate-400">{log.user}</span>
-                      {log.assignee && (
-                        <>
-                          <span>→</span>
-                          <span className="text-indigo-600 dark:text-indigo-400 font-medium">{log.assignee}</span>
-                        </>
-                      )}
-                      <span>·</span>
-                      <time dateTime={log.timestamp} title={date.toLocaleString()} className="text-slate-500 dark:text-slate-400">
-                        {timeAgo}
-                      </time>
-                    </div>
-                  </div>
-                  {/* Timestamp on hover */}
-                  <span className="hidden shrink-0 text-xs text-slate-400 group-hover:block dark:text-slate-500">
-                    {date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                </li>
-              );
-            })}
+            {groupedLogs.map((group) => (
+              <li key={group.label}>
+                <div className="sticky top-0 z-10 border-b border-slate-100 bg-white/95 px-6 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-500">
+                  {group.label}
+                </div>
+                <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {group.items.map((log) => {
+                    const v: AuditView = auditView(log.action, log.details);
+                    const Icon = v.icon;
+                    const date = new Date(log.timestamp);
+                    const timeAgo = formatTimeAgo(date);
+                    const flow = statusFlow(log.action);
+                    const isOpen = expandedId === log.id;
+                    return (
+                      <li key={log.id}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedId(isOpen ? null : log.id)}
+                          className="group flex w-full items-start gap-4 px-6 py-4 text-left transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        >
+                          {/* Icon container */}
+                          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${TONE_CLASS[v.tone]} bg-opacity-10`}>
+                            <Icon className={`h-6 w-6 ${TONE_CLASS[v.tone].replace("bg-", "text-")}`} />
+                          </span>
+                          {/* Content */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>
+                                {v.label}
+                              </span>
+                              {flow && (
+                                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium">
+                                  {flow.map((s, i) => (
+                                    <span key={i} className="inline-flex items-center gap-1.5">
+                                      {i > 0 && (
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3 text-indigo-500 dark:text-indigo-400" strokeLinecap="round" strokeLinejoin="round">
+                                          <line x1="5" y1="12" x2="19" y2="12" />
+                                          <polyline points="12 5 19 12 12 19" />
+                                        </svg>
+                                      )}
+                                      <span className={i === flow.length - 1 ? "font-semibold text-slate-800 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}>
+                                        {s}
+                                      </span>
+                                    </span>
+                                  ))}
+                                </span>
+                              )}
+                              {log.serialNumber && (
+                                <span className="rounded-full px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+                                  {log.serialNumber}
+                                </span>
+                              )}
+                              {log.model && (
+                                <span className="rounded-full px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+                                  {log.model}
+                                </span>
+                              )}
+                              {log.assignee && (
+                                <span className="rounded-full px-2 py-0.5 text-[10px] font-medium bg-indigo-100 text-indigo-600 ring-1 ring-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:ring-indigo-700">
+                                  {log.assignee}
+                                </span>
+                              )}
+                              {log.disposition && (
+                                <span className="rounded-full px-2 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-600 ring-1 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-700">
+                                  {log.disposition}
+                                </span>
+                              )}
+                              {v.summary && v.summary !== "—" && (
+                                <span className="truncate text-sm text-slate-600 dark:text-slate-300">{cleanSummary(v.summary, log.serialNumber, log.assignee)}</span>
+                              )}
+                            </div>
+                            <div className="mt-1 flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
+                              <span className="font-medium text-slate-500 dark:text-slate-400">{log.user}</span>
+                              <span>·</span>
+                              <time dateTime={log.timestamp} title={date.toLocaleString()} className="text-slate-500 dark:text-slate-400">
+                                {timeAgo}
+                              </time>
+                            </div>
+                          </div>
+                          {/* Timestamp on hover */}
+                          <span className="hidden shrink-0 items-center gap-1 text-xs text-slate-400 group-hover:flex dark:text-slate-500">
+                            {date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                          </span>
+                        </button>
+                        {isOpen && log.raw && (
+                          <div className="animate-panel-in border-t border-slate-100 bg-slate-50/70 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/30">
+                            <dl className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-4">
+                              {Object.entries(log.raw).map(([k, val]) => (
+                                <div key={k} className="min-w-0">
+                                  <dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{k}</dt>
+                                  <dd className="truncate text-sm text-slate-700 dark:text-slate-200" title={String(val)}>
+                                    {String(val ?? "—")}
+                                  </dd>
+                                </div>
+                              ))}
+                            </dl>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
           </ul>
         )}
         {/* Pagination */}
@@ -261,4 +396,23 @@ function formatTimeAgo(date: Date): string {
   const days = Math.floor(hrs / 24);
   if (days < 7) return `${days}d ago`;
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+/** Remove the serial number and PIC from the summary so it doesn't repeat next to the SN badge. */
+function cleanSummary(summary: string, serialNumber?: string, pic?: string): string {
+  if (!serialNumber && !pic) return summary;
+  // Summary formats like "SN123 → John" or "SN123 by John" or "SN123"
+  let cleaned = summary;
+  if (serialNumber) {
+    const idx = cleaned.indexOf(serialNumber);
+    if (idx !== -1) {
+      cleaned = cleaned.slice(idx + serialNumber.length);
+      cleaned = cleaned.replace(/^\s*(→|by|,)\s*/, "") || "—";
+    }
+  }
+  if (pic) {
+    // Remove PIC if it's the same as assignee or appears in the summary
+    cleaned = cleaned.replace(new RegExp(`\\b${pic}\\b`, "g"), "").trim();
+  }
+  return cleaned || "—";
 }

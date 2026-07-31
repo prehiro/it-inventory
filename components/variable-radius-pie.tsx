@@ -11,11 +11,21 @@ interface SliceDatum {
   color: string;
 }
 
-// Soft professional palette
+// Soft professional palette — category-first so FA/NCA/GENERAL keep their
+// brand colors (green / yellow / purple) even when the server omits a color.
+const CATEGORY_COLORS: Record<string, string> = {
+  FA: "#10b981",
+  NCA: "#f59e0b",
+  GENERAL: "#8b5cf6",
+};
 const FALLBACK_COLORS = [
-  "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6",
-  "#ef4444", "#ec4899", "#14b8a6", "#f97316",
+  "#10b981", "#f59e0b", "#8b5cf6",
+  "#3b82f6", "#ef4444", "#ec4899", "#14b8a6", "#f97316",
 ];
+
+function resolveColor(name: string, i: number): string {
+  return CATEGORY_COLORS[name] ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length];
+}
 
 export function VariableRadiusPie({
   data,
@@ -85,7 +95,7 @@ export function VariableRadiusPie({
       data.map((d, i) => ({
         name: d.name,
         value: d.value,
-        fill: am5.color(d.color || FALLBACK_COLORS[i % FALLBACK_COLORS.length]),
+        fill: am5.color(d.color || resolveColor(d.name, i)),
       })),
     );
 

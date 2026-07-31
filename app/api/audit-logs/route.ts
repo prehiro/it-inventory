@@ -13,7 +13,11 @@ export async function GET(req: NextRequest) {
   const limit = 25;
 
   const where: Record<string, unknown> = {};
-  if (action) where.action = action;
+  if (action) {
+    const actions = action.split(",").map((s) => s.trim()).filter(Boolean);
+    if (actions.length === 1) where.action = actions[0];
+    else if (actions.length > 1) where.action = { in: actions };
+  }
   if (q) {
     where.OR = [
       { details: { contains: q } },
@@ -40,13 +44,20 @@ export async function GET(req: NextRequest) {
     prisma.auditLog.count({ where: where as any }),
   ]);
 
-  // Gather distinct actions for the filter UI
-  const actions = await prisma.auditLog.groupBy({
-    by: ["action"],
-    where: where as any,
-    _count: { action: true },
-    orderBy: { _count: { action: "desc" } },
-  });
+  // Gather distinct actions for the filter UI.
+  // Deliberately NOT filtered by the action filter itself, so every pill
+  // stays visible no matter which filter is active (counts still respect q/date).
+  const pillWhere = { ...where };
+  delete pillWhere.action;
+  const [actions, allTotal] = await Promise.all([
+    prisma.auditLog.groupBy({
+      by: ["action"],
+      where: pillWhere as any,
+      _count: { action: true },
+      orderBy: { _count: { action: "desc" } },
+    }),
+    prisma.auditLog.count({ where: pillWhere as any }),
+  ]);
 
   return NextResponse.json({
     ok: true,
@@ -59,6 +70,7 @@ export async function GET(req: NextRequest) {
     })),
     actions: actions.map((a) => ({ action: a.action, count: a._count.action })),
     total,
+    allTotal,
     page,
     totalPages: Math.ceil(total / limit),
   });
