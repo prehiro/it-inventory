@@ -11,9 +11,21 @@ type LogEntry = {
   details: string;
   timestamp: string;
   user: string;
+  serialNumber?: string;
+  assignee?: string;
 };
 
 type ActionMeta = { action: string; count: number };
+
+function parseDetails(details: string): Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(details);
+    if (typeof parsed !== "object" || parsed === null) return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
 
 export default function AuditTrailPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -35,12 +47,23 @@ export default function AuditTrailPage() {
       const sp = new URLSearchParams(window.location.search);
       const f = sp.get("from");
       const t = sp.get("to");
-      if (f && t) params.set("from", f), params.set("to", t);
-      if (f && t && !dateFilter) setDateFilter({ from: f, to: t });
+      if (f && t) {
+        params.set("from", f);
+        params.set("to", t);
+        if (!dateFilter) setDateFilter({ from: f, to: t });
+      }
       const res = await fetch(`/api/audit-logs?${params}`);
       const json = await res.json();
       if (json.ok) {
-        setLogs(json.logs);
+        const enriched = json.logs.map((l: LogEntry) => {
+          const parsed = parseDetails(l.details);
+          return {
+            ...l,
+            serialNumber: parsed.serialNumber as string | undefined,
+            assignee: parsed.assignee as string | undefined,
+          };
+        });
+        setLogs(enriched);
         setTotalPages(json.totalPages);
         setTotal(json.total);
         if (json.actions) setActions(json.actions);
@@ -56,7 +79,6 @@ export default function AuditTrailPage() {
     fetchLogs();
   }, [fetchLogs]);
 
-  // Reset page when filter changes
   useEffect(() => {
     setPage(1);
   }, [filterAction, search]);
@@ -67,19 +89,13 @@ export default function AuditTrailPage() {
         title="Audit Trail"
         subtitle={`${total} events recorded`}
         icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4 animate-shield" strokeLinecap="round" strokeLinejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
         }
         action={
           <div className="relative">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-            >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
@@ -99,7 +115,10 @@ export default function AuditTrailPage() {
             Showing activity from {dateFilter.from} to {dateFilter.to}
           </span>
           <button
-            onClick={() => { setDateFilter(null); window.history.replaceState({}, "", "/admin/audit-trail"); }}
+            onClick={() => {
+              setDateFilter(null);
+              window.history.replaceState({}, "", "/admin/audit-trail");
+            }}
             className="ml-auto text-xs font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
           >
             Clear
@@ -111,11 +130,7 @@ export default function AuditTrailPage() {
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <button
           onClick={() => setFilterAction("")}
-          className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
-            !filterAction
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-          }`}
+          className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${!filterAction ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"}`}
         >
           All
         </button>
@@ -126,16 +141,10 @@ export default function AuditTrailPage() {
             <button
               key={a.action}
               onClick={() => setFilterAction(active ? "" : a.action)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
-                active
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-              }`}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${active ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"}`}
             >
               {v.label}
-              <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
-                active ? "bg-indigo-500 text-white" : "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
-              }`}>
+              <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${active ? "bg-indigo-500 text-white" : "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400"}`}>
                 {a.count}
               </span>
             </button>
@@ -144,13 +153,10 @@ export default function AuditTrailPage() {
       </div>
 
       {/* Timeline */}
-      <div className="overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <div className="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
         {busy ? (
           <div className="flex items-center justify-center py-24">
-            <svg className="h-6 w-6 animate-spin text-slate-400" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
-              <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
-            </svg>
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
           </div>
         ) : logs.length === 0 ? (
           <div className="flex flex-col items-center py-24 text-center">
@@ -158,7 +164,7 @@ export default function AuditTrailPage() {
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            <p className="text-sm text-slate-400">No matching events found.</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500">No matching events found.</p>
           </div>
         ) : (
           <ul className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -168,31 +174,40 @@ export default function AuditTrailPage() {
               const date = new Date(log.timestamp);
               const timeAgo = formatTimeAgo(date);
               return (
-                <li key={log.id} className="group flex items-start gap-4 px-6 py-4 transition hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  {/* Icon */}
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>
-                    <Icon className="h-5 w-5" />
+                <li key={log.id} className="group flex items-start gap-4 px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  {/* Icon container */}
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${TONE_CLASS[v.tone]} bg-opacity-10`}>
+                    <Icon className={`h-6 w-6 ${TONE_CLASS[v.tone].replace("bg-", "text-")}`} />
                   </span>
-
                   {/* Content */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2.5">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${TONE_CLASS[v.tone]}`}>
                         {v.label}
                       </span>
+                      {log.serialNumber && (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+                          {log.serialNumber}
+                        </span>
+                      )}
                       {v.summary && v.summary !== "—" && (
                         <span className="truncate text-sm text-slate-600 dark:text-slate-300">{v.summary}</span>
                       )}
                     </div>
                     <div className="mt-1 flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
                       <span className="font-medium text-slate-500 dark:text-slate-400">{log.user}</span>
+                      {log.assignee && (
+                        <>
+                          <span>→</span>
+                          <span className="text-indigo-600 dark:text-indigo-400 font-medium">{log.assignee}</span>
+                        </>
+                      )}
                       <span>·</span>
-                      <time dateTime={log.timestamp} title={date.toLocaleString()}>
+                      <time dateTime={log.timestamp} title={date.toLocaleString()} className="text-slate-500 dark:text-slate-400">
                         {timeAgo}
                       </time>
                     </div>
                   </div>
-
                   {/* Timestamp on hover */}
                   <span className="hidden shrink-0 text-xs text-slate-400 group-hover:block dark:text-slate-500">
                     {date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
@@ -202,14 +217,13 @@ export default function AuditTrailPage() {
             })}
           </ul>
         )}
-
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-slate-100 px-6 py-3 dark:border-slate-800">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
@@ -222,7 +236,7 @@ export default function AuditTrailPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800"
             >
               Next
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">

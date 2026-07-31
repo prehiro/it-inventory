@@ -17,9 +17,7 @@ export function PageHeader({
 
   return (
     <div
-      className={`mb-6 flex items-start gap-4 ${
-        isCenter && !action ? "justify-center" : "justify-between"
-      }`}
+      className={`mb-6 flex items-start gap-4 ${isCenter && !action ? "justify-center" : "justify-between"}`}
     >
       <div className={isCenter ? "flex flex-col items-center" : ""}>
         <div className={`flex items-center gap-2.5 ${isCenter ? "justify-center" : ""}`}>
@@ -32,9 +30,7 @@ export function PageHeader({
         </div>
         {subtitle && (
           <p
-            className={`mt-1 text-sm text-slate-500 dark:text-slate-400 ${
-              isCenter ? "" : ""
-            }`}
+            className={`mt-1 text-sm text-slate-500 dark:text-slate-400 ${isCenter ? "" : ""}`}
           >
             {subtitle}
           </p>
