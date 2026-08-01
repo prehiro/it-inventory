@@ -40,7 +40,7 @@ export function CreateModelForm() {
           <option value="GENERAL">GENERAL</option>
         </select>
       </div>
-      <button disabled={pending} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60">
+      <button disabled={pending} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-60">
         {pending ? "Saving…" : "Add Model"}
       </button>
       {!state.ok && <p className="text-sm text-rose-600 dark:text-rose-400">{state.error}</p>}

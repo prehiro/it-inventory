@@ -70,7 +70,7 @@ export function ReportsFilter({
         <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">To</label>
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 input-glow" />
       </div>
-      <button onClick={apply} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500">
+      <button onClick={apply} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500">
         Apply
       </button>
       <span className="text-sm text-slate-400 dark:text-slate-500">{count} rows</span>

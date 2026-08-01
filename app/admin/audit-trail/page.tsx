@@ -168,8 +168,8 @@ export default function AuditTrailPage() {
       />
 
       {dateFilter && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-indigo-50 px-4 py-2 text-sm dark:bg-indigo-500/10">
-          <span className="text-indigo-600 dark:text-indigo-400">
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 text-sm dark:bg-blue-500/10">
+          <span className="text-blue-600 dark:text-blue-400">
             Showing activity from {dateFilter.from} to {dateFilter.to}
           </span>
           <button
@@ -177,7 +177,7 @@ export default function AuditTrailPage() {
               setDateFilter(null);
               window.history.replaceState({}, "", "/admin/audit-trail");
             }}
-            className="ml-auto text-xs font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+            className="ml-auto text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
           >
             Clear
           </button>
