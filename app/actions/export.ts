@@ -390,6 +390,11 @@ export async function exportPdfAction(filter: Record<string, unknown>): Promise<
 
       let x = mL;
       vals.forEach((v, c) => {
+        // Skip TYPE (1) & STATUS (3) — drawn once below as colored chips
+        if (c === 1 || c === 3) {
+          x += cWids[c];
+          return;
+        }
         setFill(zebra[0], zebra[1], zebra[2]);
         setDraw(borderR, borderG, borderB);
         doc.rect(x, y, cWids[c], 4, "DF");
