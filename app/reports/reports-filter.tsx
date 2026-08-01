@@ -282,8 +282,8 @@ export function ReportsFilter({
           className="inline-flex h-[38px] items-center gap-2 rounded-lg bg-green-700 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800 active:scale-[0.98] disabled:opacity-60 disabled:hover:bg-green-700"
         >
           <svg viewBox="0 0 32 32" className="h-5 w-5 shrink-0" aria-hidden="true">
-            <rect x="2" y="2" width="28" height="28" rx="7" fill="#217346" />
-            <path d="M20.1 5.5v6.99L13.6 5.5H9.4v5.58l6.49 5.92-6.49 5.92v5.58h4.2l6.5-6.99V26.5h4.2v-21z" fill="#ffffff" />
+            <rect width="32" height="32" rx="6.5" fill="#217346" />
+            <path fill="#ffffff" d="M29.121 8.502v-3.749h-8.435v3.749zM29.121 15.063v-4.686h-8.435v4.686zM29.121 21.623v-4.686h-8.435v4.686zM29.121 27.247v-3.749h-8.435v3.749zM18.812 8.502v-3.749h-8.435v3.749zM18.812 15.063v-4.686h-2.812v4.686zM18.812 21.623v-4.686h-2.812v4.686zM18.812 27.247v-3.749h-8.435v3.749zM8.502 17.6l1.774 3.324h2.674l-2.974-4.836 2.924-4.749h-2.574l-1.625 2.999-0.062 0.1-0.050 0.112-0.8-1.6-0.825-1.612h-2.724l2.837 4.774-3.099 4.811h2.699z" />
           </svg>
           {busy === "xlsx" ? "Exporting…" : "Export Excel"}
         </button>
