@@ -276,8 +276,17 @@ export function ReportsFilter({
         </button>
       )}
       <div className="ml-auto flex gap-2">
-        <button disabled={busy !== ""} onClick={() => download()} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
-          {busy === "xlsx" ? "…" : "Export Excel"}
+        <button
+          disabled={busy !== ""}
+          onClick={() => download()}
+          className="inline-flex h-[38px] items-center gap-2 rounded-lg bg-green-700 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800 active:scale-[0.98] disabled:opacity-60 disabled:hover:bg-green-700"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="4.5" fill="#ffffff" />
+            <path d="M6.5 6.5l11 11" stroke="#107C41" strokeWidth="2.4" strokeLinecap="round" />
+            <path d="M17.5 6.5L11 12.5" stroke="#107C41" strokeWidth="2.4" strokeLinecap="round" />
+          </svg>
+          {busy === "xlsx" ? "Exporting…" : "Export Excel"}
         </button>
       </div>
     </div>
