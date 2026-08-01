@@ -282,14 +282,8 @@ export function ReportsFilter({
           className="inline-flex h-[38px] items-center gap-2 rounded-lg bg-green-700 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800 active:scale-[0.98] disabled:opacity-60 disabled:hover:bg-green-700"
         >
           <svg viewBox="0 0 32 32" className="h-5 w-5 shrink-0" aria-hidden="true">
-            <defs>
-              <linearGradient id="excel-grad" x1="8" y1="4" x2="24" y2="28" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stopColor="#21a366" />
-                <stop offset="1" stopColor="#107c41" />
-              </linearGradient>
-            </defs>
-            <rect x="2" y="2" width="28" height="28" rx="6.25" fill="url(#excel-grad)" stroke="#ffffff" strokeWidth="1.6" />
-            <path d="M18.24 8.5v6.74L11.88 8.5H7.5v15h4.26v-6.74L18.12 23.5h4.38v-15z" fill="#ffffff" />
+            <rect x="2" y="2" width="28" height="28" rx="7" fill="#217346" />
+            <path d="M20.1 5.5v6.99L13.6 5.5H9.4v5.58l6.49 5.92-6.49 5.92v5.58h4.2l6.5-6.99V26.5h4.2v-21z" fill="#ffffff" />
           </svg>
           {busy === "xlsx" ? "Exporting…" : "Export Excel"}
         </button>
