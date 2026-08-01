@@ -210,7 +210,7 @@ function BatchReceiveFormInner({
             onChange={(e) => setRaw(e.target.value.toUpperCase())}
             rows={8}
             placeholder={"SN-LAP-001\nSN-LAP-002\nSN-LAP-003\netc.."}
-            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <p className="mt-1 text-xs text-slate-400">Total {count} SN</p>
         </div>
@@ -229,8 +229,8 @@ function BatchReceiveFormInner({
                 if (el.selectionStart !== null && el.selectionStart < PO_PREFIX.length) e.preventDefault();
               }}
               placeholder="PTCAP__"
-              style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }}
-              className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              style={{ ["--neon" as string]: "rgba(37,99,235,0.55)" }}
+              className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
             <input type="hidden" name="poNumber" value={poNumber} />
           </div>
@@ -243,7 +243,7 @@ function BatchReceiveFormInner({
 
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Remarks (shared)</label>
-          <input value={remarks} onChange={(e) => setRemarks(e.target.value)} style={{ ["--neon" as string]: "rgba(6,111,209,0.55)" }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          <input value={remarks} onChange={(e) => setRemarks(e.target.value)} style={{ ["--neon" as string]: "rgba(37,99,235,0.55)" }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
         </div>
 
         {error && (
@@ -253,7 +253,7 @@ function BatchReceiveFormInner({
         <button
           onClick={process}
           disabled={pending || count === 0}
-          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
+          className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
         >
           {pending ? `Processing ${count} items…` : `Process ${count} item${count === 1 ? "" : "s"}`}
         </button>

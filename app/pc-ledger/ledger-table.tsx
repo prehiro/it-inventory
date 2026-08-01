@@ -60,7 +60,7 @@ function getUniqueValues(rows: LedgerRow[], key: ColKey): string[] {
 }
 
 const FILTER_INPUT_CLASS =
-  "w-full rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#066fd1] focus:ring-0 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:placeholder:text-slate-500";
+  "w-full rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#2563eb] focus:ring-0 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:placeholder:text-slate-500";
 
 export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
   const [q, setQ] = useState("");
@@ -137,7 +137,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search all…"
-              className="w-48 rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="w-48 rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -146,7 +146,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
             onClick={() => setShowFilters((v) => !v)}
             className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${
               showFilters || hasActiveFilters
-                ? "border-[#066fd1] bg-[#066fd1]/10 text-[#066fd1]"
+                ? "border-[#2563eb] bg-[#2563eb]/10 text-[#2563eb]"
                 : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
             }`}
           >
@@ -155,7 +155,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
             </svg>
             Filter
             {hasActiveFilters && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#066fd1] text-[10px] font-bold text-white">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563eb] text-[10px] font-bold text-white">
                 {activeFilterCount}
               </span>
             )}
@@ -199,14 +199,14 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                     key={col.key}
                     className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
                       isActive
-                        ? "text-[#066fd1]"
+                        ? "text-[#2563eb]"
                         : "text-slate-500 dark:text-slate-400"
                     }`}
                   >
                     <div className="flex items-center gap-1">
                       {col.label}
                       {isActive && (
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-[#066fd1]">
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-[#2563eb]">
                           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                         </svg>
                       )}
@@ -305,7 +305,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                     <p className="text-sm font-medium text-slate-400 dark:text-slate-500">No devices match your filters.</p>
                     <button
                       onClick={() => { setFilters({}); setQ(""); }}
-                      className="text-xs font-medium text-[#066fd1] hover:underline"
+                      className="text-xs font-medium text-[#2563eb] hover:underline"
                     >
                       Clear all filters
                     </button>

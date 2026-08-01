@@ -101,7 +101,7 @@ export function ModelSearchBar({
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search by type, brand, or model…"
         aria-label="Search item models"
-        className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#066fd1] focus:bg-white focus:ring-2 focus:ring-[#066fd1]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-[#066fd1] dark:focus:bg-slate-800 dark:focus:ring-[#066fd1]/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden"
+        className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#2563eb] focus:bg-white focus:ring-2 focus:ring-[#2563eb]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-[#2563eb] dark:focus:bg-slate-800 dark:focus:ring-[#2563eb]/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden"
       />
       {value && (
         <button
@@ -196,7 +196,7 @@ export function ModelCardList({
 
                       {/* Text */}
                       <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate text-sm font-bold text-slate-800 group-hover:text-[#066fd1] dark:text-slate-100 dark:group-hover:text-[#066fd1]/90" title={m.model}>
+                        <p className="truncate text-sm font-bold text-slate-800 group-hover:text-[#2563eb] dark:text-slate-100 dark:group-hover:text-[#2563eb]/90" title={m.model}>
                           {m.model}
                         </p>
                         <p className="truncate text-[11px] leading-tight text-slate-400 dark:text-slate-500">
@@ -205,8 +205,8 @@ export function ModelCardList({
                       </div>
 
                       {/* Chevron */}
-                      <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:bg-[#066fd1]/10">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3 text-[#066fd1] dark:text-[#066fd1]/80" strokeLinecap="round" strokeLinejoin="round">
+                      <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:bg-[#2563eb]/10">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3 text-[#2563eb] dark:text-[#2563eb]/80" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M5 12h14M13 5l7 7-7 7" />
                         </svg>
                       </div>

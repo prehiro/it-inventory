@@ -37,14 +37,14 @@ export default function LoginPage() {
 
       {/* ── Decorative blobs ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden dark:opacity-30">
-        <div className="absolute -left-20 top-1/4 h-[400px] w-[400px] animate-[blob_18s_ease-in-out_infinite] rounded-full bg-gradient-to-br from-[#066fd1]/10 to-sky-200/30 blur-[80px] dark:from-[#066fd1]/20 dark:to-sky-800/20" />
+        <div className="absolute -left-20 top-1/4 h-[400px] w-[400px] animate-[blob_18s_ease-in-out_infinite] rounded-full bg-gradient-to-br from-[#2563eb]/10 to-sky-200/30 blur-[80px] dark:from-[#2563eb]/20 dark:to-sky-800/20" />
         <div className="absolute -bottom-20 right-0 h-[350px] w-[350px] animate-[blob_22s_ease-in-out_infinite_reverse] rounded-full bg-gradient-to-tr from-indigo-200/30 to-purple-200/20 blur-[80px] dark:from-indigo-800/20 dark:to-purple-800/10" />
         <div className="absolute left-1/2 top-0 h-[250px] w-[250px] animate-[blob_15s_ease-in-out_infinite] rounded-full bg-gradient-to-br from-emerald-100/20 to-cyan-200/20 blur-[70px] dark:from-emerald-800/10 dark:to-cyan-800/10" />
       </div>
 
       {/* ── Subtle dot grid ── */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.15] dark:opacity-[0.04]" style={{
-        backgroundImage: "radial-gradient(circle, rgba(6,111,209,0.3) 1px, transparent 1px)",
+        backgroundImage: "radial-gradient(circle, rgba(37,99,235,0.3) 1px, transparent 1px)",
         backgroundSize: "32px 32px",
       }} />
 
@@ -56,7 +56,7 @@ export default function LoginPage() {
           {/* ── Left brand ── */}
           <div className="hidden lg:block flex-1 max-w-md">
             <div className="flex items-center gap-3 mb-8">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#066fd1] shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2563eb] shadow-sm">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5 text-white">
                   <rect x="2" y="2" width="20" height="20" rx="3" />
                   <path d="M7 7h3v10H7zM14 7h3v6h-3z" />
@@ -94,7 +94,7 @@ export default function LoginPage() {
                 },
               ].map((item) => (
                 <div key={item.text} className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#066fd1]/10 text-[#066fd1] dark:bg-[#066fd1]/20">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2563eb]/10 text-[#2563eb] dark:bg-[#2563eb]/20">
                     {item.icon}
                   </span>
                   {item.text}
@@ -110,7 +110,7 @@ export default function LoginPage() {
           <div className="w-full max-w-sm">
             {/* Mobile logo */}
             <div className="mb-8 flex flex-col items-center lg:hidden">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#066fd1] shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#2563eb] shadow-sm">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6 text-white">
                   <rect x="2" y="2" width="20" height="20" rx="3" />
                   <path d="M7 7h3v10H7zM14 7h3v6h-3z" />
@@ -134,7 +134,7 @@ export default function LoginPage() {
                       id="employeeNumber" name="employeeNumber" type="text" autoComplete="username" required
                       value={employeeNumber} onChange={(e) => setEmployeeNumber(e.target.value)}
                       placeholder="ADM001"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[#066fd1] focus:ring-2 focus:ring-[#066fd1]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder-slate-500 dark:hover:border-slate-600 dark:focus:border-[#066fd1] dark:focus:ring-[#066fd1]/20"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder-slate-500 dark:hover:border-slate-600 dark:focus:border-[#2563eb] dark:focus:ring-[#2563eb]/20"
                     />
                   </div>
 
@@ -146,7 +146,7 @@ export default function LoginPage() {
                       id="password" name="password" type="password" autoComplete="current-password" required
                       value={password} onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[#066fd1] focus:ring-2 focus:ring-[#066fd1]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder-slate-500 dark:hover:border-slate-600 dark:focus:border-[#066fd1] dark:focus:ring-[#066fd1]/20"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder-slate-500 dark:hover:border-slate-600 dark:focus:border-[#2563eb] dark:focus:ring-[#2563eb]/20"
                     />
                   </div>
 
@@ -163,7 +163,7 @@ export default function LoginPage() {
 
                   <button
                     type="submit" disabled={pending}
-                    className="group relative w-full overflow-hidden rounded-lg bg-[#066fd1] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#0585d1] active:scale-[0.98] disabled:opacity-60"
+                    className="group relative w-full overflow-hidden rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#0585d1] active:scale-[0.98] disabled:opacity-60"
                   >
                     {/* Shine sweep — glass reflect */}
                     <span className="pointer-events-none absolute inset-0 -translate-x-full skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-500 group-hover:translate-x-[200%]" />

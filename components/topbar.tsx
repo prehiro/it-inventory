@@ -50,7 +50,7 @@ export function Topbar({ name, role }: { name: string; role: string }) {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search serial number…"
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-[#066fd1] focus:bg-white focus:ring-2 focus:ring-[#066fd1]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-[#066fd1] dark:focus:bg-slate-800 dark:focus:ring-[#066fd1]/20"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-[#2563eb] focus:bg-white focus:ring-2 focus:ring-[#2563eb]/15 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-[#2563eb] dark:focus:bg-slate-800 dark:focus:ring-[#2563eb]/20"
             />
             <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-500 sm:inline-block">
               /
@@ -86,7 +86,7 @@ export function Topbar({ name, role }: { name: string; role: string }) {
                 onClick={() => setOpen((o) => !o)}
                 className="group flex items-center gap-2 rounded-lg p-1.5 transition hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#066fd1]/10 text-xs font-semibold text-[#066fd1] dark:bg-[#066fd1]/20 dark:text-[#066fd1]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#2563eb]/10 text-xs font-semibold text-[#2563eb] dark:bg-[#2563eb]/20 dark:text-[#2563eb]">
                   {name.charAt(0).toUpperCase()}
                 </div>
                 <div className="hidden text-left sm:block">
@@ -102,7 +102,7 @@ export function Topbar({ name, role }: { name: string; role: string }) {
                 <div className="absolute right-0 mt-2 w-56 animate-fade-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#066fd1]/10 text-sm font-semibold text-[#066fd1] dark:bg-[#066fd1]/20">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2563eb]/10 text-sm font-semibold text-[#2563eb] dark:bg-[#2563eb]/20">
                         {name.charAt(0).toUpperCase()}
                       </div>
                       <div>

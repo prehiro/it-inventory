@@ -24,7 +24,7 @@ export default async function ReceivePage() {
           </svg>
         }
         action={
-          <span className="hidden sm:flex items-center gap-1.5 rounded-md bg-[#066fd1]/5 px-3 py-1.5 text-xs font-medium text-[#066fd1] dark:bg-[#066fd1]/10 dark:text-[#066fd1]">
+          <span className="hidden sm:flex items-center gap-1.5 rounded-md bg-[#2563eb]/5 px-3 py-1.5 text-xs font-medium text-[#2563eb] dark:bg-[#2563eb]/10 dark:text-[#2563eb]">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 16v-4M12 8h.01" />

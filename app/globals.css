@@ -4,7 +4,7 @@
   --color-background: #f1f5f9;
   --color-foreground: #0f172a;
   --font-sans: var(--font-inter);
-  --color-primary: #066fd1;
+  --color-primary: #2563eb;
   --color-primary-light: #058bd1;
   --color-sidebar: #0c1426;
   --color-sidebar-border: #1a2540;
@@ -126,8 +126,8 @@ html {
 }
 
 @keyframes neon-breath {
-  0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(6,111,209,0.2)); }
-  50% { box-shadow: 0 0 14px 4px var(--neon, rgba(6,111,209,0.5)); }
+  0%, 100% { box-shadow: 0 0 0 0 var(--neon, rgba(37,99,235,0.2)); }
+  50% { box-shadow: 0 0 14px 4px var(--neon, rgba(37,99,235,0.5)); }
 }
 
 /* ── Bounce animation for Receive page icon ── */
@@ -248,8 +248,8 @@ html {
 
 /* Icon breathing glow for solid fill SVG (uses --neon) */
 @keyframes icon-breath {
-  0%, 100% { filter: drop-shadow(0 0 3px var(--neon, rgba(6,111,209,0.3))); }
-  50% { filter: drop-shadow(0 0 12px 5px var(--neon, rgba(6,111,209,0.65))); }
+  0%, 100% { filter: drop-shadow(0 0 3px var(--neon, rgba(37,99,235,0.3))); }
+  50% { filter: drop-shadow(0 0 12px 5px var(--neon, rgba(37,99,235,0.65))); }
 }
 .animate-icon-breath { animation: icon-breath 1.8s ease-in-out infinite; }
 
@@ -263,8 +263,8 @@ html {
   will-change: box-shadow;
 }
 @keyframes input-breath {
-  0%, 100% { box-shadow: 0 0 6px 2px rgba(6,111,209,0.2); }
-  50% { box-shadow: 0 0 6px 2px rgba(6,111,209,0.5); }
+  0%, 100% { box-shadow: 0 0 6px 2px rgba(37,99,235,0.2); }
+  50% { box-shadow: 0 0 6px 2px rgba(37,99,235,0.5); }
 }
 
 /* Red breathing glow for duplicate/error serial */
@@ -278,13 +278,13 @@ html {
 }
 
 .nav-link-active {
-  background: #e0f2fe; /* sky-50 */
-  color: #066fd1; /* primary */
+  background: #eff6ff; /* blue-50 */
+  color: #2563eb; /* primary */
   font-weight: 500;
 }
 .dark .nav-link-active {
-  background: rgba(6, 111, 209, 0.15); /* primary/15 */
-  color: #38bdf8; /* sky-400 */
+  background: rgba(37, 99, 235, 0.15); /* primary/15 */
+  color: #60a5fa; /* blue-400 */
 }
 
 /* Low stock pill */

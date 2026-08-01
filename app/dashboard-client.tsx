@@ -46,7 +46,7 @@ const QUICK_ACTIONS = [
 const ACCENT_BAR: Record<string, string> = {
   slate: "bg-slate-400 dark:bg-slate-500",
   emerald: "bg-emerald-500",
-  indigo: "bg-[#066fd1]",
+  indigo: "bg-[#2563eb]",
   amber: "bg-amber-500",
   rose: "bg-rose-500",
 };
@@ -72,7 +72,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            {greeting}, <span className="text-[#066fd1]">Administrator</span>
+            {greeting}, <span className="text-[#2563eb]">Administrator</span>
           </h1>
           <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
             {data.total.toLocaleString()} items · {data.models} models ·{" "}
@@ -131,14 +131,14 @@ export function DashboardClient({ data }: { data: DashboardData }) {
             <Link
               key={a.href}
               href={a.href}
-              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-[#066fd1]/30 hover:shadow-md hover:text-[#066fd1] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-[#066fd1]/40 dark:hover:text-[#066fd1]"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-[#2563eb]/30 hover:shadow-md hover:text-[#2563eb] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-[#2563eb]/40 dark:hover:text-[#2563eb]"
               style={{
                 opacity: mounted ? 1 : 0,
                 transform: mounted ? "translateY(0)" : "translateY(12px)",
                 transition: `all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}s`,
               }}
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition group-hover:bg-[#066fd1]/10 group-hover:text-[#066fd1] dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-[#066fd1]/20">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition group-hover:bg-[#2563eb]/10 group-hover:text-[#2563eb] dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-[#2563eb]/20">
                 {a.icon}
               </span>
               <span>{a.label}</span>
@@ -411,7 +411,7 @@ function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
             {data.map((d, i) => (
               <Cell
                 key={d.dept}
-                fill={activeBar === d.dept ? "#066fd1" : "#066fd1"}
+                fill={activeBar === d.dept ? "#2563eb" : "#2563eb"}
                 fillOpacity={activeBar === d.dept ? 1 : 0.55}
                 style={{
                   transition: `width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.6 + i * 0.12}s`,
@@ -455,7 +455,7 @@ function ModelTypeBar({ data }: { data: { type: string; count: number }[] }) {
             <div className="flex-1">
               <div className="h-5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <div
-                  className="flex h-full items-center justify-end rounded-full bg-[#066fd1] px-2"
+                  className="flex h-full items-center justify-end rounded-full bg-[#2563eb] px-2"
                   style={{
                     width: mounted ? `${Math.max(pct, 6)}%` : "0%",
                     transition: `width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay + 0.15}s`,

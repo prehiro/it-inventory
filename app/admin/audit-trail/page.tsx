@@ -161,7 +161,7 @@ export default function AuditTrailPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search details or user…"
-              className="w-56 rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-[#066fd1] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="w-56 rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
           </div>
         }
@@ -190,7 +190,7 @@ export default function AuditTrailPage() {
           onClick={() => setFilterAction("")}
           className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors ${
             !filterAction
-              ? "border-[#066fd1] bg-[#066fd1] text-white shadow-sm"
+              ? "border-[#2563eb] bg-[#2563eb] text-white shadow-sm"
               : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-700"
           }`}
         >
@@ -213,7 +213,7 @@ export default function AuditTrailPage() {
               onClick={() => setFilterAction(active ? "" : a.action)}
               className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors ${
                 active
-                  ? "border-[#066fd1] bg-[#066fd1] text-white shadow-sm"
+                  ? "border-[#2563eb] bg-[#2563eb] text-white shadow-sm"
                   : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-700"
               }`}
             >

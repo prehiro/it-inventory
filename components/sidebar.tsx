@@ -94,9 +94,9 @@ const I = {
 const SIDEBAR_BG = "bg-white dark:bg-[#0c1426]";
 const SIDEBAR_BORDER = "border-slate-200 dark:border-[#1a2540]";
 const NAV_ITEM = "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#1a2540] dark:hover:text-white";
-const NAV_ACTIVE = "bg-[#f0f7ff] text-[#066fd1] dark:bg-[#066fd1]/15 dark:text-white";
+const NAV_ACTIVE = "bg-[#f0f7ff] text-[#2563eb] dark:bg-[#2563eb]/15 dark:text-white";
 const CHILD_ITEM = "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200";
-const CHILD_ACTIVE = "text-[#066fd1] font-medium dark:text-white";
+const CHILD_ACTIVE = "text-[#2563eb] font-medium dark:text-white";
 
 export function Sidebar({ role }: { role: Role }) {
   const pathname = usePathname();
@@ -152,7 +152,7 @@ export function Sidebar({ role }: { role: Role }) {
       {/* ── Logo ── */}
       <div className={`relative flex h-16 items-center gap-3 border-b px-5 dark:border-[#1a2540] border-slate-200 ${SIDEBAR_BG}`}>
         <ParticlesBg contained className="absolute inset-0 h-full w-full pointer-events-none" />
-        <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#066fd1] text-sm font-bold text-white shadow-sm">
+        <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-sm font-bold text-white shadow-sm">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
             <rect x="2" y="2" width="20" height="20" rx="3" />
             <path d="M7 7h3v10H7zM14 7h3v6h-3z" />
@@ -176,11 +176,11 @@ export function Sidebar({ role }: { role: Role }) {
                   onClick={() => toggle(group.label.toLowerCase())}
                   className={`group relative w-full ${linkCls(active)}`}
                 >
-                  <span className={active ? "text-[#066fd1] dark:text-white" : "text-slate-400 dark:text-slate-500"}>
+                  <span className={active ? "text-[#2563eb] dark:text-white" : "text-slate-400 dark:text-slate-500"}>
                     {group.icon}
                   </span>
                   <span className="flex-1 text-left">{group.label}</span>
-                  <span className={`transition-transform duration-200 ${openGroups[group.label.toLowerCase()] ? "rotate-180" : ""} ${active ? "text-[#066fd1] dark:text-white/70" : "text-slate-400 dark:text-slate-500"}`}>
+                  <span className={`transition-transform duration-200 ${openGroups[group.label.toLowerCase()] ? "rotate-180" : ""} ${active ? "text-[#2563eb] dark:text-white/70" : "text-slate-400 dark:text-slate-500"}`}>
                     {I.chevronDown}
                   </span>
                 </button>
@@ -194,7 +194,7 @@ export function Sidebar({ role }: { role: Role }) {
                           href={child.href}
                           className={childCls(childActive)}
                         >
-                          <span className={`shrink-0 ${childActive ? "text-[#066fd1] dark:text-white" : "text-slate-400 dark:text-slate-500"}`}>
+                          <span className={`shrink-0 ${childActive ? "text-[#2563eb] dark:text-white" : "text-slate-400 dark:text-slate-500"}`}>
                             {child.icon}
                           </span>
                           {child.label}
@@ -214,7 +214,7 @@ export function Sidebar({ role }: { role: Role }) {
               href={item.href}
               className={linkCls(active)}
             >
-              <span className={active ? "text-[#066fd1] dark:text-white" : "text-slate-400 dark:text-slate-500"}>
+              <span className={active ? "text-[#2563eb] dark:text-white" : "text-slate-400 dark:text-slate-500"}>
                 {item.icon}
               </span>
               {item.label}
@@ -232,11 +232,11 @@ export function Sidebar({ role }: { role: Role }) {
               onClick={() => toggle("admin")}
               className={`group relative w-full ${linkCls(pathname.startsWith("/admin"))}`}
             >
-              <span className={pathname.startsWith("/admin") ? "text-[#066fd1] dark:text-white" : "text-slate-400 dark:text-slate-500"}>
+              <span className={pathname.startsWith("/admin") ? "text-[#2563eb] dark:text-white" : "text-slate-400 dark:text-slate-500"}>
                 {I.admin}
               </span>
               <span className="flex-1 text-left">Admin</span>
-              <span className={`transition-transform duration-200 ${openGroups.admin ? "rotate-180" : ""} ${pathname.startsWith("/admin") ? "text-[#066fd1] dark:text-white/70" : "text-slate-400 dark:text-slate-500"}`}>
+              <span className={`transition-transform duration-200 ${openGroups.admin ? "rotate-180" : ""} ${pathname.startsWith("/admin") ? "text-[#2563eb] dark:text-white/70" : "text-slate-400 dark:text-slate-500"}`}>
                 {I.chevronDown}
               </span>
             </button>
@@ -250,7 +250,7 @@ export function Sidebar({ role }: { role: Role }) {
                       href={child.href}
                       className={childCls(active)}
                     >
-                      <span className={`shrink-0 ${active ? "text-[#066fd1] dark:text-white" : "text-slate-400 dark:text-slate-500"}`}>
+                      <span className={`shrink-0 ${active ? "text-[#2563eb] dark:text-white" : "text-slate-400 dark:text-slate-500"}`}>
                         {child.icon}
                       </span>
                       {child.label}
