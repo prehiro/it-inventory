@@ -390,7 +390,7 @@ export function ReleaseForm() {
               </div>
               <button
                 disabled={pending || !lookup || !!blockedStatus}
-                className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
+                className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
               >
                 {pending ? "Saving…" : "Release Item"}
               </button>
@@ -434,7 +434,7 @@ export function ReleaseForm() {
                 type="button"
                 onClick={onSubmitBatch}
                 disabled={batchPending || batchCount === 0 || hasWarnings}
-                className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
+                className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
               >
                 {batchPending ? `Releasing ${batchCount} items…` : `Release ${batchCount} item${batchCount === 1 ? "" : "s"}`}
               </button>

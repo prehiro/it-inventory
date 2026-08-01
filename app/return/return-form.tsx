@@ -254,7 +254,7 @@ export function ReturnForm() {
         </div>
         <button
           disabled={pending || !lookup || !disposition}
-          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-60"
+          className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
         >
           {pending ? "Saving…" : "Return Item"}
         </button>
