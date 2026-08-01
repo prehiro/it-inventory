@@ -28,8 +28,8 @@ export function ParticlesBg({
       h = canvas.height = window.innerHeight;
     }
 
-    const count = contained ? 20 : 100;
-    const connectionDist = contained ? 80 : 130;
+    const count = contained ? 40 : 150;
+    const connectionDist = contained ? 90 : 140;
     const mouseConnectionDist = contained ? 120 : 200;
     const colors = isDark
       ? { particle: "rgba(0,245,255,", line: "rgba(0,217,255," }
@@ -44,7 +44,7 @@ export function ParticlesBg({
         y: Math.random() * h,
         vx: (Math.random() - 0.5) * (contained ? 0.3 : 0.7),
         vy: (Math.random() - 0.5) * (contained ? 0.3 : 0.7),
-        r: (contained ? 0.6 : 0.8) + Math.random() * (contained ? 1 : 2),
+        r: (contained ? 0.6 : 0.8) + Math.random() * (contained ? 1 : 2.2),
       });
     }
 
