@@ -96,7 +96,7 @@ export function ModelCombobox({
           setOpen((o) => !o);
           setTimeout(() => inputRef.current?.focus(), 0);
         }}
-        className="flex w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-left text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800"
+        className="flex w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-left text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
       >
         {selected ? (
           <span className="flex items-center gap-2">
@@ -143,11 +143,11 @@ export function ModelCombobox({
                       onClick={() => choose(m)}
                       className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm transition ${
                         isActive
-                          ? "bg-indigo-50 dark:bg-indigo-500/15"
+                          ? "bg-blue-50 dark:bg-blue-500/15"
                           : "hover:bg-slate-50 dark:hover:bg-slate-700/50"
                       }`}
                     >
-                      <span className={value === m.id ? "font-medium text-indigo-700 dark:text-indigo-300" : "text-slate-800 dark:text-slate-100"}>
+                      <span className={value === m.id ? "font-medium text-blue-700 dark:text-blue-300" : "text-slate-800 dark:text-slate-100"}>
                         {m.type} · {m.brand} {m.model}
                       </span>
                       <CatBadge cat={m.category} />

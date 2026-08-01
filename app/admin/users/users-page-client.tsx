@@ -28,9 +28,9 @@ type Stats = {
 const ROLE_STYLE: Record<string, { label: string; bg: string; text: string; ring: string }> = {
   ADMIN: {
     label: "Admin",
-    bg: "bg-indigo-50 dark:bg-indigo-500/10",
-    text: "text-indigo-700 dark:text-indigo-300",
-    ring: "ring-indigo-600/20 dark:ring-indigo-400/30",
+    bg: "bg-blue-50 dark:bg-blue-500/10",
+    text: "text-blue-700 dark:text-blue-300",
+    ring: "ring-blue-600/20 dark:ring-blue-400/30",
   },
   MANAGER: {
     label: "Manager",
@@ -88,7 +88,7 @@ export function UsersPageClient({ initialUsers }: { initialUsers: UserRow[] }) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: "Total Users", count: stats.total, icon: <UsersIcon />, color: "bg-slate-50 dark:bg-slate-800/50", textColor: "text-slate-900 dark:text-slate-100", iconBg: "bg-slate-200 dark:bg-slate-700", iconColor: "text-slate-600 dark:text-slate-300" },
-          { label: "Admins", count: stats.admins, icon: <ShieldIcon />, color: "bg-indigo-50 dark:bg-indigo-500/10", textColor: "text-indigo-700 dark:text-indigo-300", iconBg: "bg-indigo-100 dark:bg-indigo-500/20", iconColor: "text-indigo-600 dark:text-indigo-400" },
+          { label: "Admins", count: stats.admins, icon: <ShieldIcon />, color: "bg-blue-50 dark:bg-blue-500/10", textColor: "text-blue-700 dark:text-blue-300", iconBg: "bg-blue-100 dark:bg-blue-500/20", iconColor: "text-blue-600 dark:text-blue-400" },
           { label: "Managers", count: stats.managers, icon: <BriefcaseIcon />, color: "bg-amber-50 dark:bg-amber-500/10", textColor: "text-amber-700 dark:text-amber-300", iconBg: "bg-amber-100 dark:bg-amber-500/20", iconColor: "text-amber-600 dark:text-amber-400" },
           { label: "Operators", count: stats.operators, icon: <UsersIcon />, color: "bg-emerald-50 dark:bg-emerald-500/10", textColor: "text-emerald-700 dark:text-emerald-300", iconBg: "bg-emerald-100 dark:bg-emerald-500/20", iconColor: "text-emerald-600 dark:text-emerald-400" },
         ].map((card) => (
@@ -203,10 +203,10 @@ function CreateUserCard({ onCreated }: { onCreated: () => void }) {
   );
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50/80 to-white shadow-md ring-1 ring-indigo-200/60 dark:from-slate-800 dark:to-slate-900 dark:ring-indigo-500/20">
-      <div className="border-b border-indigo-100 px-6 py-4 dark:border-indigo-500/20">
+    <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50/80 to-white shadow-md ring-1 ring-blue-200/60 dark:from-slate-800 dark:to-slate-900 dark:ring-blue-500/20">
+      <div className="border-b border-blue-100 px-6 py-4 dark:border-blue-500/20">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><line x1="20" y1="8" x2="20" y2="14" /><line x1="23" y1="11" x2="17" y2="11" />
             </svg>
@@ -314,7 +314,7 @@ function UserRowComponent({ user, onUpdated }: { user: UserRow; onUpdated: () =>
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset transition hover:opacity-80 disabled:opacity-60 ${roleStyle.bg} ${roleStyle.text} ${roleStyle.ring}`}
           >
             <span className={`h-1.5 w-1.5 rounded-full ${
-              user.role === "ADMIN" ? "bg-indigo-500" :
+              user.role === "ADMIN" ? "bg-blue-500" :
               user.role === "MANAGER" ? "bg-amber-500" :
               "bg-emerald-500"
             }`} />
@@ -339,13 +339,13 @@ function UserRowComponent({ user, onUpdated }: { user: UserRow; onUpdated: () =>
                     }`}
                   >
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                      r === "ADMIN" ? "bg-indigo-500" :
+                      r === "ADMIN" ? "bg-blue-500" :
                       r === "MANAGER" ? "bg-amber-500" :
                       "bg-emerald-500"
                     }`} />
                     <span className="flex-1">{s.label}</span>
                     {active && (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3.5 w-3.5 text-indigo-600" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3.5 w-3.5 text-blue-600" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                     )}
                   </button>
                 );

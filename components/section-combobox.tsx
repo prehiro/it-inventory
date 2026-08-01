@@ -71,7 +71,7 @@ export function SectionCombobox({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-left text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-left text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
       >
         {value || <span className="text-slate-400">Select section…</span>}
       </button>
@@ -113,7 +113,7 @@ export function SectionCombobox({
                     onClick={() => select(s)}
                     className={`w-full px-3 py-2 text-left ${
                       i === active
-                        ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300"
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
                         : "text-slate-700 dark:text-slate-200"
                     }`}
                   >
