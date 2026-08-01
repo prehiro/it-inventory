@@ -4,28 +4,33 @@ import { useState, useMemo, useRef, useEffect } from "react";
 
 type Model = { id: string; type: string; model: string; brand: string; category: string };
 
-const CAT_STYLE: Record<string, { gradient: string; border: string; badge: string; iconBg: string; neon: string; ring: string }> = {
+type ModelWithCount = Model & { count?: number; available?: number };
+
+const CAT_STYLE: Record<string, { accent: string; bg: string; border: string; badge: string; iconBg: string; neon: string; ring: string }> = {
   NCA: {
-    gradient: "bg-gradient-to-br from-amber-50 via-amber-50/80 to-amber-100/60 dark:from-amber-950/30 dark:via-amber-900/20 dark:to-amber-800/20",
-    border: "border-amber-200/80 hover:border-amber-300 focus-visible:border-amber-400 dark:border-amber-700/40 dark:hover:border-amber-600/60 dark:focus-visible:border-amber-500/70",
+    accent: "bg-amber-400",
+    bg: "bg-amber-50/70 dark:bg-amber-950/20",
+    border: "border-amber-200/70 hover:border-amber-300 focus-visible:border-amber-400 dark:border-amber-700/30 dark:hover:border-amber-600/50 dark:focus-visible:border-amber-500/60",
     badge: "bg-amber-500 text-white dark:bg-amber-600 dark:text-white",
-    iconBg: "bg-white/70 text-amber-600 dark:bg-slate-800/60 dark:text-amber-400",
+    iconBg: "bg-white/80 text-amber-600 dark:bg-slate-800/70 dark:text-amber-400",
     neon: "rgba(245,158,11,0.55)",
     ring: "focus-visible:ring-amber-400/40",
   },
   GENERAL: {
-    gradient: "bg-gradient-to-br from-purple-50 via-purple-50/80 to-purple-100/60 dark:from-purple-950/30 dark:via-purple-900/20 dark:to-purple-800/20",
-    border: "border-purple-200/80 hover:border-purple-300 focus-visible:border-purple-400 dark:border-purple-700/40 dark:hover:border-purple-600/60 dark:focus-visible:border-purple-500/70",
+    accent: "bg-purple-400",
+    bg: "bg-purple-50/70 dark:bg-purple-950/20",
+    border: "border-purple-200/70 hover:border-purple-300 focus-visible:border-purple-400 dark:border-purple-700/30 dark:hover:border-purple-600/50 dark:focus-visible:border-purple-500/60",
     badge: "bg-purple-500 text-white dark:bg-purple-600 dark:text-white",
-    iconBg: "bg-white/70 text-purple-600 dark:bg-slate-800/60 dark:text-purple-400",
+    iconBg: "bg-white/80 text-purple-600 dark:bg-slate-800/70 dark:text-purple-400",
     neon: "rgba(147,51,234,0.55)",
     ring: "focus-visible:ring-purple-400/40",
   },
   FA: {
-    gradient: "bg-gradient-to-br from-emerald-50 via-emerald-50/80 to-emerald-100/60 dark:from-emerald-950/30 dark:via-emerald-900/20 dark:to-emerald-800/20",
-    border: "border-emerald-200/80 hover:border-emerald-300 focus-visible:border-emerald-400 dark:border-emerald-700/40 dark:hover:border-emerald-600/60 dark:focus-visible:border-emerald-500/70",
+    accent: "bg-emerald-400",
+    bg: "bg-emerald-50/70 dark:bg-emerald-950/20",
+    border: "border-emerald-200/70 hover:border-emerald-300 focus-visible:border-emerald-400 dark:border-emerald-700/30 dark:hover:border-emerald-600/50 dark:focus-visible:border-emerald-500/60",
     badge: "bg-emerald-500 text-white dark:bg-emerald-600 dark:text-white",
-    iconBg: "bg-white/70 text-emerald-600 dark:bg-slate-800/60 dark:text-emerald-400",
+    iconBg: "bg-white/80 text-emerald-600 dark:bg-slate-800/70 dark:text-emerald-400",
     neon: "rgba(16,185,129,0.55)",
     ring: "focus-visible:ring-emerald-400/40",
   },
@@ -120,7 +125,7 @@ export function ModelCardList({
   searchQuery,
   onSelect,
 }: {
-  models: Model[];
+  models: (Model & { count?: number; available?: number })[];
   searchQuery: string;
   onSelect: (id: string) => void;
 }) {
@@ -141,7 +146,7 @@ export function ModelCardList({
   const totalFiltered = filtered.length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {CATEGORIES.map((cat) => {
         const items = filtered
           .filter((m) => m.category === cat)
@@ -158,41 +163,71 @@ export function ModelCardList({
         return (
           <div key={cat}>
             <div className="mb-3 flex items-center gap-2.5">
-              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-widest ${s.badge}`}>
+              <span className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-widest ${s.badge}`}>
                 {cat}
               </span>
-              <span className="text-[11px] text-slate-400 dark:text-slate-500">{items.length}</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">{items.length} model{items.length !== 1 ? "s" : ""}</span>
               <span className="h-px flex-1 bg-slate-100 dark:bg-slate-700/50" />
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5" role="listbox" aria-label={`${cat} item models`}>
-              {items.map((m) => (
-                <button
-                  key={m.id}
-                  role="option"
-                  aria-selected={activeCard === m.id}
-                  type="button"
-                  onClick={() => onSelect(m.id)}
-                  onFocus={() => setActiveCard(m.id)}
-                  onBlur={() => setActiveCard(null)}
-                  className={`group relative flex items-center gap-3 rounded-xl border-2 p-4 text-left shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 ${s.border} ${s.gradient} ${s.ring}`}
-                >
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <p className="text-sm font-bold text-slate-800 group-hover:text-[#066fd1] dark:text-slate-100 dark:group-hover:text-[#066fd1]/90">
-                      {m.type}
-                    </p>
-                    <p className="text-[11px] leading-tight text-slate-400 dark:text-slate-500">{m.brand}</p>
-                    <p className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">{m.model}</p>
-                  </div>
-                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${s.iconBg} transition-transform duration-200 group-hover:scale-110`}>
-                    <TypeIcon type={m.type} className="h-7 w-7" neon={s.neon} />
-                  </div>
-                  <div className="absolute bottom-2 right-2 flex h-4 w-4 items-center justify-center rounded-full opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:bg-[#066fd1]/10">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3 text-[#066fd1] dark:text-[#066fd1]/80" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M13 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-              ))}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4" role="listbox" aria-label={`${cat} item models`}>
+              {items.map((m) => {
+                const total = m.count ?? 0;
+                const avail = m.available ?? total;
+                const used = total - avail;
+                return (
+                  <button
+                    key={m.id}
+                    role="option"
+                    aria-selected={activeCard === m.id}
+                    type="button"
+                    onClick={() => onSelect(m.id)}
+                    onFocus={() => setActiveCard(m.id)}
+                    onBlur={() => setActiveCard(null)}
+                    className={`group relative flex flex-col overflow-hidden rounded-xl border p-0 text-left shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 ${s.border} ${s.bg} ${s.ring}`}
+                  >
+                    {/* Accent strip */}
+                    <div className={`h-1 w-full ${s.accent}`} />
+
+                    <div className="flex items-start gap-3 p-4">
+                      {/* Icon */}
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${s.iconBg} transition-transform duration-200 group-hover:scale-105`}>
+                        <TypeIcon type={m.type} className="h-6 w-6" neon={s.neon} />
+                      </div>
+
+                      {/* Text */}
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <p className="truncate text-sm font-bold text-slate-800 group-hover:text-[#066fd1] dark:text-slate-100 dark:group-hover:text-[#066fd1]/90" title={m.model}>
+                          {m.model}
+                        </p>
+                        <p className="truncate text-[11px] leading-tight text-slate-400 dark:text-slate-500">
+                          {m.type} <span className="text-slate-300 dark:text-slate-600">·</span> {m.brand}
+                        </p>
+                      </div>
+
+                      {/* Chevron */}
+                      <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:bg-[#066fd1]/10">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3 text-[#066fd1] dark:text-[#066fd1]/80" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14M13 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Count strip */}
+                    {total > 0 && (
+                      <div className="flex items-center gap-2 border-t border-slate-100/80 px-4 py-2 dark:border-slate-700/30">
+                        <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{total} unit{total !== 1 ? "s" : ""}</span>
+                        {used > 0 && (
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500">·</span>
+                        )}
+                        {used > 0 && (
+                          <span className="text-[11px] text-slate-400 dark:text-slate-500">{used} deployed</span>
+                        )}
+                        <span className="ml-auto text-[11px] font-medium text-emerald-600 dark:text-emerald-400">{avail} available</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         );
@@ -200,11 +235,12 @@ export function ModelCardList({
 
       {totalFiltered === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-3 h-8 w-8 text-slate-300 dark:text-slate-600" strokeLinecap="round" strokeLinejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-3 h-10 w-10 text-slate-300 dark:text-slate-600" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="7" />
             <path d="m20 20-3.5-3.5" />
           </svg>
           <p className="text-sm text-slate-500 dark:text-slate-400">No models match &quot;{searchQuery}&quot;</p>
+          <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Try a different search term</p>
         </div>
       )}
     </div>
