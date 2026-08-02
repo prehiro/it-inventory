@@ -26,10 +26,14 @@ export function DatePicker({
   value,
   onChange,
   placeholder,
+  compact = false,
+  align = "left",
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
+  compact?: boolean;
+  align?: "left" | "right";
 }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -73,7 +77,9 @@ export function DatePicker({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`flex w-full items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 ${
+        className={`flex w-full items-center gap-1.5 rounded border bg-white text-xs outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 ${
+          compact ? "px-2 py-1" : "px-3 py-2 text-sm"
+        } ${
           open ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-300 dark:border-slate-700"
         }`}
       >
@@ -82,7 +88,7 @@ export function DatePicker({
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          className="h-4 w-4 shrink-0 text-slate-400"
+          className={`shrink-0 text-slate-400 ${compact ? "h-3.5 w-3.5" : "h-4 w-4"}`}
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -95,25 +101,30 @@ export function DatePicker({
           {selected ? fmt(selected) : placeholder}
         </span>
         {value && (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               onChange("");
             }}
-            className="rounded p-0.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
+            className="cursor-pointer rounded p-0.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
             aria-label="Clear date"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          </button>
+          </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute left-0 z-30 mt-1.5 w-72 animate-slide-up-flip rounded-xl bg-white p-3 shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+        <div
+          className={`absolute z-50 mt-1.5 w-72 rounded-xl bg-white p-3 shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700 ${
+            align === "right" ? "right-0" : "left-0"
+          }`}
+        >
           {/* Header */}
           <div className="flex items-center justify-between">
             <button

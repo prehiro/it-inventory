@@ -103,6 +103,7 @@ export function Sidebar({ role }: { role: Role }) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => ({
     admin: true,
     inventory: true,
+    reports: true,
   }));
 
   function toggle(group: string) {
@@ -119,9 +120,9 @@ export function Sidebar({ role }: { role: Role }) {
       label: "Inventory",
       icon: I.inventory,
       children: [
-        { href: "/receive", label: "Receive", icon: I.receive },
-        { href: "/release", label: "Release", icon: I.release },
-        { href: "/return", label: "Return", icon: I.return },
+        { href: "/receive", label: "Receive Items", icon: I.receive },
+        { href: "/release", label: "Release Items", icon: I.release },
+        { href: "/return", label: "Return Items", icon: I.return },
       ],
     },
     { href: "/pc-ledger", label: "PC Ledger", icon: I.ledger },
@@ -139,7 +140,16 @@ export function Sidebar({ role }: { role: Role }) {
   };
 
   if (role === "ADMIN" || role === "MANAGER")
-    items.push({ href: "/reports", label: "Reports", icon: I.reports });
+    items.push({
+      label: "Reports",
+      icon: I.reports,
+      children: [
+        { href: "/reports/received", label: "Received Item", icon: I.receive },
+        { href: "/reports/released", label: "Released Item", icon: I.release },
+        { href: "/reports/returned", label: "Returned Item", icon: I.return },
+        { href: "/reports/movement", label: "Movement History", icon: I.reports },
+      ],
+    });
 
   const linkCls = (active: boolean) =>
     `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${active ? NAV_ACTIVE : NAV_ITEM}`;

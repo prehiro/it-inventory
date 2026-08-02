@@ -93,6 +93,20 @@ html {
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* ── Full-viewport-height page shell: keeps the body page from ever
+     scrolling — only the inner table scrolls. dvh fallback for mobile. ── */
+.page-fill-height {
+  height: calc(100vh - 8rem);
+  height: calc(100dvh - 8rem);
+  display: flex;
+  flex-direction: column;
+}
+.page-fill-height > * {
+  min-height: 0;
 }
 
 @keyframes fade-in {

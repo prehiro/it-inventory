@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -14,9 +14,20 @@ export async function POST(req: NextRequest) {
     if (!file) return NextResponse.json({ ok: false, error: "No file" });
 
     const buf = Buffer.from(await file.arrayBuffer());
-    const workbook = XLSX.read(buf, { type: "buffer" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buf as unknown as ArrayBuffer);
+    const sheet = workbook.worksheets[0];
+    const rows: Record<string, unknown>[] = [];
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // skip header
+      const vals = row.values as unknown[];
+      rows.push({
+        "Employee No": vals[1] ?? "",
+        "Alphabet Name": vals[2] ?? "",
+        "Global ID": vals[3] ?? "",
+        "E-mail Address": vals[4] ?? "",
+      });
+    });
 
     let inserted = 0;
     let updated = 0;

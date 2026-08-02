@@ -7,16 +7,28 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaMssql } from "@prisma/adapter-mssql";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { readFileSync } from "fs";
 
 const adapter = new PrismaMssql(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const filePath = process.argv[2] ?? "/home/hiro/Downloads/gid_list.xlsx";
-  const workbook = XLSX.readFile(filePath);
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(readFileSync(filePath) as unknown as ArrayBuffer);
+  const sheet = workbook.worksheets[0];
+  const rows: Record<string, unknown>[] = [];
+  sheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // skip header
+    const vals = row.values as unknown[];
+    rows.push({
+      "Employee No": vals[1] ?? "",
+      "Alphabet Name": vals[2] ?? "",
+      "Global ID": vals[3] ?? "",
+      "E-mail Address": vals[4] ?? "",
+    });
+  });
 
   let inserted = 0;
   let updated = 0;

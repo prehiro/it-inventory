@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 export async function AvailableItemsTable() {
   const items = await prisma.item.findMany({
     where: { isDeleted: false, status: { in: ["AVAILABLE", "RETURNED_KEEP"] } },
-    orderBy: [{ status: "asc" }, { dateReceived: "asc" }],
+    orderBy: [{ dateReceived: "desc" }, { serialNumber: "asc" }],
     select: {
       serialNumber: true,
       status: true,

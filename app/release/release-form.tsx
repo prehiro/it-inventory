@@ -768,7 +768,7 @@ function Row({ label, value, badge }: { label: string; value: string; badge?: bo
               : isInRepair
                 ? "bg-amber-50 text-amber-700 ring-amber-600/30 dark:bg-amber-500/15 dark:text-amber-400"
                 : isReleased
-                  ? "bg-sky-50 text-sky-700 ring-sky-600/30 dark:bg-sky-500/15 dark:text-sky-400"
+                  ? "bg-indigo-50 text-indigo-700 ring-indigo-600/30 dark:bg-indigo-500/15 dark:text-indigo-400"
                   : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
             }`}
           style={isAvail ? { boxShadow: "0 0 10px 1px rgba(16,185,129,0.55)" } : isPlanDispose ? { boxShadow: "0 0 10px 1px rgba(244,63,94,0.55)" } : undefined}
