@@ -74,10 +74,10 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
           <td className="whitespace-nowrap px-4 py-3">
             <span
               className={`inline-flex rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${i.model.category === "FA"
-                ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
+                ? "bg-[#F59E0B] text-white ring-[#F59E0B]/30 dark:bg-[#F59E0B]/20 dark:text-[#FDE047]"
                 : i.model.category === "NCA"
-                  ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
-                  : "bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/15 dark:text-sky-400"
+                  ? "bg-[#7C3AED] text-white ring-[#7C3AED]/30 dark:bg-[#7C3AED]/20 dark:text-[#C4B5FD]"
+                  : "bg-[#10B981] text-white ring-[#10B981]/30 dark:bg-[#10B981]/20 dark:text-[#6EE7B7]"
                 }`}
             >
               {i.model.category}
