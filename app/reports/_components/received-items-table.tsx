@@ -22,10 +22,10 @@ export type ReceivedRow = {
 
 const TYPE_BADGE = (cat: string) =>
   cat === "FA"
-    ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
+    ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
     : cat === "NCA"
-      ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
-      : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400";
+      ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
+      : "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400";
 
 function groupByDay(items: ReceivedRow[]) {
   const groups: { key: string; date: Date; items: ReceivedRow[] }[] = [];

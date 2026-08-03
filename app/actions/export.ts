@@ -375,9 +375,9 @@ export async function buildAvailableStockWorkbook(
     DISPOSED: { fg: C.rose, bg: C.roseLight },
   };
   const CAT_STYLE: Record<string, { fg: string; bg: string }> = {
-    FA: { fg: C.amber, bg: C.amberLight },
-    NCA: { fg: C.purple, bg: C.purpleLight },
-    GENERAL: { fg: C.sky, bg: C.skyLight },
+    FA: { fg: C.emerald, bg: C.emeraldLight },
+    NCA: { fg: C.amber, bg: C.amberLight },
+    GENERAL: { fg: C.purple, bg: C.purpleLight },
   };
   items.forEach((i, idx) => {
     const r = 4 + idx;
