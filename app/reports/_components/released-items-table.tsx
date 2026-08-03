@@ -8,9 +8,11 @@ import { CategoryBadge } from "./category-badge";
 import { StatusBadge } from "@/components/status-badge";
 
 /* ──────────────────────────────────────────
-   ReleasedItemsTable — full table card (toolbar + sticky thead w/ filter row
-   + grouped body + pagination). Mirrors ReceivedItemsTable; adds a Status
-   column (AVAILABLE / RETURNED_KEEP are the ready-to-release statuses).
+   ReleasedItemsTable — items currently in RELEASED status.
+   Layout mirrors ReceivedItemsTable (sticky thead + per-column filter row +
+   grouped body + pagination) with 10 columns. The "Released" column shows
+   the release date (latest RELEASE txn); hostname + assignee are shown
+   inline. Filter row: Assignee text input + Status dropdown via props.
    ────────────────────────────────────────── */
 
 export type ReleasedRow = {
@@ -19,7 +21,16 @@ export type ReleasedRow = {
   poNumber: string | null;
   location: string;
   dateReceived: Date;
+  hostname: string;
   model: { type: string; brand: string; model: string; category: string };
+  transactions: {
+    date: Date;
+    assigneeName: string | null;
+    assigneeEmpNumber: string | null;
+    assigneeDept: string | null;
+    gid: string | null;
+    email: string | null;
+  }[];
 };
 
 const TYPE_BADGE = (cat: string) =>
@@ -32,7 +43,8 @@ const TYPE_BADGE = (cat: string) =>
 function groupByDay(items: ReleasedRow[]) {
   const groups: { key: string; date: Date; items: ReleasedRow[] }[] = [];
   for (const i of items) {
-    const d = new Date(i.dateReceived.getFullYear(), i.dateReceived.getMonth(), i.dateReceived.getDate());
+    const relDate = i.transactions[0]?.date ?? i.dateReceived;
+    const d = new Date(relDate.getFullYear(), relDate.getMonth(), relDate.getDate());
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const last = groups[groups.length - 1];
     if (last && last.key === key) last.items.push(i);
@@ -51,7 +63,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
   return (
     <>
       <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800/40">
-        <td colSpan={9} className="px-4 py-2.5">
+        <td colSpan={10} className="px-4 py-2.5">
           <div className="flex items-center gap-2">
             {isToday && (
               <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
@@ -67,36 +79,54 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
           </div>
         </td>
       </tr>
-      {group.items.map((i, idx) => (
-        <tr
-          key={i.serialNumber}
-          className={`border-b border-slate-50 transition hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-slate-800/40 ${
-            idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/40 dark:bg-slate-800/20"
-          }`}
-        >
-          <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200" title={i.serialNumber}>{i.serialNumber}</td>
-          <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
-            <span
-              className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TYPE_BADGE(i.model.category)}`}
-            >
-              {i.model.type}
-            </span>
-          </td>
-          <td className="whitespace-nowrap px-4 py-3 text-slate-600 dark:text-slate-300">{i.model.brand}</td>
-          <td className="max-w-0 truncate px-4 py-3 font-medium text-slate-800 dark:text-slate-100" title={i.model.model}>{i.model.model}</td>
-          <td className="whitespace-nowrap px-4 py-3">
-            <CategoryBadge category={i.model.category} />
-          </td>
-          <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={i.poNumber || "—"}>{i.poNumber || "—"}</td>
-          <td className="max-w-0 truncate px-4 py-3 text-slate-600 dark:text-slate-300" title={i.location}>{i.location}</td>
-          <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
-            {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(i.dateReceived)}
-          </td>
-          <td className="whitespace-nowrap px-4 py-3">
-            <StatusBadge status={i.status} />
-          </td>
-        </tr>
-      ))}
+      {group.items.map((i, idx) => {
+        const rel = i.transactions[0];
+        return (
+          <tr
+            key={i.serialNumber}
+            className={`border-b border-slate-50 transition hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-slate-800/40 ${
+              idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/40 dark:bg-slate-800/20"
+            }`}
+          >
+            <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200" title={i.serialNumber}>{i.serialNumber}</td>
+            <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
+              <span
+                className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TYPE_BADGE(i.model.category)}`}
+              >
+                {i.model.type}
+              </span>
+            </td>
+            <td className="whitespace-nowrap px-4 py-3 text-slate-600 dark:text-slate-300">{i.model.brand}</td>
+            <td className="max-w-0 truncate px-4 py-3 font-medium text-slate-800 dark:text-slate-100" title={i.model.model}>
+              <div className="flex flex-col">
+                <span className="truncate">{i.model.model}</span>
+                {i.hostname && i.hostname !== "N/A" && (
+                  <span className="truncate font-mono text-[11px] font-normal text-slate-400 dark:text-slate-500">◎ {i.hostname}</span>
+                )}
+              </div>
+            </td>
+            <td className="whitespace-nowrap px-4 py-3">
+              <CategoryBadge category={i.model.category} />
+            </td>
+            <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={i.poNumber || "—"}>{i.poNumber || "—"}</td>
+            <td className="max-w-0 truncate px-4 py-3 text-slate-700 dark:text-slate-200" title={`${rel?.assigneeName ?? "—"}${rel?.assigneeEmpNumber ? ` (${rel.assigneeEmpNumber})` : ""}`}>
+              <div className="flex flex-col">
+                <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">{rel?.assigneeName ?? "—"}</span>
+                <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">
+                  {rel?.assigneeEmpNumber || rel?.gid || ""}
+                </span>
+              </div>
+            </td>
+            <td className="max-w-0 truncate px-4 py-3 text-slate-600 dark:text-slate-300" title={i.location}>{i.location}</td>
+            <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
+              {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(rel?.date ?? i.dateReceived)}
+            </td>
+            <td className="whitespace-nowrap px-4 py-3">
+              <StatusBadge status={i.status} />
+            </td>
+          </tr>
+        );
+      })}
     </>
   );
 }
@@ -116,10 +146,10 @@ export function ReleasedItemsTable({
   totalPages: number;
   pageSize: number;
   query: string;
-  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status: string };
+  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status: string; assignee?: string };
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
-  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.status);
+  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.status || filter.assignee);
 
   return (
     <div className="-mx-6 flex min-h-0 flex-1 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -136,7 +166,7 @@ export function ReleasedItemsTable({
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Released Items</p>
             <p className="text-xs text-slate-400 dark:text-slate-500">
-              {total.toLocaleString()} Items Ready to Release
+              {total.toLocaleString()} Items Released
               {totalPages > 1 && ` · page ${page} of ${totalPages}`}
             </p>
           </div>
@@ -165,6 +195,7 @@ export function ReleasedItemsTable({
                   Boolean(filter.location),
                   Boolean(filter.from || filter.to),
                   Boolean(filter.status),
+                  Boolean(filter.assignee),
                 ].filter(Boolean).length}
               </span>
             )}
@@ -183,7 +214,7 @@ export function ReleasedItemsTable({
             </a>
           )}
           <ExportExcelButton
-            statuses={["AVAILABLE", "RETURNED_KEEP"]}
+            statuses={["RELEASED"]}
             filter={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to }}
             count={total}
           />
@@ -194,15 +225,16 @@ export function ReleasedItemsTable({
       <div className="min-h-0 flex-1 overflow-auto custom-scrollbar">
         <table className="w-full table-fixed border-collapse text-sm">
           <colgroup>
+            <col className="w-[12%]" />
+            <col className="w-[8%]" />
+            <col className="w-[9%]" />
+            <col className="w-[12%]" />
+            <col className="w-[9%]" />
+            <col className="w-[10%]" />
             <col className="w-[13%]" />
-            <col className="w-[9%]" />
-            <col className="w-[9%]" />
-            <col className="w-[12%]" />
-            <col className="w-[9%]" />
-            <col className="w-[12%]" />
-            <col className="w-[11%]" />
-            <col className="w-[13%]" />
-            <col className="w-[12%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr className="border-b border-slate-200 bg-slate-50/90 dark:border-slate-700 dark:bg-slate-800/90">
@@ -212,28 +244,30 @@ export function ReleasedItemsTable({
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Model</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.category ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Category</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.po ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>PO Number</th>
+              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.assignee ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Assignee</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.location ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Location</th>
-              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.from || filter.to ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Received</th>
+              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.from || filter.to ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Released</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.status ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Status</th>
             </tr>
             <TableFilterRow
               basePath="/reports/released"
-              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, status: filter.status }}
+              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, status: filter.status, assignee: filter.assignee ?? "" }}
               show={filterOpen}
               withStatus
+              withAssignee
             />
           </thead>
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center">
+                <td colSpan={10} className="px-4 py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8 text-slate-300 dark:text-slate-600" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                       <polyline points="17 8 12 3 7 8" />
                       <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    <p className="text-sm font-medium text-slate-400 dark:text-slate-500">No items ready to release match your filters.</p>
+                    <p className="text-sm font-medium text-slate-400 dark:text-slate-500">No released items match your filters.</p>
                     <a href="/reports/released" className="text-xs font-medium text-[#2563eb] hover:underline">
                       Clear all filters
                     </a>

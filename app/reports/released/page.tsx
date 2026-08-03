@@ -4,20 +4,20 @@ import { PageHeader } from "@/components/page-header";
 import { ReleasedItemsTable } from "../_components/released-items-table";
 
 /* ──────────────────────────────────────────
-   Released Item report — inventory currently available & ready to release
-   Only statuses AVAILABLE + RETURNED_KEEP (deployed-returned, kept at store)
+   Released Item report — items currently in RELEASED status
+   (assets deployed/released to users, tracked via release transactions)
    ────────────────────────────────────────── */
 export default async function ReleasedItemPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; status?: string; page?: string }>;
+  searchParams: Promise<{ type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; status?: string; assignee?: string; page?: string }>;
 }) {
   await requireRole(await requireAuth(), ["ADMIN", "MANAGER"]);
   const sp = await searchParams;
 
   const where: Record<string, unknown> = {
     isDeleted: false,
-    status: { in: ["AVAILABLE", "RETURNED_KEEP"] },
+    status: { in: ["RELEASED"] },
   };
   if (sp.type && sp.type !== "All") where.model = { type: sp.type };
   if (sp.category && sp.category !== "All") where.model = { ...(where.model as object), category: sp.category };
@@ -33,6 +33,11 @@ export default async function ReleasedItemPage({
   if (sp.status && sp.status !== "All") {
     where.status = sp.status;
   }
+  if (sp.assignee) {
+    where.transactions = {
+      some: { type: "RELEASE", assigneeName: { contains: sp.assignee } },
+    };
+  }
   if (sp.from || sp.to) {
     where.dateReceived = {};
     if (sp.from) (where.dateReceived as Record<string, unknown>).gte = new Date(sp.from);
@@ -42,9 +47,9 @@ export default async function ReleasedItemPage({
   const PAGE_SIZE = 30;
   const page = Math.max(1, Number(sp.page) || 1);
 
-  // Default sort: newest received first (dateReceived desc) with a serial
-  // number tiebreaker so the order is deterministic across refreshes.
-  const [totalRows, items] = await Promise.all([
+  // Default sort: newest released first — use the latest RELEASE txn date.
+  // We fetch the latest release txn per item to display assignee + released date.
+  const [totalRows, rawItems] = await Promise.all([
     prisma.item.count({ where }),
     prisma.item.findMany({
       where,
@@ -57,10 +62,33 @@ export default async function ReleasedItemPage({
         poNumber: true,
         location: true,
         dateReceived: true,
+        hostname: true,
         model: { select: { type: true, brand: true, model: true, category: true } },
+        transactions: {
+          where: { type: "RELEASE" },
+          orderBy: { date: "desc" },
+          take: 1,
+          select: {
+            date: true,
+            assigneeName: true,
+            assigneeEmpNumber: true,
+            assigneeDept: true,
+            gid: true,
+            email: true,
+          },
+        },
       },
     }),
   ]);
+  // Group rows by release date — sort by latest release date first so
+  // the day-grouped table reads newest → oldest (deterministic tiebreak).
+  const items = rawItems.sort((a, b) => {
+    const da = a.transactions[0]?.date ?? a.dateReceived;
+    const db = b.transactions[0]?.date ?? b.dateReceived;
+    const diff = db.getTime() - da.getTime();
+    if (diff !== 0) return diff;
+    return a.serialNumber.localeCompare(b.serialNumber);
+  });
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
 
   const filter = {
@@ -72,6 +100,7 @@ export default async function ReleasedItemPage({
     from: sp.from ?? "",
     to: sp.to ?? "",
     status: sp.status ?? "",
+    assignee: sp.assignee ?? "",
   };
   const query = new URLSearchParams();
   if (filter.type) query.set("type", filter.type);
@@ -82,13 +111,14 @@ export default async function ReleasedItemPage({
   if (filter.from) query.set("from", filter.from);
   if (filter.to) query.set("to", filter.to);
   if (filter.status) query.set("status", filter.status);
+  if (filter.assignee) query.set("assignee", filter.assignee);
   const queryStr = query.toString();
 
   return (
     <div className="page-fill-height">
       <PageHeader
         title="Released Item"
-        subtitle="Inventory available & ready to release"
+        subtitle="Items currently released to users"
         align="center"
         icon={
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">

@@ -11,7 +11,7 @@ import { DateRangePreset } from "./date-range-preset";
    ────────────────────────────────────────── */
 
 const CATEGORIES = ["All", "FA", "NCA", "GENERAL"];
-const STATUS_OPTIONS = ["All", "AVAILABLE", "RETURNED_KEEP"];
+const STATUS_OPTIONS = ["All", "AVAILABLE", "RETURNED_KEEP", "RELEASED"];
 const TYPE_OPTIONS = [
   "All",
   "PC",
@@ -105,11 +105,13 @@ export function TableFilterRow({
   initial,
   show,
   withStatus = false,
+  withAssignee = false,
 }: {
   basePath: string;
-  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status?: string };
+  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string };
   show: boolean;
   withStatus?: boolean;
+  withAssignee?: boolean;
 }) {
   const router = useRouter();
   const [type, setType] = useState(initial.type || "All");
@@ -123,6 +125,8 @@ export function TableFilterRow({
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to);
   const [status, setStatus] = useState(initial.status || "All");
+  const [assignee, setAssignee] = useState(initial.assignee || "");
+  const [debouncedAssignee, setDebouncedAssignee] = useState(initial.assignee || "");
   const firstRun = useRef(true);
 
   // Debounce text inputs — avoid a router push per keystroke
@@ -138,6 +142,10 @@ export function TableFilterRow({
     const t = setTimeout(() => setDebouncedLocation(location), 400);
     return () => clearTimeout(t);
   }, [location]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedAssignee(assignee), 400);
+    return () => clearTimeout(t);
+  }, [assignee]);
 
   function push() {
     const p = new URLSearchParams();
@@ -149,6 +157,7 @@ export function TableFilterRow({
     if (from) p.set("from", from);
     if (to) p.set("to", to);
     if (withStatus && status !== "All") p.set("status", status);
+    if (withAssignee && debouncedAssignee) p.set("assignee", debouncedAssignee);
     p.set("page", "1");
     router.push(`${basePath}?${p.toString()}`);
   }
@@ -160,7 +169,7 @@ export function TableFilterRow({
     }
     push();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to, status]);
+  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee]);
 
   return (
     <tr className={`border-b border-slate-100 bg-white dark:border-slate-700 dark:bg-slate-900 ${show ? "" : "hidden"}`}>
@@ -188,6 +197,11 @@ export function TableFilterRow({
       <td className="px-2 py-2">
         <input value={po} onChange={(e) => setPo(e.target.value)} placeholder="Filter…" className={inputClass} />
       </td>
+      {withAssignee && (
+        <td className="px-2 py-2">
+          <input value={assignee} onChange={(e) => setAssignee(e.target.value)} placeholder="Filter…" className={inputClass} />
+        </td>
+      )}
       {/* Location */}
       <td className="px-2 py-2">
         <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Filter…" className={inputClass} />
