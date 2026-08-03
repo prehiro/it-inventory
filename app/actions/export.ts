@@ -237,6 +237,13 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
   }
   if (filter.po) where.poNumber = { contains: filter.po as string };
   if (filter.location) where.location = { contains: filter.location as string };
+  // Released report: destination is the assignee's department (RELEASE txn).
+  if (filter.assigneeDept) {
+    where.transactions = { some: { type: "RELEASE", assigneeDept: { contains: filter.assigneeDept as string } } };
+  }
+  if (filter.assigneeName) {
+    where.transactions = { some: { type: "RELEASE", assigneeName: { contains: filter.assigneeName as string } } };
+  }
   if (filter.q) {
     where.OR = [
       { serialNumber: { contains: filter.q as string } },
@@ -260,6 +267,12 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
       location: true,
       dateReceived: true,
       model: { select: { type: true, brand: true, model: true, category: true } },
+      transactions: {
+        where: { type: "RELEASE" },
+        orderBy: { date: "desc" },
+        take: 1,
+        select: { assigneeName: true, assigneeEmpNumber: true, assigneeDept: true, date: true },
+      },
     },
   });
 }
@@ -274,6 +287,7 @@ export async function buildAvailableStockWorkbook(
   wb.created = new Date();
   const sheetTitle = (filter.sheetTitle as string) ?? "Available Stock";
   const isReceived = sheetTitle === "Received Item";
+  const isReleased = sheetTitle === "Released Item";
   const band = isReceived ? "217346" : C.blue; // Excel brand green for Received
   const bandDark = isReceived ? "145A32" : C.blueDark;
   const ws = wb.addWorksheet(sheetTitle, {
@@ -289,9 +303,17 @@ export async function buildAvailableStockWorkbook(
     { key: "model", width: 24 },
     { key: "category", width: 11 },
     { key: "po", width: 16 },
-    { key: "location", width: 16 },
-    { key: "received", width: 14 },
-    { key: "status", width: 16 },
+    ...(isReleased
+      ? ([
+          { key: "assignee", width: 18 },
+          { key: "dept", width: 18 },
+          { key: "released", width: 14 },
+        ] as { key: string; width: number }[])
+      : ([
+          { key: "location", width: 16 },
+          { key: "received", width: 14 },
+          { key: "status", width: 16 },
+        ] as { key: string; width: number }[])),
   ];
 
   const thin = { style: "thin" as const, color: { argb: "FF" + C.border } };
@@ -330,7 +352,9 @@ export async function buildAvailableStockWorkbook(
   /* ── Row 3: table header (frozen) ── */
   const rHead = ws.getRow(3);
   rHead.height = 22;
-  const HEADERS = ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
+  const HEADERS = isReleased
+    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "RELEASED"]
+    : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
   HEADERS.forEach((h, i) => {
     const cell = rHead.getCell(i + 1);
     cell.value = h;
@@ -360,18 +384,32 @@ export async function buildAvailableStockWorkbook(
     const row = ws.getRow(r);
     row.height = 20;
     const zebra = idx % 2 === 0 ? C.white : C.slateLight;
-    const vals = [
-      idx + 1,
-      i.serialNumber,
-      i.model.type,
-      i.model.brand,
-      i.model.model,
-      i.model.category,
-      i.poNumber ?? "",
-      i.location,
-      i.dateReceived.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-      statusLabel(i.status),
-    ];
+    const rel = i.transactions?.[0];
+    const vals = isReleased
+      ? [
+          idx + 1,
+          i.serialNumber,
+          i.model.type,
+          i.model.brand,
+          i.model.model,
+          i.model.category,
+          i.poNumber ?? "",
+          rel?.assigneeName ?? "",
+          rel?.assigneeDept ?? i.location,
+          rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
+        ]
+      : [
+          idx + 1,
+          i.serialNumber,
+          i.model.type,
+          i.model.brand,
+          i.model.model,
+          i.model.category,
+          i.poNumber ?? "",
+          i.location,
+          i.dateReceived.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+          statusLabel(i.status),
+        ];
     const catSty = CAT_STYLE[i.model.category] ?? { fg: C.slate, bg: C.slateLight };
     const statusSty = STATUS_STYLE[i.status] ?? { fg: C.slate, bg: C.slateLight };
     vals.forEach((v, c) => {
@@ -391,11 +429,13 @@ export async function buildAvailableStockWorkbook(
     cc.font = { size: 10, bold: true, color: { argb: "FF" + catSty.fg } };
     cc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + catSty.bg } };
     cc.alignment = { vertical: "middle", horizontal: "center" };
-    // Column 10: STATUS — colored badge
-    const sc = row.getCell(10);
-    sc.font = { size: 10, bold: true, color: { argb: "FF" + statusSty.fg } };
-    sc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + statusSty.bg } };
-    sc.alignment = { vertical: "middle", horizontal: "center" };
+    // Column 10: STATUS badge (received) — released report shows a plain date
+    if (!isReleased) {
+      const sc = row.getCell(10);
+      sc.font = { size: 10, bold: true, color: { argb: "FF" + statusSty.fg } };
+      sc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + statusSty.bg } };
+      sc.alignment = { vertical: "middle", horizontal: "center" };
+    }
   });
 
   // Freeze header row 3 + autofilter

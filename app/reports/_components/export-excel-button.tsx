@@ -16,10 +16,16 @@ export function ExportExcelButton({
   statuses,
   filter,
   count,
+  sheetTitle = "Received Item",
+  filename = "it-inventory-received-item.xlsx",
+  subtitle = "Available & ready-to-release inventory",
 }: {
   statuses?: string[];
-  filter?: { type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string };
+  filter?: { type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string };
   count?: number;
+  sheetTitle?: string;
+  filename?: string;
+  subtitle?: string;
 }) {
   const [busy, setBusy] = useState<"" | "xlsx">("");
 
@@ -34,9 +40,11 @@ export function ExportExcelButton({
       location: filter?.location ?? "",
       from: filter?.from ?? "",
       to: filter?.to ?? "",
-      sheetTitle: "Received Item",
-      subtitle: "Available & ready-to-release inventory",
-      filename: "it-inventory-received-item.xlsx",
+      assigneeDept: filter?.location ?? "", // released: location = assignee dept
+      assigneeName: filter?.assignee ?? "",
+      sheetTitle,
+      subtitle,
+      filename,
     });
     setBusy("");
     if (!res.ok) {

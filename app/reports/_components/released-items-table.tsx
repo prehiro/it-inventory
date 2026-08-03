@@ -5,19 +5,17 @@ import { ExportExcelButton } from "./export-excel-button";
 import { TableFilterRow } from "./table-filter-row";
 import { ReportsPagination } from "./reports-pagination";
 import { CategoryBadge } from "./category-badge";
-import { StatusBadge } from "@/components/status-badge";
 
 /* ──────────────────────────────────────────
    ReleasedItemsTable — items currently in RELEASED status.
    Layout mirrors ReceivedItemsTable (sticky thead + per-column filter row +
    grouped body + pagination) with 10 columns. The "Released" column shows
-   the release date (latest RELEASE txn); hostname + assignee are shown
-   inline. Filter row: Assignee text input + Status dropdown via props.
-   ────────────────────────────────────────── */
+   Release (latest RELEASE txn); hostname + assignee are shown
+      inline. Filter row: Assignee text input + Location (dept) input via props.
+      ────────────────────────────────────────── */
 
 export type ReleasedRow = {
   serialNumber: string;
-  status: string;
   poNumber: string | null;
   location: string;
   dateReceived: Date;
@@ -63,7 +61,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
   return (
     <>
       <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800/40">
-        <td colSpan={10} className="px-4 py-2.5">
+        <td colSpan={9} className="px-4 py-2.5">
           <div className="flex items-center gap-2">
             {isToday && (
               <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
@@ -117,12 +115,17 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
                 </span>
               </div>
             </td>
-            <td className="max-w-0 truncate px-4 py-3 text-slate-600 dark:text-slate-300" title={i.location}>{i.location}</td>
+            <td className="max-w-0 truncate px-4 py-3 text-slate-600 dark:text-slate-300" title={rel?.assigneeDept ?? i.location}>
+              <span className="inline-flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                {rel?.assigneeDept || i.location}
+              </span>
+            </td>
             <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
               {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(rel?.date ?? i.dateReceived)}
-            </td>
-            <td className="whitespace-nowrap px-4 py-3">
-              <StatusBadge status={i.status} />
             </td>
           </tr>
         );
@@ -146,10 +149,10 @@ export function ReleasedItemsTable({
   totalPages: number;
   pageSize: number;
   query: string;
-  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status: string; assignee?: string };
+  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; assignee?: string };
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
-  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.status || filter.assignee);
+  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.assignee);
 
   return (
     <div className="-mx-6 flex min-h-0 flex-1 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -194,7 +197,6 @@ export function ReleasedItemsTable({
                   Boolean(filter.po),
                   Boolean(filter.location),
                   Boolean(filter.from || filter.to),
-                  Boolean(filter.status),
                   Boolean(filter.assignee),
                 ].filter(Boolean).length}
               </span>
@@ -215,8 +217,11 @@ export function ReleasedItemsTable({
           )}
           <ExportExcelButton
             statuses={["RELEASED"]}
-            filter={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to }}
+            filter={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "" }}
             count={total}
+            sheetTitle="Released Item"
+            filename="it-inventory-released-item.xlsx"
+            subtitle="Items currently released to users"
           />
         </div>
       </div>
@@ -225,16 +230,15 @@ export function ReleasedItemsTable({
       <div className="min-h-0 flex-1 overflow-auto custom-scrollbar">
         <table className="w-full table-fixed border-collapse text-sm">
           <colgroup>
-            <col className="w-[12%]" />
-            <col className="w-[8%]" />
-            <col className="w-[9%]" />
-            <col className="w-[12%]" />
+            <col className="w-[13%]" />
             <col className="w-[9%]" />
             <col className="w-[10%]" />
             <col className="w-[13%]" />
             <col className="w-[10%]" />
-            <col className="w-[10%]" />
-            <col className="w-[10%]" />
+            <col className="w-[11%]" />
+            <col className="w-[14%]" />
+            <col className="w-[11%]" />
+            <col className="w-[11%]" />
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr className="border-b border-slate-200 bg-slate-50/90 dark:border-slate-700 dark:bg-slate-800/90">
@@ -247,20 +251,18 @@ export function ReleasedItemsTable({
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.assignee ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Assignee</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.location ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Location</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.from || filter.to ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Released</th>
-              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.status ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Status</th>
             </tr>
             <TableFilterRow
               basePath="/reports/released"
-              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, status: filter.status, assignee: filter.assignee ?? "" }}
+              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "" }}
               show={filterOpen}
-              withStatus
               withAssignee
             />
           </thead>
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-12 text-center">
+                <td colSpan={9} className="px-4 py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8 text-slate-300 dark:text-slate-600" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
