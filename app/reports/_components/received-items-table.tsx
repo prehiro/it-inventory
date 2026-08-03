@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { ExportExcelButton } from "./export-excel-button";
 import { TableFilterRow } from "./table-filter-row";
+import { ReportsPagination } from "./reports-pagination";
 
 /* ──────────────────────────────────────────
    ReceivedItemsTable — full table card (toolbar + sticky thead w/ filter row
@@ -13,12 +13,18 @@ import { TableFilterRow } from "./table-filter-row";
 
 export type ReceivedRow = {
   serialNumber: string;
-  status: string;
   poNumber: string | null;
   location: string;
   dateReceived: Date;
   model: { type: string; brand: string; model: string; category: string };
 };
+
+const CAT_BADGE = (cat: string) =>
+  cat === "FA"
+    ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
+    : cat === "NCA"
+      ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
+      : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400";
 
 function groupByDay(items: ReceivedRow[]) {
   const groups: { key: string; date: Date; items: ReceivedRow[] }[] = [];
@@ -42,7 +48,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
   return (
     <>
       <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800/40">
-        <td colSpan={9} className="px-4 py-2.5">
+        <td colSpan={8} className="px-4 py-2.5">
           <div className="flex items-center gap-2">
             {isToday && (
               <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
@@ -68,13 +74,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
           <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200" title={i.serialNumber}>{i.serialNumber}</td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
             <span
-              className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
-                i.model.category === "FA"
-                  ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
-                  : i.model.category === "NCA"
-                    ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
-                    : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
-              }`}
+              className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${CAT_BADGE(i.model.category)}`}
             >
               {i.model.type}
             </span>
@@ -83,12 +83,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
           <td className="max-w-0 truncate px-4 py-3 font-medium text-slate-800 dark:text-slate-100" title={i.model.model}>{i.model.model}</td>
           <td className="whitespace-nowrap px-4 py-3">
             <span
-              className={`inline-flex rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${i.model.category === "FA"
-                ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
-                : i.model.category === "NCA"
-                  ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
-                  : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
-                }`}
+              className={`inline-flex rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${CAT_BADGE(i.model.category)}`}
             >
               {i.model.category}
             </span>
@@ -245,100 +240,8 @@ export function ReceivedItemsTable({
 
       {/* ── Pagination ── */}
       <div className="rounded-b-2xl border-t border-slate-100 dark:border-slate-800">
-        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} query={query} basePath="/reports/received" />
+        <ReportsPagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} query={query} basePath="/reports/received" />
       </div>
-    </div>
-  );
-}
-
-function Pagination({
-  page,
-  totalPages,
-  total,
-  pageSize,
-  query,
-  basePath,
-}: {
-  page: number;
-  totalPages: number;
-  total: number;
-  pageSize: number;
-  query: string;
-  basePath: string;
-}) {
-  if (totalPages <= 1) {
-    return (
-      <div className="flex items-center justify-between px-5 py-3 text-sm text-slate-400 dark:text-slate-500">
-        <span>Showing {total.toLocaleString()} row{total === 1 ? "" : "s"}</span>
-      </div>
-    );
-  }
-  const start = (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, total);
-  const makeHref = (p: number) => {
-    const q = new URLSearchParams(query);
-    q.set("page", String(p));
-    return `${basePath}?${q.toString()}`;
-  };
-  const pages: (number | "...")[] = [];
-  for (let p = 1; p <= totalPages; p++) {
-    if (p === 1 || p === totalPages || Math.abs(p - page) <= 2) pages.push(p);
-  }
-  const dedup: (number | "...")[] = [];
-  for (const p of pages) {
-    const prev = dedup[dedup.length - 1];
-    if (typeof prev === "number" && typeof p === "number" && p - prev > 1) dedup.push("...");
-    dedup.push(p);
-  }
-  const navBtn =
-    "flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition disabled:opacity-40 disabled:cursor-not-allowed";
-  const pageBtn = (active: boolean) =>
-    `flex h-8 w-8 items-center justify-center rounded-lg text-sm transition ${
-      active
-        ? "bg-blue-600 font-semibold text-white shadow-sm"
-        : "border border-slate-200 text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-600/40 dark:hover:bg-blue-500/10 dark:hover:text-blue-300"
-    }`;
-
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
-      <span className="text-sm text-slate-400 dark:text-slate-500">
-        Showing <span className="font-medium text-slate-600 dark:text-slate-300">{start.toLocaleString()}</span>–
-        <span className="font-medium text-slate-600 dark:text-slate-300">{end.toLocaleString()}</span> of{" "}
-        <span className="font-medium text-slate-600 dark:text-slate-300">{total.toLocaleString()}</span> rows
-      </span>
-      <nav className="flex items-center gap-1.5" aria-label="Pagination">
-        <Link
-          href={makeHref(page - 1)}
-          aria-disabled={page <= 1}
-          className={`${navBtn} border-slate-200 text-slate-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-600/40 dark:hover:bg-blue-500/10 dark:hover:text-blue-300 ${page <= 1 ? "pointer-events-none opacity-40" : ""}`}
-          aria-label="Previous page"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </Link>
-        {dedup.map((p, i) =>
-          typeof p === "number" ? (
-            <Link key={p} href={makeHref(p)} className={pageBtn(p === page)} aria-current={p === page ? "page" : undefined}>
-              {p}
-            </Link>
-          ) : (
-            <span key={`e-${i}`} className="px-1 text-sm text-slate-400">
-              …
-            </span>
-          )
-        )}
-        <Link
-          href={makeHref(page + 1)}
-          aria-disabled={page >= totalPages}
-          className={`${navBtn} border-slate-200 text-slate-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-600/40 dark:hover:bg-blue-500/10 dark:hover:text-blue-300 ${page >= totalPages ? "pointer-events-none opacity-40" : ""}`}
-          aria-label="Next page"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </Link>
-      </nav>
     </div>
   );
 }

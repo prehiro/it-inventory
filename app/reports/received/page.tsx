@@ -51,7 +51,6 @@ export default async function ReceivedItemPage({
       take: PAGE_SIZE,
       select: {
         serialNumber: true,
-        status: true,
         poNumber: true,
         location: true,
         dateReceived: true,
