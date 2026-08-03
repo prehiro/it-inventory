@@ -12,7 +12,7 @@ and role-based access control.
 - **Return** — preview deployed item, pick disposition: **Keep** (available again) / **Repair** / **Dispose**
 - **Master Data** — device model catalog (type / brand / model / category) with guarded delete
 - **Dashboard** — status charts, recent activity, low-stock alerts
-- **Reports** — filter by type/date, export to Excel & PDF
+- **Reports** — filter by type/date, export to Excel
 - **User Management** — admin CRUD with roles (ADMIN / MANAGER / OPERATOR)
 - **Item lookup** — full movement history per serial
 - **Dark mode** + responsive layout
@@ -26,7 +26,7 @@ and role-based access control.
 | Database | SQL Server (MSSQL) via Prisma 7 + `@prisma/adapter-mssql` |
 | Auth | Auth.js v5 (Credentials + bcrypt, JWT session) |
 | Charts | Recharts |
-| Export | xlsx (Excel) + jsPDF (PDF) |
+| Export | xlsx (Excel via exceljs) |
 | Validation | Zod |
 
 ## Status Lifecycle
