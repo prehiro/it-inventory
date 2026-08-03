@@ -266,6 +266,7 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
       poNumber: true,
       location: true,
       dateReceived: true,
+      hostname: true,
       model: { select: { type: true, brand: true, model: true, category: true } },
       transactions: {
         where: { type: "RELEASE" },
@@ -301,6 +302,7 @@ export async function buildAvailableStockWorkbook(
     { key: "type", width: 12 },
     { key: "brand", width: 14 },
     { key: "model", width: 24 },
+    { key: "hostname", width: 18 },
     { key: "category", width: 11 },
     { key: "po", width: 16 },
     ...(isReleased
@@ -327,12 +329,12 @@ export async function buildAvailableStockWorkbook(
   titleCell.font = { bold: true, size: 18, color: { argb: "FF" + C.white } };
   titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + band } };
   titleCell.alignment = { vertical: "middle", horizontal: "left" };
-  for (let c = 2; c <= 10; c++) {
+  for (let c = 2; c <= 11; c++) {
     const cell = rTitle.getCell(c);
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + band } };
   }
 
-  // Subtitle + filter summary, merged G1:J1, two lines, right-aligned on the band
+  // Subtitle + filter summary, merged G1:K1, two lines, right-aligned on the band
   const parts: string[] = [];
   if (filter.type && filter.type !== "All") parts.push(`Type: ${filter.type}`);
   if (filter.category && filter.category !== "All") parts.push(`Category: ${filter.category}`);
@@ -343,7 +345,7 @@ export async function buildAvailableStockWorkbook(
   if (filter.to) parts.push(`To: ${filter.to}`);
   const filterStr = parts.length ? parts.join("   ·   ") : "All items";
   const subtitle = (filter.subtitle as string) ?? "Available & ready-to-release inventory";
-  ws.mergeCells(1, 7, 1, 10); // G1:J1
+  ws.mergeCells(1, 7, 1, 11); // G1:K1
   const infoCell = rTitle.getCell(7);
   infoCell.value = `${subtitle}\nFilter: ${filterStr}`;
   infoCell.font = { italic: true, size: 9.5, color: { argb: "F5FFFFFF" } };
@@ -353,8 +355,8 @@ export async function buildAvailableStockWorkbook(
   const rHead = ws.getRow(3);
   rHead.height = 22;
   const HEADERS = isReleased
-    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "RELEASED"]
-    : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
+    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "RELEASED"]
+    : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
   HEADERS.forEach((h, i) => {
     const cell = rHead.getCell(i + 1);
     cell.value = h;
@@ -392,6 +394,7 @@ export async function buildAvailableStockWorkbook(
           i.model.type,
           i.model.brand,
           i.model.model,
+          i.hostname ?? "",
           i.model.category,
           i.poNumber ?? "",
           rel?.assigneeName ?? "",
@@ -404,6 +407,7 @@ export async function buildAvailableStockWorkbook(
           i.model.type,
           i.model.brand,
           i.model.model,
+          i.hostname ?? "",
           i.model.category,
           i.poNumber ?? "",
           i.location,
@@ -424,14 +428,14 @@ export async function buildAvailableStockWorkbook(
     const nc = row.getCell(1);
     nc.alignment = { vertical: "middle", horizontal: "center" };
     nc.font = { size: 10, color: { argb: "FF" + C.black } };
-    // Column 6: CATEGORY — colored chip
-    const cc = row.getCell(6);
+    // Column 7: CATEGORY — colored chip
+    const cc = row.getCell(7);
     cc.font = { size: 10, bold: true, color: { argb: "FF" + catSty.fg } };
     cc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + catSty.bg } };
     cc.alignment = { vertical: "middle", horizontal: "center" };
-    // Column 10: STATUS badge (received) — released report shows a plain date
+    // Column 11: STATUS badge (received) — released report shows a plain date
     if (!isReleased) {
-      const sc = row.getCell(10);
+      const sc = row.getCell(11);
       sc.font = { size: 10, bold: true, color: { argb: "FF" + statusSty.fg } };
       sc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + statusSty.bg } };
       sc.alignment = { vertical: "middle", horizontal: "center" };
@@ -440,7 +444,7 @@ export async function buildAvailableStockWorkbook(
 
   // Freeze header row 3 + autofilter
   ws.views = [{ state: "frozen", ySplit: 3 }];
-  ws.autoFilter = { from: "A3", to: `J${3 + items.length}` };
+  ws.autoFilter = { from: "A3", to: `K${3 + items.length}` };
 
   /* ── Footer: generation stamp only (no item-count row) ── */
   const last = 4 + items.length;
