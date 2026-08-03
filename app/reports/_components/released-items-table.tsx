@@ -5,15 +5,17 @@ import { ExportExcelButton } from "./export-excel-button";
 import { TableFilterRow } from "./table-filter-row";
 import { ReportsPagination } from "./reports-pagination";
 import { CategoryBadge } from "./category-badge";
+import { StatusBadge } from "@/components/status-badge";
 
 /* ──────────────────────────────────────────
-   ReceivedItemsTable — full table card (toolbar + sticky thead w/ filter row
-   + grouped body + pagination). Mirrors PC Ledger architecture:
-   server fetches, client renders & filters.
+   ReleasedItemsTable — full table card (toolbar + sticky thead w/ filter row
+   + grouped body + pagination). Mirrors ReceivedItemsTable; adds a Status
+   column (AVAILABLE / RETURNED_KEEP are the ready-to-release statuses).
    ────────────────────────────────────────── */
 
-export type ReceivedRow = {
+export type ReleasedRow = {
   serialNumber: string;
+  status: string;
   poNumber: string | null;
   location: string;
   dateReceived: Date;
@@ -27,8 +29,8 @@ const TYPE_BADGE = (cat: string) =>
       ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
       : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400";
 
-function groupByDay(items: ReceivedRow[]) {
-  const groups: { key: string; date: Date; items: ReceivedRow[] }[] = [];
+function groupByDay(items: ReleasedRow[]) {
+  const groups: { key: string; date: Date; items: ReleasedRow[] }[] = [];
   for (const i of items) {
     const d = new Date(i.dateReceived.getFullYear(), i.dateReceived.getMonth(), i.dateReceived.getDate());
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -39,7 +41,7 @@ function groupByDay(items: ReceivedRow[]) {
   return groups;
 }
 
-function GroupRows({ group }: { group: { key: string; date: Date; items: ReceivedRow[] } }) {
+function GroupRows({ group }: { group: { key: string; date: Date; items: ReleasedRow[] } }) {
   const dayFmt = new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const today = new Date();
   const isToday =
@@ -49,7 +51,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
   return (
     <>
       <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800/40">
-        <td colSpan={8} className="px-4 py-2.5">
+        <td colSpan={9} className="px-4 py-2.5">
           <div className="flex items-center gap-2">
             {isToday && (
               <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
@@ -90,13 +92,16 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
           <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
             {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(i.dateReceived)}
           </td>
+          <td className="whitespace-nowrap px-4 py-3">
+            <StatusBadge status={i.status} />
+          </td>
         </tr>
       ))}
     </>
   );
 }
 
-export function ReceivedItemsTable({
+export function ReleasedItemsTable({
   items,
   total,
   page,
@@ -105,16 +110,16 @@ export function ReceivedItemsTable({
   query,
   filter,
 }: {
-  items: ReceivedRow[];
+  items: ReleasedRow[];
   total: number;
   page: number;
   totalPages: number;
   pageSize: number;
   query: string;
-  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string };
+  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status: string };
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
-  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to);
+  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.status);
 
   return (
     <div className="-mx-6 flex min-h-0 flex-1 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -123,15 +128,15 @@ export function ReceivedItemsTable({
         <div className="flex items-center gap-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-              <line x1="12" y1="22.08" x2="12" y2="12" />
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
           </span>
           <div>
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Received Items</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Released Items</p>
             <p className="text-xs text-slate-400 dark:text-slate-500">
-              {total.toLocaleString()} Items Available
+              {total.toLocaleString()} Items Ready to Release
               {totalPages > 1 && ` · page ${page} of ${totalPages}`}
             </p>
           </div>
@@ -159,6 +164,7 @@ export function ReceivedItemsTable({
                   Boolean(filter.po),
                   Boolean(filter.location),
                   Boolean(filter.from || filter.to),
+                  Boolean(filter.status),
                 ].filter(Boolean).length}
               </span>
             )}
@@ -166,7 +172,7 @@ export function ReceivedItemsTable({
 
           {hasFilter && (
             <a
-              href="/reports/received"
+              href="/reports/released"
               className="group inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-2 text-sm font-medium text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-rose-500/30 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5 transition group-hover:rotate-90" strokeLinecap="round" strokeLinejoin="round">
@@ -176,23 +182,27 @@ export function ReceivedItemsTable({
               Clear
             </a>
           )}
-          <ExportExcelButton statuses={["AVAILABLE"]} filter={filter} count={total} />
+          <ExportExcelButton
+            statuses={["AVAILABLE", "RETURNED_KEEP"]}
+            filter={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to }}
+            count={total}
+          />
         </div>
       </div>
 
-      {/* ── Table (internal scroll, sticky header) — flex-1 so it fills the
-           remaining card height; body page never scrolls ── */}
+      {/* ── Table (internal scroll, sticky header) — flex-1 fills remaining card height ── */}
       <div className="min-h-0 flex-1 overflow-auto custom-scrollbar">
         <table className="w-full table-fixed border-collapse text-sm">
           <colgroup>
-            <col className="w-[15%]" />
-            <col className="w-[10%]" />
-            <col className="w-[10%]" />
             <col className="w-[13%]" />
-            <col className="w-[10%]" />
+            <col className="w-[9%]" />
+            <col className="w-[9%]" />
+            <col className="w-[12%]" />
+            <col className="w-[9%]" />
+            <col className="w-[12%]" />
+            <col className="w-[11%]" />
             <col className="w-[13%]" />
             <col className="w-[12%]" />
-            <col className="w-[17%]" />
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr className="border-b border-slate-200 bg-slate-50/90 dark:border-slate-700 dark:bg-slate-800/90">
@@ -204,25 +214,27 @@ export function ReceivedItemsTable({
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.po ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>PO Number</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.location ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Location</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.from || filter.to ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Received</th>
+              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.status ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Status</th>
             </tr>
             <TableFilterRow
-              basePath="/reports/received"
-              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to }}
+              basePath="/reports/released"
+              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, status: filter.status }}
               show={filterOpen}
+              withStatus
             />
           </thead>
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center">
+                <td colSpan={9} className="px-4 py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8 text-slate-300 dark:text-slate-600" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                      <line x1="12" y1="22.08" x2="12" y2="12" />
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    <p className="text-sm font-medium text-slate-400 dark:text-slate-500">No received items match your filters.</p>
-                    <a href="/reports/received" className="text-xs font-medium text-[#2563eb] hover:underline">
+                    <p className="text-sm font-medium text-slate-400 dark:text-slate-500">No items ready to release match your filters.</p>
+                    <a href="/reports/released" className="text-xs font-medium text-[#2563eb] hover:underline">
                       Clear all filters
                     </a>
                   </div>
@@ -237,7 +249,7 @@ export function ReceivedItemsTable({
 
       {/* ── Pagination ── */}
       <div className="rounded-b-2xl border-t border-slate-100 dark:border-slate-800">
-        <ReportsPagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} query={query} basePath="/reports/received" />
+        <ReportsPagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} query={query} basePath="/reports/released" />
       </div>
     </div>
   );

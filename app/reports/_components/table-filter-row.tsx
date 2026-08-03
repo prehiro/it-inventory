@@ -11,6 +11,7 @@ import { DateRangePreset } from "./date-range-preset";
    ────────────────────────────────────────── */
 
 const CATEGORIES = ["All", "FA", "NCA", "GENERAL"];
+const STATUS_OPTIONS = ["All", "AVAILABLE", "RETURNED_KEEP"];
 const TYPE_OPTIONS = [
   "All",
   "PC",
@@ -103,10 +104,12 @@ export function TableFilterRow({
   basePath,
   initial,
   show,
+  withStatus = false,
 }: {
   basePath: string;
-  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string };
+  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status?: string };
   show: boolean;
+  withStatus?: boolean;
 }) {
   const router = useRouter();
   const [type, setType] = useState(initial.type || "All");
@@ -119,6 +122,7 @@ export function TableFilterRow({
   const [debouncedLocation, setDebouncedLocation] = useState(initial.location);
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to);
+  const [status, setStatus] = useState(initial.status || "All");
   const firstRun = useRef(true);
 
   // Debounce text inputs — avoid a router push per keystroke
@@ -144,6 +148,7 @@ export function TableFilterRow({
     if (debouncedLocation) p.set("location", debouncedLocation);
     if (from) p.set("from", from);
     if (to) p.set("to", to);
+    if (withStatus && status !== "All") p.set("status", status);
     p.set("page", "1");
     router.push(`${basePath}?${p.toString()}`);
   }
@@ -155,7 +160,7 @@ export function TableFilterRow({
     }
     push();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to]);
+  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to, status]);
 
   return (
     <tr className={`border-b border-slate-100 bg-white dark:border-slate-700 dark:bg-slate-900 ${show ? "" : "hidden"}`}>
@@ -191,6 +196,11 @@ export function TableFilterRow({
       <td className="px-2 py-2">
         <DateRangePreset from={from} to={to} onChange={(f, t) => { setFrom(f); setTo(t); }} />
       </td>
+      {withStatus && (
+        <td className="px-2 py-2">
+          <Dropdown value={status} onChange={setStatus} options={STATUS_OPTIONS} placeholder="All" />
+        </td>
+      )}
     </tr>
   );
 }
