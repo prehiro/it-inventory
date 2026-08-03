@@ -67,17 +67,27 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
         >
           <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200" title={i.serialNumber}>{i.serialNumber}</td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
-            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">{i.model.type}</span>
+            <span
+              className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
+                i.model.category === "FA"
+                  ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
+                  : i.model.category === "NCA"
+                    ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
+                    : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
+              }`}
+            >
+              {i.model.type}
+            </span>
           </td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-600 dark:text-slate-300">{i.model.brand}</td>
           <td className="max-w-0 truncate px-4 py-3 font-medium text-slate-800 dark:text-slate-100" title={i.model.model}>{i.model.model}</td>
           <td className="whitespace-nowrap px-4 py-3">
             <span
               className={`inline-flex rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${i.model.category === "FA"
-                ? "bg-[#F59E0B] text-white ring-[#F59E0B]/30 dark:bg-[#F59E0B]/20 dark:text-[#FDE047]"
+                ? "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/15 dark:text-amber-400"
                 : i.model.category === "NCA"
-                  ? "bg-[#7C3AED] text-white ring-[#7C3AED]/30 dark:bg-[#7C3AED]/20 dark:text-[#C4B5FD]"
-                  : "bg-[#10B981] text-white ring-[#10B981]/30 dark:bg-[#10B981]/20 dark:text-[#6EE7B7]"
+                  ? "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/15 dark:text-purple-400"
+                  : "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/15 dark:text-emerald-400"
                 }`}
             >
               {i.model.category}
