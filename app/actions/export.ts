@@ -70,7 +70,7 @@ export async function exportExcelAction(filter: Record<string, unknown>): Promis
     wb.creator = "IT Inventory";
     wb.created = new Date();
     const ws = wb.addWorksheet("Movement Report", {
-      views: [{ state: "frozen", ySplit: 8 }],
+      views: [{ state: "frozen", ySplit: 5 }],
       properties: { defaultRowHeight: 18 },
     });
 
@@ -188,9 +188,9 @@ export async function exportExcelAction(filter: Record<string, unknown>): Promis
       sc.alignment = { vertical: "middle", horizontal: "center" };
     });
 
-    // Freeze + autofilter
-    ws.views = [{ state: "frozen", ySplit: 8 }];
-    ws.autoFilter = { from: "A8", to: `F${8 + txns.length}` };
+    // Freeze header row 5 + autofilter
+    ws.views = [{ state: "frozen", ySplit: 5 }];
+    ws.autoFilter = { from: "A5", to: `F${5 + txns.length}` };
 
     // A4 fit-to-width: all columns fit on one landscape A4 page (height scales)
     ws.pageSetup = {
@@ -277,7 +277,7 @@ export async function buildAvailableStockWorkbook(
   const band = isReceived ? "217346" : C.blue; // Excel brand green for Received
   const bandDark = isReceived ? "145A32" : C.blueDark;
   const ws = wb.addWorksheet(sheetTitle, {
-    views: [{ state: "frozen", ySplit: 5 }],
+    views: [{ state: "frozen", ySplit: 3 }],
     properties: { defaultRowHeight: 18 },
   });
 
@@ -398,12 +398,12 @@ export async function buildAvailableStockWorkbook(
     sc.alignment = { vertical: "middle", horizontal: "center" };
   });
 
-  // Freeze + autofilter
-  ws.views = [{ state: "frozen", ySplit: 5 }];
-  ws.autoFilter = { from: "A5", to: `J${5 + items.length}` };
+  // Freeze header row 3 + autofilter
+  ws.views = [{ state: "frozen", ySplit: 3 }];
+  ws.autoFilter = { from: "A3", to: `J${3 + items.length}` };
 
   /* ── Footer: generation stamp only (no item-count row) ── */
-  const last = 6 + items.length;
+  const last = 4 + items.length;
   const rGen = ws.getRow(last + 1);
   rGen.height = 18;
   const genCell = rGen.getCell(1);
