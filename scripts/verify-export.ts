@@ -20,7 +20,7 @@ async function main() {
 
   // Released variant
   const releasedItems = [
-    { serialNumber: "REL-1", status: "RELEASED", poNumber: "PO-9", location: "IT Store", dateReceived: new Date("2026-07-20"), hostname: "BAL444PC29384", model: { type: "PC", brand: "DELL", model: "OPTIPLEX 7060", category: "FA" }, transactions: [{ assigneeName: "Jhon Doe", assigneeEmpNumber: "5435345", assigneeDept: "QE", date: new Date("2026-07-21") }] },
+    { serialNumber: "REL-1", status: "RELEASED", poNumber: "PO-9", location: "IT Store", dateReceived: new Date("2026-07-20"), hostname: "BAL444PC29384", model: { type: "PC", brand: "DELL", model: "OPTIPLEX 7060", category: "FA" }, transactions: [{ assigneeName: "Jhon Doe", assigneeEmpNumber: "5435345", assigneeDept: "QE", date: new Date("2026-07-21"), remarks: "ok" }] },
   ] as unknown as Awaited<ReturnType<typeof loadAvailableStock>>;
   const res2 = await buildAvailableStockWorkbook(releasedItems, {
     sheetTitle: "Released Item",
@@ -34,13 +34,13 @@ async function main() {
   const ws2 = wb2.getWorksheet("Released Item");
   if (!ws2) throw new Error("released sheet missing");
   const h2: string[] = [];
-  for (let c = 1; c <= 11; c++) {
+  for (let c = 1; c <= 12; c++) {
     const v = ws2.getRow(3).getCell(c).value as string;
     h2.push(v ?? "");
   }
   console.log("RELEASED HEADERS:", JSON.stringify(h2));
   const r4: string[] = [];
-  for (let c = 1; c <= 11; c++) {
+  for (let c = 1; c <= 12; c++) {
     const v = ws2.getRow(4).getCell(c).value as string;
     r4.push(v ?? "");
   }

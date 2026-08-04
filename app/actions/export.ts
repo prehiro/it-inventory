@@ -272,7 +272,7 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
         where: { type: "RELEASE" },
         orderBy: { date: "desc" },
         take: 1,
-        select: { assigneeName: true, assigneeEmpNumber: true, assigneeDept: true, date: true },
+        select: { assigneeName: true, assigneeEmpNumber: true, assigneeDept: true, date: true, remarks: true },
       },
     },
   });
@@ -310,6 +310,7 @@ export async function buildAvailableStockWorkbook(
           { key: "assignee", width: 18 },
           { key: "dept", width: 18 },
           { key: "released", width: 14 },
+          { key: "remarks", width: 22 },
         ] as { key: string; width: number }[])
       : ([
           { key: "location", width: 16 },
@@ -317,6 +318,7 @@ export async function buildAvailableStockWorkbook(
           { key: "status", width: 16 },
         ] as { key: string; width: number }[])),
   ];
+  const colCount = isReleased ? 12 : 11;
 
   const thin = { style: "thin" as const, color: { argb: "FF" + C.border } };
   const mediumBand = { style: "medium" as const, color: { argb: "FF" + bandDark } };
@@ -329,12 +331,12 @@ export async function buildAvailableStockWorkbook(
   titleCell.font = { bold: true, size: 18, color: { argb: "FF" + C.white } };
   titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + band } };
   titleCell.alignment = { vertical: "middle", horizontal: "left" };
-  for (let c = 2; c <= 11; c++) {
+  for (let c = 2; c <= colCount; c++) {
     const cell = rTitle.getCell(c);
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + band } };
   }
 
-  // Subtitle + filter summary, merged G1:K1, two lines, right-aligned on the band
+  // Subtitle + filter summary, merged G1:<lastCol>, two lines, right-aligned on the band
   const parts: string[] = [];
   if (filter.type && filter.type !== "All") parts.push(`Type: ${filter.type}`);
   if (filter.category && filter.category !== "All") parts.push(`Category: ${filter.category}`);
@@ -345,7 +347,7 @@ export async function buildAvailableStockWorkbook(
   if (filter.to) parts.push(`To: ${filter.to}`);
   const filterStr = parts.length ? parts.join("   ·   ") : "All items";
   const subtitle = (filter.subtitle as string) ?? "Available & ready-to-release inventory";
-  ws.mergeCells(1, 7, 1, 11); // G1:K1
+  ws.mergeCells(1, 7, 1, colCount); // G1:<lastCol>
   const infoCell = rTitle.getCell(7);
   infoCell.value = `${subtitle}\nFilter: ${filterStr}`;
   infoCell.font = { italic: true, size: 9.5, color: { argb: "F5FFFFFF" } };
@@ -355,7 +357,7 @@ export async function buildAvailableStockWorkbook(
   const rHead = ws.getRow(3);
   rHead.height = 22;
   const HEADERS = isReleased
-    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "RELEASED"]
+    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "RELEASED", "REMARKS"]
     : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
   HEADERS.forEach((h, i) => {
     const cell = rHead.getCell(i + 1);
@@ -400,6 +402,7 @@ export async function buildAvailableStockWorkbook(
           rel?.assigneeName ?? "",
           rel?.assigneeDept ?? i.location,
           rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
+          rel?.remarks ?? "",
         ]
       : [
           idx + 1,
@@ -444,7 +447,8 @@ export async function buildAvailableStockWorkbook(
 
   // Freeze header row 3 + autofilter
   ws.views = [{ state: "frozen", ySplit: 3 }];
-  ws.autoFilter = { from: "A3", to: `K${3 + items.length}` };
+  const lastColLetter = colCount === 12 ? "L" : "K";
+  ws.autoFilter = { from: "A3", to: `${lastColLetter}${3 + items.length}` };
 
   /* ── Footer: generation stamp only (no item-count row) ── */
   const last = 4 + items.length;
