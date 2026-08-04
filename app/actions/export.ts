@@ -309,8 +309,8 @@ export async function buildAvailableStockWorkbook(
       ? ([
           { key: "assignee", width: 18 },
           { key: "dept", width: 18 },
-          { key: "released", width: 14 },
           { key: "remarks", width: 22 },
+          { key: "released", width: 14 },
         ] as { key: string; width: number }[])
       : ([
           { key: "location", width: 16 },
@@ -357,7 +357,7 @@ export async function buildAvailableStockWorkbook(
   const rHead = ws.getRow(3);
   rHead.height = 22;
   const HEADERS = isReleased
-    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "RELEASED", "REMARKS"]
+    ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "REMARKS", "RELEASED"]
     : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
   HEADERS.forEach((h, i) => {
     const cell = rHead.getCell(i + 1);
@@ -401,8 +401,8 @@ export async function buildAvailableStockWorkbook(
           i.poNumber ?? "",
           rel?.assigneeName ?? "",
           rel?.assigneeDept ?? i.location,
-          rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
           rel?.remarks ?? "",
+          rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
         ]
       : [
           idx + 1,
