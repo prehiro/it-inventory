@@ -5,7 +5,7 @@ import { ExportExcelButton } from "./export-excel-button";
 import { TableFilterRow } from "./table-filter-row";
 import { ReportsPagination } from "./reports-pagination";
 import { CategoryBadge } from "./category-badge";
-import { CellTooltip } from "./cell-tooltip";
+import { BigGooseTooltip } from "./big-goose-tooltip";
 
 /* ──────────────────────────────────────────
    ReleasedItemsTable — items currently in RELEASED status.
@@ -89,14 +89,14 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
             }`}
           >
             <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200">
-              <CellTooltip
+              <BigGooseTooltip
                 label={<span className="block truncate">{i.serialNumber}</span>}
-                content={
-                  <span className="font-mono text-[11px] leading-relaxed">
+                tooltip={
+                  <span className="block font-mono text-[11px] tracking-wide">
                     {i.serialNumber}
                   </span>
                 }
-                width={240}
+                category={i.model.category}
               />
             </td>
             <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
@@ -107,23 +107,34 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
               </span>
             </td>
             <td className="max-w-0 px-4 py-3 font-medium text-slate-800 dark:text-slate-100">
-              <div className="flex flex-col gap-0.5">
-                <span className="truncate font-medium text-slate-700 dark:text-slate-200">{i.model.brand}</span>
-                <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">{i.model.model}</span>
-              </div>
+              <BigGooseTooltip
+                label={
+                  <div className="flex flex-col gap-0.5">
+                    <span className="truncate font-medium text-slate-700 dark:text-slate-200">{i.model.brand}</span>
+                    <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">{i.model.model}</span>
+                  </div>
+                }
+                tooltip={
+                  <span className="block">
+                    <span className="block font-medium text-white">{i.model.brand}</span>
+                    <span className="mt-0.5 block text-[11px] text-slate-300">{i.model.model}</span>
+                  </span>
+                }
+                category={i.model.category}
+              />
             </td>
             <td className="whitespace-nowrap px-4 py-3">
               <CategoryBadge category={i.model.category} />
             </td>
             <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
-              <CellTooltip
+              <BigGooseTooltip
                 label={<span className="block truncate">{i.poNumber || "—"}</span>}
-                content={<span className="block text-[11px] text-slate-200">{i.poNumber || "No PO"}</span>}
-                width={240}
+                tooltip={i.poNumber || "No PO"}
+                category={i.model.category}
               />
             </td>
             <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-200">
-              <CellTooltip
+              <BigGooseTooltip
                 label={
                   <div className="flex flex-col">
                     <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
@@ -134,19 +145,19 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
                     </span>
                   </div>
                 }
-                content={
+                tooltip={
                   <span className="block leading-relaxed">
                     <span className="block font-medium text-white">{rel?.assigneeName ?? "—"}</span>
-                    <span className="mt-0.5 block text-[11px] text-slate-300 dark:text-slate-300">
+                    <span className="mt-0.5 block text-[11px] text-slate-300">
                       {rel?.assigneeEmpNumber || rel?.gid || ""}
                     </span>
                   </span>
                 }
-                width={260}
+                category={i.model.category}
               />
             </td>
             <td className="max-w-0 overflow-hidden px-4 py-3 text-slate-600 dark:text-slate-300">
-              <CellTooltip
+              <BigGooseTooltip
                 label={
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <span className="flex min-w-0 items-center gap-1.5">
@@ -161,7 +172,7 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
                     ) : null}
                   </div>
                 }
-                content={
+                tooltip={
                   <span className="block text-[11px] leading-relaxed">
                     <span className="text-white font-medium">{rel?.assigneeDept || i.location}</span>
                     {rel?.remarks ? (
@@ -171,14 +182,14 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
                     ) : null}
                   </span>
                 }
-                width={220}
+                category={i.model.category}
               />
             </td>
             <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
-              <CellTooltip
+              <BigGooseTooltip
                 label={<span className="block truncate">{i.hostname && i.hostname !== "N/A" ? i.hostname : "—"}</span>}
-                content={<span className="block font-mono text-[11px] text-slate-200">{i.hostname && i.hostname !== "N/A" ? i.hostname : "No hostname"}</span>}
-                width={220}
+                tooltip={i.hostname && i.hostname !== "N/A" ? i.hostname : "No hostname"}
+                category={i.model.category}
               />
             </td>
             <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
