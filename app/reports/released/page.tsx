@@ -10,7 +10,7 @@ import { ReleasedItemsTable } from "../_components/released-items-table";
 export default async function ReleasedItemPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string; page?: string }>;
+  searchParams: Promise<{ type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string; hostname?: string; page?: string }>;
 }) {
   await requireRole(await requireAuth(), ["ADMIN", "MANAGER"]);
   const sp = await searchParams;
@@ -22,12 +22,20 @@ export default async function ReleasedItemPage({
   if (sp.type && sp.type !== "All") where.model = { type: sp.type };
   if (sp.category && sp.category !== "All") where.model = { ...(where.model as object), category: sp.category };
   if (sp.po) where.poNumber = { contains: sp.po };
+  if (sp.hostname) where.hostname = { contains: sp.hostname };
   // Location/assignee/date filters all target the RELEASE txn (for released
   // items the destination is the assignee's department; item.location stays
   // "IT Store" from receive). Merge them into one `some` filter.
   const txnFilter: Record<string, unknown> = { type: "RELEASE" };
   if (sp.location) txnFilter.assigneeDept = { contains: sp.location };
-  if (sp.assignee) txnFilter.assigneeName = { contains: sp.assignee };
+  if (sp.assignee) {
+    txnFilter.OR = [
+      { assigneeName: { contains: sp.assignee } },
+      { assigneeEmpNumber: { contains: sp.assignee } },
+      { gid: { contains: sp.assignee } },
+      { email: { contains: sp.assignee } },
+    ];
+  }
   if (sp.from || sp.to) {
     const date: Record<string, unknown> = {};
     if (sp.from) date.gte = new Date(sp.from);
@@ -39,9 +47,9 @@ export default async function ReleasedItemPage({
   }
   if (sp.q) {
     where.OR = [
-      { serialNumber: { contains: sp.q, mode: "insensitive" } },
-      { model: { model: { contains: sp.q, mode: "insensitive" } } },
-      { model: { brand: { contains: sp.q, mode: "insensitive" } } },
+      { serialNumber: { contains: sp.q } },
+      { model: { model: { contains: sp.q } } },
+      { model: { brand: { contains: sp.q } } },
     ];
   }
 
@@ -75,6 +83,7 @@ export default async function ReleasedItemPage({
             assigneeDept: true,
             gid: true,
             email: true,
+            remarks: true,
           },
         },
       },
@@ -100,6 +109,7 @@ export default async function ReleasedItemPage({
     from: sp.from ?? "",
     to: sp.to ?? "",
     assignee: sp.assignee ?? "",
+    hostname: sp.hostname ?? "",
   };
   const query = new URLSearchParams();
   if (filter.type) query.set("type", filter.type);
@@ -110,6 +120,7 @@ export default async function ReleasedItemPage({
   if (filter.from) query.set("from", filter.from);
   if (filter.to) query.set("to", filter.to);
   if (filter.assignee) query.set("assignee", filter.assignee);
+  if (filter.hostname) query.set("hostname", filter.hostname);
   const queryStr = query.toString();
 
   return (

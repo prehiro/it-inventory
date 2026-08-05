@@ -5,6 +5,7 @@ import { ExportExcelButton } from "./export-excel-button";
 import { TableFilterRow } from "./table-filter-row";
 import { ReportsPagination } from "./reports-pagination";
 import { CategoryBadge } from "./category-badge";
+import { CellTooltip } from "./cell-tooltip";
 
 /* ──────────────────────────────────────────
    ReceivedItemsTable — full table card (toolbar + sticky thead w/ filter row
@@ -72,21 +73,61 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Receive
             idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/40 dark:bg-slate-800/20"
           }`}
         >
-          <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200" title={i.serialNumber}>{i.serialNumber}</td>
-          <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
-            <span
-              className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TYPE_BADGE(i.model.category)}`}
-            >
-              {i.model.type}
-            </span>
+          <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200">
+            <CellTooltip
+              label={<span className="block truncate">{i.serialNumber}</span>}
+              content={<span className="font-mono text-[11px] leading-relaxed">{i.serialNumber}</span>}
+              width={240}
+            />
           </td>
+          <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
+              <CellTooltip
+                label={
+                  <span
+                    className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TYPE_BADGE(i.model.category)}`}
+                  >
+                    {i.model.type}
+                  </span>
+                }
+                content={
+                  <span className="block">
+                    <span className="font-medium text-white">Type: {i.model.type}</span>
+                    <span className="mt-1 block text-[11px] text-slate-300 dark:text-slate-300">Device type for this item</span>
+                  </span>
+                }
+                width={240}
+              />
+            </td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-600 dark:text-slate-300">{i.model.brand}</td>
-          <td className="max-w-0 truncate px-4 py-3 font-medium text-slate-800 dark:text-slate-100" title={i.model.model}>{i.model.model}</td>
+          <td className="max-w-0 px-4 py-3 font-medium text-slate-800 dark:text-slate-100">
+            <CellTooltip
+              label={<span className="block truncate">{i.model.model}</span>}
+              content={<span className="block font-medium text-white">{i.model.model}</span>}
+              width={260}
+            />
+          </td>
           <td className="whitespace-nowrap px-4 py-3">
             <CategoryBadge category={i.model.category} />
           </td>
-          <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={i.poNumber || "—"}>{i.poNumber || "—"}</td>
-          <td className="max-w-0 truncate px-4 py-3 text-slate-600 dark:text-slate-300" title={i.location}>{i.location}</td>
+          <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+            <CellTooltip
+              label={<span className="block truncate">{i.poNumber || "—"}</span>}
+              content={<span className="block text-[11px] text-slate-200">{i.poNumber || "No PO"}</span>}
+              width={240}
+            />
+          </td>
+          <td className="max-w-0 px-4 py-3 text-slate-600 dark:text-slate-300">
+            <CellTooltip
+              label={<span className="block truncate">{i.location}</span>}
+              content={
+                <span className="block">
+                  <span className="font-medium text-white">{i.location}</span>
+                  <span className="mt-0.5 block text-[11px] text-slate-400">Physical storage location</span>
+                </span>
+              }
+              width={220}
+            />
+          </td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
             {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(i.dateReceived)}
           </td>

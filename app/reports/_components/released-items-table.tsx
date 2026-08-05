@@ -5,14 +5,15 @@ import { ExportExcelButton } from "./export-excel-button";
 import { TableFilterRow } from "./table-filter-row";
 import { ReportsPagination } from "./reports-pagination";
 import { CategoryBadge } from "./category-badge";
+import { CellTooltip } from "./cell-tooltip";
 
 /* ──────────────────────────────────────────
    ReleasedItemsTable — items currently in RELEASED status.
    Layout mirrors ReceivedItemsTable (sticky thead + per-column filter row +
-   grouped body + pagination) with 10 columns. The "Released" column shows
-   Release (latest RELEASE txn); hostname + assignee are shown
-      inline. Filter row: Assignee text input + Location (dept) input via props.
-      ────────────────────────────────────────── */
+   grouped body + pagination) with 9 columns. The "Released" column shows
+   Release (latest RELEASE txn); hostname has its own column.
+   Filter row: Assignee text input + Location (dept) input via props.
+   ────────────────────────────────────────── */
 
 export type ReleasedRow = {
   serialNumber: string;
@@ -28,6 +29,7 @@ export type ReleasedRow = {
     assigneeDept: string | null;
     gid: string | null;
     email: string | null;
+    remarks: string | null;
   }[];
 };
 
@@ -86,7 +88,17 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
               idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/40 dark:bg-slate-800/20"
             }`}
           >
-            <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200" title={i.serialNumber}>{i.serialNumber}</td>
+            <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-200">
+              <CellTooltip
+                label={<span className="block truncate">{i.serialNumber}</span>}
+                content={
+                  <span className="font-mono text-[11px] leading-relaxed">
+                    {i.serialNumber}
+                  </span>
+                }
+                width={240}
+              />
+            </td>
             <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-200">
               <span
                 className={`rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TYPE_BADGE(i.model.category)}`}
@@ -94,35 +106,80 @@ function GroupRows({ group }: { group: { key: string; date: Date; items: Release
                 {i.model.type}
               </span>
             </td>
-            <td className="whitespace-nowrap px-4 py-3 text-slate-600 dark:text-slate-300">{i.model.brand}</td>
-            <td className="max-w-0 truncate px-4 py-3 font-medium text-slate-800 dark:text-slate-100" title={i.model.model}>
-              <div className="flex flex-col">
-                <span className="truncate">{i.model.model}</span>
-                {i.hostname && i.hostname !== "N/A" && (
-                  <span className="truncate font-mono text-[11px] font-normal text-slate-400 dark:text-slate-500">◎ {i.hostname}</span>
-                )}
+            <td className="max-w-0 px-4 py-3 font-medium text-slate-800 dark:text-slate-100">
+              <div className="flex flex-col gap-0.5">
+                <span className="truncate font-medium text-slate-700 dark:text-slate-200">{i.model.brand}</span>
+                <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">{i.model.model}</span>
               </div>
             </td>
             <td className="whitespace-nowrap px-4 py-3">
               <CategoryBadge category={i.model.category} />
             </td>
-            <td className="max-w-0 truncate px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" title={i.poNumber || "—"}>{i.poNumber || "—"}</td>
-            <td className="max-w-0 truncate px-4 py-3 text-slate-700 dark:text-slate-200" title={`${rel?.assigneeName ?? "—"}${rel?.assigneeEmpNumber ? ` (${rel.assigneeEmpNumber})` : ""}`}>
-              <div className="flex flex-col">
-                <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">{rel?.assigneeName ?? "—"}</span>
-                <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">
-                  {rel?.assigneeEmpNumber || rel?.gid || ""}
-                </span>
-              </div>
+            <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+              <CellTooltip
+                label={<span className="block truncate">{i.poNumber || "—"}</span>}
+                content={<span className="block text-[11px] text-slate-200">{i.poNumber || "No PO"}</span>}
+                width={240}
+              />
             </td>
-            <td className="max-w-0 truncate px-4 py-3 text-slate-600 dark:text-slate-300" title={rel?.assigneeDept ?? i.location}>
-              <span className="inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                {rel?.assigneeDept || i.location}
-              </span>
+            <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-200">
+              <CellTooltip
+                label={
+                  <div className="flex flex-col">
+                    <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
+                      {rel?.assigneeName ?? "—"}
+                    </span>
+                    <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">
+                      {rel?.assigneeEmpNumber || rel?.gid || ""}
+                    </span>
+                  </div>
+                }
+                content={
+                  <span className="block leading-relaxed">
+                    <span className="block font-medium text-white">{rel?.assigneeName ?? "—"}</span>
+                    <span className="mt-0.5 block text-[11px] text-slate-300 dark:text-slate-300">
+                      {rel?.assigneeEmpNumber || rel?.gid || ""}
+                    </span>
+                  </span>
+                }
+                width={260}
+              />
+            </td>
+            <td className="max-w-0 overflow-hidden px-4 py-3 text-slate-600 dark:text-slate-300">
+              <CellTooltip
+                label={
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="relative h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      <span className="block min-w-0 flex-1 truncate text-slate-600 dark:text-slate-300">{rel?.assigneeDept || i.location}</span>
+                    </span>
+                    {rel?.remarks ? (
+                      <span className="block min-w-0 truncate pl-5 text-[11px] text-slate-400 dark:text-slate-500">{rel.remarks}</span>
+                    ) : null}
+                  </div>
+                }
+                content={
+                  <span className="block text-[11px] leading-relaxed">
+                    <span className="text-white font-medium">{rel?.assigneeDept || i.location}</span>
+                    {rel?.remarks ? (
+                      <span className="mt-1.5 block border-t border-slate-700/60 pt-1.5 text-slate-300">
+                        {rel.remarks}
+                      </span>
+                    ) : null}
+                  </span>
+                }
+                width={220}
+              />
+            </td>
+            <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+              <CellTooltip
+                label={<span className="block truncate">{i.hostname && i.hostname !== "N/A" ? i.hostname : "—"}</span>}
+                content={<span className="block font-mono text-[11px] text-slate-200">{i.hostname && i.hostname !== "N/A" ? i.hostname : "No hostname"}</span>}
+                width={220}
+              />
             </td>
             <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">
               {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(rel?.date ?? i.dateReceived)}
@@ -149,10 +206,10 @@ export function ReleasedItemsTable({
   totalPages: number;
   pageSize: number;
   query: string;
-  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; assignee?: string };
+  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; assignee?: string; hostname?: string };
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
-  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.assignee);
+  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.assignee || filter.hostname);
 
   return (
     <div className="-mx-6 flex min-h-0 flex-1 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -227,36 +284,38 @@ export function ReleasedItemsTable({
       </div>
 
       {/* ── Table (internal scroll, sticky header) — flex-1 fills remaining card height ── */}
-      <div className="min-h-0 flex-1 overflow-auto custom-scrollbar">
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar">
         <table className="w-full table-fixed border-collapse text-sm">
           <colgroup>
-            <col className="w-[13%]" />
+            <col className="w-[12%]" />
+            <col className="w-[8%]" />
+            <col className="w-[15%]" />
             <col className="w-[9%]" />
-            <col className="w-[10%]" />
-            <col className="w-[13%]" />
-            <col className="w-[10%]" />
-            <col className="w-[11%]" />
+            <col className="w-[12%]" />
             <col className="w-[14%]" />
-            <col className="w-[11%]" />
-            <col className="w-[11%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
+            <col className="w-[9%]" />
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr className="border-b border-slate-200 bg-slate-50/90 dark:border-slate-700 dark:bg-slate-800/90">
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.type || filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Serial Number</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.type ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Type</th>
-              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Brand</th>
-              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Model</th>
+              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Brand / Model</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.category ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Category</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.po ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>PO Number</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.assignee ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Assignee</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.location ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Location</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Hostname</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.from || filter.to ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Released</th>
             </tr>
             <TableFilterRow
               basePath="/reports/released"
-              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "" }}
+              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "", hostname: filter.hostname ?? "" }}
               show={filterOpen}
               withAssignee
+              mergeBrandModel
+              withHostname
             />
           </thead>
           <tbody>

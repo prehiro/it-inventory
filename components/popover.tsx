@@ -31,6 +31,7 @@ export function usePopoverPosition({
   flip?: boolean;
 }) {
   const [pos, setPos] = useState<PopoverPos>(null);
+  const [flipped, setFlipped] = useState(false);
   const [mounted, setMounted] = useState(false);
   const popRef = useRef<HTMLDivElement>(null);
 
@@ -51,12 +52,15 @@ export function usePopoverPosition({
     const ph = pop ? pop.offsetHeight : 0;
 
     let top = r.bottom + gap;
+    let isUp = false;
     if (flip && r.bottom + gap + ph > vh - 8 && r.top - gap - ph > 8) {
       top = r.top - gap - ph;
+      isUp = true;
     }
     let left = align === "right" ? r.right - pw : r.left;
     left = Math.max(8, Math.min(left, vw - pw - 8));
     setPos({ top, left });
+    setFlipped(isUp);
   }, [open, mounted, triggerRef, width, gap, align, flip]);
 
   function portal(children: React.ReactNode, className = "") {
@@ -73,5 +77,5 @@ export function usePopoverPosition({
     );
   }
 
-  return { pos, popRef, mounted, portal };
+  return { pos, popRef, mounted, flipped, portal };
 }

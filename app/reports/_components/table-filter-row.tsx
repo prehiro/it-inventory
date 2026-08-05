@@ -106,12 +106,18 @@ export function TableFilterRow({
   show,
   withStatus = false,
   withAssignee = false,
+  mergeBrandModel = false,
+  withHostname = false,
 }: {
   basePath: string;
-  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string };
+  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string; hostname?: string };
   show: boolean;
   withStatus?: boolean;
   withAssignee?: boolean;
+  /** Release: combine Brand + Model into a single filter cell (matches merged header). */
+  mergeBrandModel?: boolean;
+  /** Show an extra HOSTNAME filter cell after Location. */
+  withHostname?: boolean;
 }) {
   const router = useRouter();
   const [type, setType] = useState(initial.type || "All");
@@ -127,6 +133,8 @@ export function TableFilterRow({
   const [status, setStatus] = useState(initial.status || "All");
   const [assignee, setAssignee] = useState(initial.assignee || "");
   const [debouncedAssignee, setDebouncedAssignee] = useState(initial.assignee || "");
+  const [hostname, setHostname] = useState(initial.hostname || "");
+  const [debouncedHostname, setDebouncedHostname] = useState(initial.hostname || "");
   const firstRun = useRef(true);
 
   // Debounce text inputs — avoid a router push per keystroke
@@ -146,6 +154,10 @@ export function TableFilterRow({
     const t = setTimeout(() => setDebouncedAssignee(assignee), 400);
     return () => clearTimeout(t);
   }, [assignee]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedHostname(hostname), 400);
+    return () => clearTimeout(t);
+  }, [hostname]);
 
   function push() {
     const p = new URLSearchParams();
@@ -158,6 +170,7 @@ export function TableFilterRow({
     if (to) p.set("to", to);
     if (withStatus && status !== "All") p.set("status", status);
     if (withAssignee && debouncedAssignee) p.set("assignee", debouncedAssignee);
+    if (withHostname && debouncedHostname) p.set("hostname", debouncedHostname);
     p.set("page", "1");
     router.push(`${basePath}?${p.toString()}`);
   }
@@ -169,7 +182,7 @@ export function TableFilterRow({
     }
     push();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee]);
+  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee, debouncedHostname]);
 
   return (
     <tr className={`border-b border-slate-100 bg-white dark:border-slate-700 dark:bg-slate-900 ${show ? "" : "hidden"}`}>
@@ -181,14 +194,21 @@ export function TableFilterRow({
       <td className="px-2 py-2">
         <Dropdown value={type} onChange={setType} options={TYPE_OPTIONS} placeholder="All" />
       </td>
-      {/* Brand */}
-      <td className="px-2 py-2">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
-      </td>
-      {/* Model */}
-      <td className="px-2 py-2">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
-      </td>
+      {/* Brand / Brand+Model / Model */}
+      {mergeBrandModel ? (
+        <td className="px-2 py-2">
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
+        </td>
+      ) : (
+        <>
+          <td className="px-2 py-2">
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
+          </td>
+          <td className="px-2 py-2">
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
+          </td>
+        </>
+      )}
       {/* Category */}
       <td className="px-2 py-2">
         <Dropdown value={category} onChange={setCategory} options={CATEGORIES} placeholder="All" />
@@ -206,6 +226,11 @@ export function TableFilterRow({
       <td className="px-2 py-2">
         <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Filter…" className={inputClass} />
       </td>
+      {withHostname && (
+        <td className="px-2 py-2">
+          <input value={hostname} onChange={(e) => setHostname(e.target.value)} placeholder="Filter…" className={inputClass} />
+        </td>
+      )}
       {/* Received */}
       <td className="px-2 py-2">
         <DateRangePreset from={from} to={to} onChange={(f, t) => { setFrom(f); setTo(t); }} />
