@@ -217,10 +217,10 @@ export function ReleasedItemsTable({
   totalPages: number;
   pageSize: number;
   query: string;
-  filter: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; assignee?: string; hostname?: string };
+  filter: { type: string; category: string; q: string; serial: string; brand: string; model: string; po: string; location: string; from: string; to: string; assignee?: string; hostname?: string };
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
-  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.po || filter.location || filter.from || filter.to || filter.assignee || filter.hostname);
+  const hasFilter = Boolean(filter.type || filter.category || filter.q || filter.serial || filter.brand || filter.model || filter.po || filter.location || filter.from || filter.to || filter.assignee || filter.hostname);
 
   return (
     <div className="-mx-6 flex min-h-0 flex-1 flex-col rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -262,6 +262,9 @@ export function ReleasedItemsTable({
                   Boolean(filter.type),
                   Boolean(filter.category),
                   Boolean(filter.q),
+                  Boolean(filter.serial),
+                  Boolean(filter.brand),
+                  Boolean(filter.model),
                   Boolean(filter.po),
                   Boolean(filter.location),
                   Boolean(filter.from || filter.to),
@@ -285,7 +288,7 @@ export function ReleasedItemsTable({
           )}
           <ExportExcelButton
             statuses={["RELEASED"]}
-            filter={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "" }}
+            filter={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "", hostname: filter.hostname ?? "" }}
             count={total}
             sheetTitle="Released Item"
             filename="it-inventory-released-item.xlsx"
@@ -310,9 +313,9 @@ export function ReleasedItemsTable({
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr className="border-b border-slate-200 bg-slate-50/90 dark:border-slate-700 dark:bg-slate-800/90">
-              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.type || filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Serial Number</th>
+              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.type || filter.q || filter.serial ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Serial Number</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.type ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Type</th>
-              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.q ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Brand / Model</th>
+              <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.q || filter.brand || filter.model ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Brand / Model</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.category ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Category</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.po ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>PO Number</th>
               <th className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${filter.assignee ? "text-[#2563eb]" : "text-slate-500 dark:text-slate-400"}`}>Assignee</th>
@@ -322,7 +325,7 @@ export function ReleasedItemsTable({
             </tr>
             <TableFilterRow
               basePath="/reports/released"
-              initial={{ type: filter.type, category: filter.category, q: filter.q, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "", hostname: filter.hostname ?? "" }}
+              initial={{ type: filter.type, category: filter.category, q: filter.q, serial: filter.serial, brand: filter.brand, model: filter.model, po: filter.po, location: filter.location, from: filter.from, to: filter.to, assignee: filter.assignee ?? "", hostname: filter.hostname ?? "" }}
               show={filterOpen}
               withAssignee
               mergeBrandModel

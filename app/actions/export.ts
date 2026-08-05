@@ -231,19 +231,16 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
   // Build where from the same filters as the report pages
   const statuses = (filter.statuses as string[] | undefined) ?? ["AVAILABLE"];
   const where: Prisma.ItemWhereInput = { isDeleted: false, status: { in: statuses } };
+  // Released report: destination is the assignee's department (RELEASE txn); date
+  // filter targets the RELEASE date (end-of-day inclusive). Received report: plain
+  // item.location + dateReceived. Both must match what their page displays.
+  const released = statuses.includes("RELEASED");
   if (filter.type && filter.type !== "All") where.model = { type: filter.type as string };
   if (filter.category && filter.category !== "All") {
     where.model = { ...(where.model as object), category: filter.category as string };
   }
   if (filter.po) where.poNumber = { contains: filter.po as string };
-  if (filter.location) where.location = { contains: filter.location as string };
-  // Released report: destination is the assignee's department (RELEASE txn).
-  if (filter.assigneeDept) {
-    where.transactions = { some: { type: "RELEASE", assigneeDept: { contains: filter.assigneeDept as string } } };
-  }
-  if (filter.assigneeName) {
-    where.transactions = { some: { type: "RELEASE", assigneeName: { contains: filter.assigneeName as string } } };
-  }
+  if (filter.hostname) where.hostname = { contains: filter.hostname as string };
   if (filter.q) {
     where.OR = [
       { serialNumber: { contains: filter.q as string } },
@@ -251,11 +248,71 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
       { model: { brand: { contains: filter.q as string } } },
     ];
   }
-  if (filter.from || filter.to) {
-    where.dateReceived = {};
-    if (filter.from) (where.dateReceived as Record<string, unknown>).gte = new Date(filter.from as string);
-    if (filter.to) (where.dateReceived as Record<string, unknown>).lte = new Date(filter.to as string);
+  // Column-scoped AND filters (serial / brand / model) — mirrors report pages.
+  const ands: Prisma.ItemWhereInput[] = [];
+  if (filter.serial) ands.push({ serialNumber: { contains: filter.serial as string } });
+  if (filter.brand) ands.push({ model: { brand: { contains: filter.brand as string } } });
+  if (filter.model) ands.push({ model: { model: { contains: filter.model as string } } });
+  if (ands.length) where.AND = ands;
+  if (released) {
+    // Released: location = assignee dept, assignee = OR over identity fields, date = release date.
+    // Fetch ALL matching released items + each latest RELEASE txn, then filter in JS so the
+    // exported set matches EXACTLY what the Released report page displays (latest-txn semantics).
+    const candidates = await prisma.item.findMany({
+      where: { ...where, transactions: undefined } as Prisma.ItemWhereInput,
+      select: {
+        serialNumber: true,
+        poNumber: true,
+        location: true,
+        dateReceived: true,
+        hostname: true,
+        model: { select: { type: true, brand: true, model: true, category: true } },
+        transactions: {
+          where: { type: "RELEASE" },
+          orderBy: { date: "desc" },
+          take: 1,
+          select: { date: true, assigneeName: true, assigneeEmpNumber: true, assigneeDept: true, gid: true, email: true, remarks: true },
+        },
+      },
+    });
+    const matches = candidates.filter((i) => {
+      const t = i.transactions[0];
+      const dept = t?.assigneeDept ?? i.location;
+      const name = t?.assigneeName ?? "";
+      const emp = t?.assigneeEmpNumber ?? "";
+      const gid = t?.gid ?? "";
+      const email = t?.email ?? "";
+      const d = t?.date ?? i.dateReceived;
+      if (filter.assigneeDept && !dept.toLowerCase().includes(String(filter.assigneeDept).toLowerCase())) return false;
+      if (filter.assigneeName) {
+        const hay = `${name} ${emp} ${gid} ${email}`.toLowerCase();
+        if (!hay.includes(String(filter.assigneeName).toLowerCase())) return false;
+      }
+      if (filter.from && d < new Date(filter.from as string)) return false;
+      if (filter.to && d > new Date(`${filter.to as string}T23:59:59.999`)) return false;
+      return true;
+    });
+    return prisma.item.findMany({
+      where: { serialNumber: { in: matches.map((m) => m.serialNumber) } },
+      orderBy: [{ dateReceived: "desc" }, { serialNumber: "asc" }],
+      select: {
+        serialNumber: true,
+        status: true,
+        poNumber: true,
+        location: true,
+        dateReceived: true,
+        hostname: true,
+        model: { select: { type: true, brand: true, model: true, category: true } },
+        transactions: {
+          where: { type: "RELEASE" },
+          orderBy: { date: "desc" },
+          take: 1,
+          select: { assigneeName: true, assigneeEmpNumber: true, assigneeDept: true, date: true, remarks: true },
+        },
+      },
+    });
   }
+  // Received: plain item fields.
 
   return prisma.item.findMany({
     where,
@@ -343,6 +400,9 @@ export async function buildAvailableStockWorkbook(
   if (filter.po) parts.push(`PO: ${filter.po}`);
   if (filter.location) parts.push(`Location: ${filter.location}`);
   if (filter.q) parts.push(`Search: ${filter.q}`);
+  if (filter.serial) parts.push(`Serial: ${filter.serial}`);
+  if (filter.brand) parts.push(`Brand: ${filter.brand}`);
+  if (filter.model) parts.push(`Model: ${filter.model}`);
   if (filter.from) parts.push(`From: ${filter.from}`);
   if (filter.to) parts.push(`To: ${filter.to}`);
   const filterStr = parts.length ? parts.join("   ·   ") : "All items";

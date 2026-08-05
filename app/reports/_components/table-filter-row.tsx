@@ -110,7 +110,7 @@ export function TableFilterRow({
   withHostname = false,
 }: {
   basePath: string;
-  initial: { type: string; category: string; q: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string; hostname?: string };
+  initial: { type: string; category: string; serial?: string; brand?: string; model?: string; q?: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string; hostname?: string };
   show: boolean;
   withStatus?: boolean;
   withAssignee?: boolean;
@@ -122,8 +122,14 @@ export function TableFilterRow({
   const router = useRouter();
   const [type, setType] = useState(initial.type || "All");
   const [category, setCategory] = useState(initial.category || "All");
-  const [q, setQ] = useState(initial.q);
-  const [debouncedQ, setDebouncedQ] = useState(initial.q);
+  // Brand / model / serial are independent fields (AND semantics). They were all
+  // bound to a single `q` before, which made typing in one populate the others.
+  const [serial, setSerial] = useState(initial.serial || "");
+  const [debouncedSerial, setDebouncedSerial] = useState(initial.serial || "");
+  const [brand, setBrand] = useState(initial.brand || "");
+  const [debouncedBrand, setDebouncedBrand] = useState(initial.brand || "");
+  const [model, setModel] = useState(initial.model || "");
+  const [debouncedModel, setDebouncedModel] = useState(initial.model || "");
   const [po, setPo] = useState(initial.po);
   const [debouncedPo, setDebouncedPo] = useState(initial.po);
   const [location, setLocation] = useState(initial.location);
@@ -139,9 +145,17 @@ export function TableFilterRow({
 
   // Debounce text inputs — avoid a router push per keystroke
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQ(q), 400);
+    const t = setTimeout(() => setDebouncedSerial(serial), 400);
     return () => clearTimeout(t);
-  }, [q]);
+  }, [serial]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedBrand(brand), 400);
+    return () => clearTimeout(t);
+  }, [brand]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedModel(model), 400);
+    return () => clearTimeout(t);
+  }, [model]);
   useEffect(() => {
     const t = setTimeout(() => setDebouncedPo(po), 400);
     return () => clearTimeout(t);
@@ -163,7 +177,9 @@ export function TableFilterRow({
     const p = new URLSearchParams();
     if (type !== "All") p.set("type", type);
     if (category !== "All") p.set("category", category);
-    if (debouncedQ) p.set("q", debouncedQ);
+    if (debouncedSerial) p.set("serial", debouncedSerial);
+    if (debouncedBrand) p.set("brand", debouncedBrand);
+    if (debouncedModel) p.set("model", debouncedModel);
     if (debouncedPo) p.set("po", debouncedPo);
     if (debouncedLocation) p.set("location", debouncedLocation);
     if (from) p.set("from", from);
@@ -182,13 +198,13 @@ export function TableFilterRow({
     }
     push();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, category, debouncedQ, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee, debouncedHostname]);
+  }, [type, category, debouncedSerial, debouncedBrand, debouncedModel, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee, debouncedHostname]);
 
   return (
     <tr className={`border-b border-slate-100 bg-white dark:border-slate-700 dark:bg-slate-900 ${show ? "" : "hidden"}`}>
       {/* Serial Number */}
       <td className="px-2 py-2">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
+        <input value={serial} onChange={(e) => setSerial(e.target.value)} placeholder="Filter…" className={inputClass} />
       </td>
       {/* Type */}
       <td className="px-2 py-2">
@@ -196,16 +212,21 @@ export function TableFilterRow({
       </td>
       {/* Brand / Brand+Model / Model */}
       {mergeBrandModel ? (
-        <td className="px-2 py-2">
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
-        </td>
+        <>
+          <td className="px-2 py-2">
+            <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Filter…" className={inputClass} />
+          </td>
+          <td className="px-2 py-2">
+            <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Filter…" className={inputClass} />
+          </td>
+        </>
       ) : (
         <>
           <td className="px-2 py-2">
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
+            <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Filter…" className={inputClass} />
           </td>
           <td className="px-2 py-2">
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className={inputClass} />
+            <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Filter…" className={inputClass} />
           </td>
         </>
       )}

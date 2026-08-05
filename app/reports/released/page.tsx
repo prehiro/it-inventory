@@ -10,10 +10,17 @@ import { ReleasedItemsTable } from "../_components/released-items-table";
 export default async function ReleasedItemPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string; hostname?: string; page?: string }>;
+  searchParams: Promise<{ type?: string; category?: string; q?: string; serial?: string; brand?: string; model?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string; hostname?: string; page?: string }>;
 }) {
   await requireRole(await requireAuth(), ["ADMIN", "MANAGER"]);
   const sp = await searchParams;
+
+  // Backward compat: legacy ?q= mapped to serial+brand+model OR. New UI sends
+  // separate ?serial=&brand=&model= which AND together (one field per column).
+  const serial = sp.serial ?? "";
+  const brand = sp.brand ?? "";
+  const model = sp.model ?? "";
+  const legacyQ = sp.q ?? "";
 
   const where: Record<string, unknown> = {
     isDeleted: false,
@@ -23,86 +30,97 @@ export default async function ReleasedItemPage({
   if (sp.category && sp.category !== "All") where.model = { ...(where.model as object), category: sp.category };
   if (sp.po) where.poNumber = { contains: sp.po };
   if (sp.hostname) where.hostname = { contains: sp.hostname };
-  // Location/assignee/date filters all target the RELEASE txn (for released
-  // items the destination is the assignee's department; item.location stays
-  // "IT Store" from receive). Merge them into one `some` filter.
-  const txnFilter: Record<string, unknown> = { type: "RELEASE" };
-  if (sp.location) txnFilter.assigneeDept = { contains: sp.location };
-  if (sp.assignee) {
-    txnFilter.OR = [
-      { assigneeName: { contains: sp.assignee } },
-      { assigneeEmpNumber: { contains: sp.assignee } },
-      { gid: { contains: sp.assignee } },
-      { email: { contains: sp.assignee } },
-    ];
-  }
-  if (sp.from || sp.to) {
-    const date: Record<string, unknown> = {};
-    if (sp.from) date.gte = new Date(sp.from);
-    if (sp.to) date.lte = new Date(sp.to);
-    txnFilter.date = date;
-  }
-  if (sp.location || sp.assignee || sp.from || sp.to) {
-    where.transactions = { some: txnFilter };
-  }
-  if (sp.q) {
+  // Column-scoped AND filters (serial / brand / model), each `contains`.
+  const ands: Record<string, unknown>[] = [];
+  if (serial) ands.push({ serialNumber: { contains: serial } });
+  if (brand) ands.push({ model: { brand: { contains: brand } } });
+  if (model) ands.push({ model: { model: { contains: model } } });
+  // Legacy ?q= (single free-text across all three) kept for old links.
+  if (legacyQ) {
     where.OR = [
-      { serialNumber: { contains: sp.q } },
-      { model: { model: { contains: sp.q } } },
-      { model: { brand: { contains: sp.q } } },
+      { serialNumber: { contains: legacyQ } },
+      { model: { model: { contains: legacyQ } } },
+      { model: { brand: { contains: legacyQ } } },
     ];
   }
+  if (ands.length) where.AND = ands;
 
   const PAGE_SIZE = 30;
   const page = Math.max(1, Number(sp.page) || 1);
 
-  // Default sort: newest released first — use the latest RELEASE txn date.
-  // We fetch the latest release txn per item to display assignee + released date.
-  const [totalRows, rawItems] = await Promise.all([
-    prisma.item.count({ where }),
-    prisma.item.findMany({
-      where,
-      orderBy: [{ dateReceived: "desc" }, { serialNumber: "asc" }],
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      select: {
-        serialNumber: true,
-        poNumber: true,
-        location: true,
-        dateReceived: true,
-        hostname: true,
-        model: { select: { type: true, brand: true, model: true, category: true } },
-        transactions: {
-          where: { type: "RELEASE" },
-          orderBy: { date: "desc" },
-          take: 1,
-          select: {
-            date: true,
-            assigneeName: true,
-            assigneeEmpNumber: true,
-            assigneeDept: true,
-            gid: true,
-            email: true,
-            remarks: true,
-          },
+  // Location / assignee / date filters target the LATEST RELEASE txn — the same row
+  // the UI displays (transactions[0]). `some` alone would match ANY old release txn
+  // (e.g. an item previously at "Anode" whose latest dept is now "PE" — wrong).
+  // Fetch ALL matching items + each latest RELEASE txn, then filter & paginate in JS
+  // so the filtered result set is always consistent with what the rows render.
+  const rawItems = await prisma.item.findMany({
+    where,
+    orderBy: [{ dateReceived: "desc" }, { serialNumber: "asc" }],
+    select: {
+      serialNumber: true,
+      poNumber: true,
+      location: true,
+      dateReceived: true,
+      hostname: true,
+      model: { select: { type: true, brand: true, model: true, category: true } },
+      transactions: {
+        where: { type: "RELEASE" },
+        orderBy: { date: "desc" },
+        take: 1,
+        select: {
+          date: true,
+          assigneeName: true,
+          assigneeEmpNumber: true,
+          assigneeDept: true,
+          gid: true,
+          email: true,
+          remarks: true,
         },
       },
-    }),
-  ]);
-  // Group rows by release date — sort by latest release date first so
-  // the day-grouped table reads newest → oldest (deterministic tiebreak).
-  const items = rawItems.sort((a, b) => {
-    const da = a.transactions[0]?.date ?? a.dateReceived;
-    const db = b.transactions[0]?.date ?? b.dateReceived;
+    },
+  });
+
+  // ── Filter by LATEST RELEASE txn (in-memory, mirrors what the table displays) ──
+  const latest = (i: (typeof rawItems)[number]) => i.transactions[0];
+
+  const matchesLatest = (i: (typeof rawItems)[number]) => {
+    const t = latest(i);
+    const dept = t?.assigneeDept ?? i.location;
+    const emp = t?.assigneeEmpNumber ?? "";
+    const gid = t?.gid ?? "";
+    const email = t?.email ?? "";
+    const name = t?.assigneeName ?? "";
+    const d = t?.date ?? i.dateReceived;
+    if (sp.location && !dept.toLowerCase().includes(sp.location.toLowerCase())) return false;
+    if (sp.assignee) {
+      const hay = `${name} ${emp} ${gid} ${email}`.toLowerCase();
+      if (!hay.includes(sp.assignee.toLowerCase())) return false;
+    }
+    if (sp.from && d < new Date(sp.from)) return false;
+    if (sp.to) {
+      const end = new Date(`${sp.to}T23:59:59.999`);
+      if (d > end) return false;
+    }
+    return true;
+  };
+
+  const filtered = rawItems.filter(matchesLatest).sort((a, b) => {
+    const da = latest(a)?.date ?? a.dateReceived;
+    const db = latest(b)?.date ?? b.dateReceived;
     const diff = db.getTime() - da.getTime();
     if (diff !== 0) return diff;
     return a.serialNumber.localeCompare(b.serialNumber);
   });
+  const totalRows = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+  const items = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const filter = {
     type: sp.type ?? "",
     category: sp.category ?? "",
+    serial: sp.serial ?? "",
+    brand: sp.brand ?? "",
+    model: sp.model ?? "",
     q: sp.q ?? "",
     po: sp.po ?? "",
     location: sp.location ?? "",
@@ -114,6 +132,9 @@ export default async function ReleasedItemPage({
   const query = new URLSearchParams();
   if (filter.type) query.set("type", filter.type);
   if (filter.category) query.set("category", filter.category);
+  if (filter.serial) query.set("serial", filter.serial);
+  if (filter.brand) query.set("brand", filter.brand);
+  if (filter.model) query.set("model", filter.model);
   if (filter.q) query.set("q", filter.q);
   if (filter.po) query.set("po", filter.po);
   if (filter.location) query.set("location", filter.location);

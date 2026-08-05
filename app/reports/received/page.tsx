@@ -11,10 +11,17 @@ import { ReceivedItemsTable } from "../_components/received-items-table";
 export default async function ReceivedItemPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; page?: string }>;
+  searchParams: Promise<{ type?: string; category?: string; q?: string; serial?: string; brand?: string; model?: string; po?: string; location?: string; from?: string; to?: string; page?: string }>;
 }) {
   await requireRole(await requireAuth(), ["ADMIN", "MANAGER"]);
   const sp = await searchParams;
+
+  // Backward compat: legacy ?q= mapped to serial+brand+model OR. New UI sends
+  // separate ?serial=&brand=&model= which AND together (one field per column).
+  const serial = sp.serial ?? "";
+  const brand = sp.brand ?? "";
+  const model = sp.model ?? "";
+  const legacyQ = sp.q ?? "";
 
   const where: Record<string, unknown> = {
     isDeleted: false,
@@ -24,13 +31,20 @@ export default async function ReceivedItemPage({
   if (sp.category && sp.category !== "All") where.model = { ...(where.model as object), category: sp.category };
   if (sp.po) where.poNumber = { contains: sp.po };
   if (sp.location) where.location = { contains: sp.location };
-  if (sp.q) {
+  // Column-scoped AND filters (serial / brand / model), each `contains`.
+  const ands: Record<string, unknown>[] = [];
+  if (serial) ands.push({ serialNumber: { contains: serial } });
+  if (brand) ands.push({ model: { brand: { contains: brand } } });
+  if (model) ands.push({ model: { model: { contains: model } } });
+  // Legacy ?q= (single free-text across all three) kept for old links.
+  if (legacyQ) {
     where.OR = [
-      { serialNumber: { contains: sp.q } },
-      { model: { model: { contains: sp.q } } },
-      { model: { brand: { contains: sp.q } } },
+      { serialNumber: { contains: legacyQ } },
+      { model: { model: { contains: legacyQ } } },
+      { model: { brand: { contains: legacyQ } } },
     ];
   }
+  if (ands.length) where.AND = ands;
   if (sp.from || sp.to) {
     where.dateReceived = {};
     if (sp.from) (where.dateReceived as Record<string, unknown>).gte = new Date(sp.from);
@@ -60,10 +74,13 @@ export default async function ReceivedItemPage({
   ]);
   const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
 
-  const filter = { type: sp.type ?? "", category: sp.category ?? "", q: sp.q ?? "", po: sp.po ?? "", location: sp.location ?? "", from: sp.from ?? "", to: sp.to ?? "" };
+  const filter = { type: sp.type ?? "", category: sp.category ?? "", q: sp.q ?? "", serial: sp.serial ?? "", brand: sp.brand ?? "", model: sp.model ?? "", po: sp.po ?? "", location: sp.location ?? "", from: sp.from ?? "", to: sp.to ?? "" };
   const query = new URLSearchParams();
   if (filter.type) query.set("type", filter.type);
   if (filter.category) query.set("category", filter.category);
+  if (filter.serial) query.set("serial", filter.serial);
+  if (filter.brand) query.set("brand", filter.brand);
+  if (filter.model) query.set("model", filter.model);
   if (filter.q) query.set("q", filter.q);
   if (filter.po) query.set("po", filter.po);
   if (filter.location) query.set("location", filter.location);
