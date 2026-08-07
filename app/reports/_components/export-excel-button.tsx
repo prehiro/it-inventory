@@ -21,7 +21,7 @@ export function ExportExcelButton({
   subtitle = "Available & ready-to-release inventory",
 }: {
   statuses?: string[];
-  filter?: { type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string; hostname?: string };
+  filter?: { type?: string; category?: string; q?: string; po?: string; location?: string; from?: string; to?: string; assignee?: string; hostname?: string; status?: string; reason?: string; brandModel?: string };
   count?: number;
   sheetTitle?: string;
   filename?: string;
@@ -43,6 +43,9 @@ export function ExportExcelButton({
       assigneeDept: filter?.location ?? "", // released: location = assignee dept
       assigneeName: filter?.assignee ?? "",
       hostname: filter?.hostname ?? "",
+      status: filter?.status ?? "",
+      reason: filter?.reason ?? "",
+      brandModel: filter?.brandModel ?? "",
       sheetTitle,
       subtitle,
       filename,

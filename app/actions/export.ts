@@ -235,6 +235,7 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
   // filter targets the RELEASE date (end-of-day inclusive). Received report: plain
   // item.location + dateReceived. Both must match what their page displays.
   const released = statuses.includes("RELEASED");
+  const returned = statuses.includes("RETURNED");
   if (filter.type && filter.type !== "All") where.model = { type: filter.type as string };
   if (filter.category && filter.category !== "All") {
     where.model = { ...(where.model as object), category: filter.category as string };
@@ -253,6 +254,7 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
   if (filter.serial) ands.push({ serialNumber: { contains: filter.serial as string } });
   if (filter.brand) ands.push({ model: { brand: { contains: filter.brand as string } } });
   if (filter.model) ands.push({ model: { model: { contains: filter.model as string } } });
+  if (filter.brandModel) ands.push({ model: { OR: [{ brand: { contains: filter.brandModel as string } }, { model: { contains: filter.brandModel as string } }] } });
   if (ands.length) where.AND = ands;
   if (released) {
     // Released: location = assignee dept, assignee = OR over identity fields, date = release date.
@@ -312,6 +314,85 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
       },
     });
   }
+  if (returned) {
+    // Returned: row = RETURN txn. Filter model-level fields in Prisma (via the
+    // item relation), txn-level fields (status / returning PIC / return date)
+    // in JS — same semantics as the Returned Item report page.
+    // Only items CURRENTLY in a returned state (returned → released again leaves
+    // a stale RETURN txn; the report shows only items still returned right now).
+    const txnWhere: Prisma.ItemTxnWhereInput = {
+      type: "RETURN",
+      item: { status: { in: ["RETURNED_KEEP", "IN_REPAIR", "PLAN_DISPOSE"] } },
+    };
+    const ands: Prisma.ItemTxnWhereInput[] = [];
+    if (filter.type && filter.type !== "All") ands.push({ item: { model: { type: filter.type as string } } });
+    if (filter.category && filter.category !== "All") ands.push({ item: { model: { category: filter.category as string } } });
+    if (filter.serial) ands.push({ item: { serialNumber: { equals: filter.serial as string } } });
+    if (filter.brand) ands.push({ item: { model: { brand: { contains: filter.brand as string } } } });
+    if (filter.model) ands.push({ item: { model: { model: { contains: filter.model as string } } } });
+    if (filter.brandModel) ands.push({ item: { model: { OR: [{ brand: { contains: filter.brandModel as string } }, { model: { contains: filter.brandModel as string } }] } } });
+    if (filter.po) ands.push({ item: { poNumber: { contains: filter.po as string } } });
+    if (filter.q) {
+      txnWhere.OR = [
+        { item: { serialNumber: { contains: filter.q as string } } },
+        { item: { model: { model: { contains: filter.q as string } } } },
+        { item: { model: { brand: { contains: filter.q as string } } } },
+      ];
+    }
+    if (ands.length) txnWhere.AND = ands;
+    const txns = await prisma.itemTxn.findMany({
+      where: txnWhere,
+      orderBy: { date: "desc" },
+      select: {
+        id: true,
+        date: true,
+        statusAfter: true,
+        returningPicName: true,
+        returnReason: true,
+        remarks: true,
+        item: {
+          select: {
+            serialNumber: true,
+            status: true,
+            poNumber: true,
+            location: true,
+            dateReceived: true,
+            hostname: true,
+            model: { select: { type: true, brand: true, model: true, category: true } },
+          },
+        },
+      },
+    });
+    const filteredTxns = txns.filter((t) => {
+      if (filter.status && t.statusAfter !== (filter.status as string)) return false;
+      if (filter.assigneeName) {
+        const hay = `${t.returningPicName ?? ""} ${t.item.serialNumber}`.toLowerCase();
+        if (!hay.includes(String(filter.assigneeName).toLowerCase())) return false;
+      }
+      if (filter.from && t.date < new Date(filter.from as string)) return false;
+      if (filter.to && t.date > new Date(`${filter.to as string}T23:59:59.999`)) return false;
+      return true;
+    });
+    // Map to the same item-like shape buildAvailableStockWorkbook expects.
+    return filteredTxns.map((t) => ({
+      serialNumber: t.item.serialNumber,
+      status: t.statusAfter,
+      poNumber: t.item.poNumber,
+      location: t.item.location,
+      dateReceived: t.item.dateReceived,
+      hostname: t.item.hostname,
+      model: t.item.model,
+      transactions: [
+        {
+          assigneeName: t.returningPicName,
+          assigneeEmpNumber: null,
+          assigneeDept: t.item.location,
+          date: t.date,
+          remarks: t.remarks,
+        },
+      ],
+    }));
+  }
   // Received: plain item fields.
 
   return prisma.item.findMany({
@@ -346,6 +427,7 @@ export async function buildAvailableStockWorkbook(
   const sheetTitle = (filter.sheetTitle as string) ?? "Available Stock";
   const isReceived = sheetTitle === "Received Item";
   const isReleased = sheetTitle === "Released Item";
+  const isReturned = sheetTitle === "Returned Item";
   const band = isReceived ? "217346" : C.blue; // Excel brand green for Received
   const bandDark = isReceived ? "145A32" : C.blueDark;
   const ws = wb.addWorksheet(sheetTitle, {
@@ -363,19 +445,12 @@ export async function buildAvailableStockWorkbook(
     { key: "category", width: 11 },
     { key: "po", width: 16 },
     ...(isReleased
-      ? ([
-          { key: "assignee", width: 18 },
-          { key: "dept", width: 18 },
-          { key: "remarks", width: 22 },
-          { key: "released", width: 14 },
-        ] as { key: string; width: number }[])
-      : ([
-          { key: "location", width: 16 },
-          { key: "received", width: 14 },
-          { key: "status", width: 16 },
-        ] as { key: string; width: number }[])),
+      ? ([{ key: "assignee", width: 18 }, { key: "dept", width: 18 }, { key: "remarks", width: 22 }, { key: "released", width: 14 }] as { key: string; width: number }[])
+      : isReturned
+        ? ([{ key: "returningPic", width: 18 }, { key: "status", width: 12 }, { key: "reason", width: 22 }, { key: "returned", width: 14 }] as { key: string; width: number }[])
+        : ([{ key: "location", width: 16 }, { key: "received", width: 14 }, { key: "status", width: 16 }] as { key: string; width: number }[])),
   ];
-  const colCount = isReleased ? 12 : 11;
+  const colCount = isReleased ? 12 : isReturned ? 12 : 11;
 
   const thin = { style: "thin" as const, color: { argb: "FF" + C.border } };
   const mediumBand = { style: "medium" as const, color: { argb: "FF" + bandDark } };
@@ -418,7 +493,9 @@ export async function buildAvailableStockWorkbook(
   rHead.height = 22;
   const HEADERS = isReleased
     ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "REMARKS", "RELEASED"]
-    : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
+    : isReturned
+      ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "RETURNING PIC", "STATUS", "REASON", "RETURNED"]
+      : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
   HEADERS.forEach((h, i) => {
     const cell = rHead.getCell(i + 1);
     cell.value = h;
@@ -464,19 +541,34 @@ export async function buildAvailableStockWorkbook(
           rel?.remarks ?? "",
           rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
         ]
-      : [
-          idx + 1,
-          i.serialNumber,
-          i.model.type,
-          i.model.brand,
-          i.model.model,
-          i.hostname ?? "",
-          i.model.category,
-          i.poNumber ?? "",
-          i.location,
-          i.dateReceived.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
-          statusLabel(i.status),
-        ];
+      : isReturned
+        ? [
+            idx + 1,
+            i.serialNumber,
+            i.model.type,
+            i.model.brand,
+            i.model.model,
+            i.hostname ?? "",
+            i.model.category,
+            i.poNumber ?? "",
+            rel?.assigneeName ?? "", // = returningPicName (mapped in loader)
+            statusLabel(i.status),
+            (i.transactions as unknown as { returnReason?: string | null }[])[0]?.returnReason ?? "",
+            rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
+          ]
+        : [
+            idx + 1,
+            i.serialNumber,
+            i.model.type,
+            i.model.brand,
+            i.model.model,
+            i.hostname ?? "",
+            i.model.category,
+            i.poNumber ?? "",
+            i.location,
+            i.dateReceived.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+            statusLabel(i.status),
+          ];
     const catSty = CAT_STYLE[i.model.category] ?? { fg: C.slate, bg: C.slateLight };
     const statusSty = STATUS_STYLE[i.status] ?? { fg: C.slate, bg: C.slateLight };
     vals.forEach((v, c) => {
@@ -496,9 +588,10 @@ export async function buildAvailableStockWorkbook(
     cc.font = { size: 10, bold: true, color: { argb: "FF" + catSty.fg } };
     cc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + catSty.bg } };
     cc.alignment = { vertical: "middle", horizontal: "center" };
-    // Column 11: STATUS badge (received) — released report shows a plain date
+    // Column 11: STATUS badge (received) / Column 10 (returned) — released report shows a plain date
     if (!isReleased) {
-      const sc = row.getCell(11);
+      const statusCol = isReturned ? 10 : 11;
+      const sc = row.getCell(statusCol);
       sc.font = { size: 10, bold: true, color: { argb: "FF" + statusSty.fg } };
       sc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + statusSty.bg } };
       sc.alignment = { vertical: "middle", horizontal: "center" };

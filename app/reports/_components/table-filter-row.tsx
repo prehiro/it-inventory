@@ -108,9 +108,14 @@ export function TableFilterRow({
   withAssignee = false,
   mergeBrandModel = false,
   withHostname = false,
+  withReason = false,
+  statusFirst = false,
+  statusOptions,
+  withLocation = true,
+  brandModelSingle = false,
 }: {
   basePath: string;
-  initial: { type: string; category: string; serial?: string; brand?: string; model?: string; q?: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string; hostname?: string };
+  initial: { type: string; category: string; serial?: string; brand?: string; model?: string; q?: string; po: string; location: string; from: string; to: string; status?: string; assignee?: string; hostname?: string; reason?: string; brandModel?: string };
   show: boolean;
   withStatus?: boolean;
   withAssignee?: boolean;
@@ -118,6 +123,17 @@ export function TableFilterRow({
   mergeBrandModel?: boolean;
   /** Show an extra HOSTNAME filter cell after Location. */
   withHostname?: boolean;
+  /** Show a REASON filter cell (Returned report — Return Reason column). */
+  withReason?: boolean;
+  /** Render Status/Reason BEFORE the date cell (Returned report column order). */
+  statusFirst?: boolean;
+  /** Override the Status dropdown options (Returned report: RETURNED_KEEP/IN_REPAIR/PLAN_DISPOSE). */
+  statusOptions?: string[];
+  /** Show the Location filter cell (default true; Returned report has no Location column). */
+  withLocation?: boolean;
+  /** Render ONE combined Brand/Model filter input (searches brand OR model) —
+      matches a merged "BRAND / MODEL" header so the filter row stays aligned. */
+  brandModelSingle?: boolean;
 }) {
   const router = useRouter();
   const [type, setType] = useState(initial.type || "All");
@@ -141,6 +157,10 @@ export function TableFilterRow({
   const [debouncedAssignee, setDebouncedAssignee] = useState(initial.assignee || "");
   const [hostname, setHostname] = useState(initial.hostname || "");
   const [debouncedHostname, setDebouncedHostname] = useState(initial.hostname || "");
+  const [reason, setReason] = useState(initial.reason || "");
+  const [debouncedReason, setDebouncedReason] = useState(initial.reason || "");
+  const [brandModel, setBrandModel] = useState(initial.brandModel || "");
+  const [debouncedBrandModel, setDebouncedBrandModel] = useState(initial.brandModel || "");
   const firstRun = useRef(true);
 
   // Debounce text inputs — avoid a router push per keystroke
@@ -172,6 +192,14 @@ export function TableFilterRow({
     const t = setTimeout(() => setDebouncedHostname(hostname), 400);
     return () => clearTimeout(t);
   }, [hostname]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedReason(reason), 400);
+    return () => clearTimeout(t);
+  }, [reason]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedBrandModel(brandModel), 400);
+    return () => clearTimeout(t);
+  }, [brandModel]);
 
   function push() {
     const p = new URLSearchParams();
@@ -187,6 +215,8 @@ export function TableFilterRow({
     if (withStatus && status !== "All") p.set("status", status);
     if (withAssignee && debouncedAssignee) p.set("assignee", debouncedAssignee);
     if (withHostname && debouncedHostname) p.set("hostname", debouncedHostname);
+    if (withReason && debouncedReason) p.set("reason", debouncedReason);
+    if (brandModelSingle && debouncedBrandModel) p.set("brandModel", debouncedBrandModel);
     p.set("page", "1");
     router.push(`${basePath}?${p.toString()}`);
   }
@@ -198,7 +228,7 @@ export function TableFilterRow({
     }
     push();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, category, debouncedSerial, debouncedBrand, debouncedModel, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee, debouncedHostname]);
+  }, [type, category, debouncedSerial, debouncedBrand, debouncedModel, debouncedPo, debouncedLocation, from, to, status, debouncedAssignee, debouncedHostname, debouncedReason, debouncedBrandModel]);
 
   return (
     <tr className={`border-b border-slate-100 bg-white dark:border-slate-700 dark:bg-slate-900 ${show ? "" : "hidden"}`}>
@@ -211,7 +241,11 @@ export function TableFilterRow({
         <Dropdown value={type} onChange={setType} options={TYPE_OPTIONS} placeholder="All" />
       </td>
       {/* Brand / Brand+Model / Model */}
-      {mergeBrandModel ? (
+      {brandModelSingle ? (
+        <td className="px-2 py-2">
+          <input value={brandModel} onChange={(e) => setBrandModel(e.target.value)} placeholder="Filter brand / model…" className={inputClass} />
+        </td>
+      ) : mergeBrandModel ? (
         <>
           <td className="px-2 py-2">
             <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Filter…" className={inputClass} />
@@ -244,21 +278,42 @@ export function TableFilterRow({
         </td>
       )}
       {/* Location */}
-      <td className="px-2 py-2">
-        <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Filter…" className={inputClass} />
-      </td>
+      {withLocation && (
+        <td className="px-2 py-2">
+          <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Filter…" className={inputClass} />
+        </td>
+      )}
       {withHostname && (
         <td className="px-2 py-2">
           <input value={hostname} onChange={(e) => setHostname(e.target.value)} placeholder="Filter…" className={inputClass} />
         </td>
       )}
+      {statusFirst ? (
+        <>
+          {withStatus && (
+            <td className="px-2 py-2">
+              <Dropdown value={status} onChange={setStatus} options={statusOptions ?? STATUS_OPTIONS} placeholder="All" />
+            </td>
+          )}
+          {withReason && (
+            <td className="px-2 py-2">
+              <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Filter…" className={inputClass} />
+            </td>
+          )}
+        </>
+      ) : null}
       {/* Received */}
       <td className="px-2 py-2">
         <DateRangePreset from={from} to={to} onChange={(f, t) => { setFrom(f); setTo(t); }} />
       </td>
-      {withStatus && (
+      {!statusFirst && withStatus && (
         <td className="px-2 py-2">
-          <Dropdown value={status} onChange={setStatus} options={STATUS_OPTIONS} placeholder="All" />
+          <Dropdown value={status} onChange={setStatus} options={statusOptions ?? STATUS_OPTIONS} placeholder="All" />
+        </td>
+      )}
+      {!statusFirst && withReason && (
+        <td className="px-2 py-2">
+          <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Filter…" className={inputClass} />
         </td>
       )}
     </tr>
