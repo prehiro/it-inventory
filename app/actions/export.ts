@@ -374,24 +374,33 @@ export async function loadAvailableStock(filter: Record<string, unknown>) {
       return true;
     });
     // Map to the same item-like shape buildAvailableStockWorkbook expects.
-    return filteredTxns.map((t) => ({
-      serialNumber: t.item.serialNumber,
-      status: t.statusAfter,
-      poNumber: t.item.poNumber,
-      location: t.item.location,
-      dateReceived: t.item.dateReceived,
-      hostname: t.item.hostname,
-      model: t.item.model,
-      transactions: [
-        {
-          assigneeName: t.returningPicName,
-          assigneeEmpNumber: null,
-          assigneeDept: t.item.location,
-          date: t.date,
-          remarks: t.remarks,
-        },
-      ],
-    }));
+    return filteredTxns.map((t) => {
+      // returningPicName is stored as "EMP — NAME" (em dash) by the return form.
+      // Split into separate emp-no / name fields so the workbook can put them
+      // in two dedicated columns.
+      const rawPic = t.returningPicName ?? "";
+      const picMatch = rawPic.match(/^([^\s—–-]+)\s*[—–-]?\s*(.*)$/);
+      const empNo = picMatch?.[1]?.trim() ?? "";
+      const picName = picMatch?.[2]?.trim() || rawPic;
+      return {
+        serialNumber: t.item.serialNumber,
+        status: t.statusAfter,
+        poNumber: t.item.poNumber,
+        location: t.item.location,
+        dateReceived: t.item.dateReceived,
+        hostname: t.item.hostname,
+        model: t.item.model,
+        transactions: [
+          {
+            assigneeName: picName,
+            assigneeEmpNumber: empNo || null,
+            assigneeDept: t.item.location,
+            date: t.date,
+            remarks: t.remarks,
+          },
+        ],
+      };
+    });
   }
   // Received: plain item fields.
 
@@ -447,10 +456,10 @@ export async function buildAvailableStockWorkbook(
     ...(isReleased
       ? ([{ key: "assignee", width: 18 }, { key: "dept", width: 18 }, { key: "remarks", width: 22 }, { key: "released", width: 14 }] as { key: string; width: number }[])
       : isReturned
-        ? ([{ key: "returningPic", width: 18 }, { key: "status", width: 12 }, { key: "reason", width: 22 }, { key: "returned", width: 14 }] as { key: string; width: number }[])
+        ? ([{ key: "picEmpNo", width: 16 }, { key: "picName", width: 20 }, { key: "status", width: 12 }, { key: "reason", width: 22 }, { key: "returned", width: 14 }] as { key: string; width: number }[])
         : ([{ key: "location", width: 16 }, { key: "received", width: 14 }, { key: "status", width: 16 }] as { key: string; width: number }[])),
   ];
-  const colCount = isReleased ? 12 : isReturned ? 12 : 11;
+  const colCount = isReleased ? 12 : isReturned ? 13 : 11;
 
   const thin = { style: "thin" as const, color: { argb: "FF" + C.border } };
   const mediumBand = { style: "medium" as const, color: { argb: "FF" + bandDark } };
@@ -494,7 +503,7 @@ export async function buildAvailableStockWorkbook(
   const HEADERS = isReleased
     ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "ASSIGNEE", "LOCATION", "REMARKS", "RELEASED"]
     : isReturned
-      ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "RETURNING PIC", "STATUS", "REASON", "RETURNED"]
+      ? ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "RETURNING EMP NO", "RETURNING PIC", "STATUS", "REASON", "RETURNED"]
       : ["NO", "SERIAL NUMBER", "TYPE", "BRAND", "MODEL", "HOSTNAME", "CATEGORY", "PO NUMBER", "LOCATION", "RECEIVED", "STATUS"];
   HEADERS.forEach((h, i) => {
     const cell = rHead.getCell(i + 1);
@@ -551,7 +560,8 @@ export async function buildAvailableStockWorkbook(
             i.hostname ?? "",
             i.model.category,
             i.poNumber ?? "",
-            rel?.assigneeName ?? "", // = returningPicName (mapped in loader)
+            rel?.assigneeEmpNumber ?? "", // returning PIC emp no (parsed from "EMP — NAME")
+            rel?.assigneeName ?? "", // returning PIC name
             statusLabel(i.status),
             (i.transactions as unknown as { returnReason?: string | null }[])[0]?.returnReason ?? "",
             rel?.date ? rel.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "",
@@ -588,10 +598,9 @@ export async function buildAvailableStockWorkbook(
     cc.font = { size: 10, bold: true, color: { argb: "FF" + catSty.fg } };
     cc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + catSty.bg } };
     cc.alignment = { vertical: "middle", horizontal: "center" };
-    // Column 11: STATUS badge (received) / Column 10 (returned) — released report shows a plain date
+    // Column 11: STATUS badge (received & returned) — released report shows a plain date
     if (!isReleased) {
-      const statusCol = isReturned ? 10 : 11;
-      const sc = row.getCell(statusCol);
+      const sc = row.getCell(11);
       sc.font = { size: 10, bold: true, color: { argb: "FF" + statusSty.fg } };
       sc.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF" + statusSty.bg } };
       sc.alignment = { vertical: "middle", horizontal: "center" };
@@ -600,7 +609,7 @@ export async function buildAvailableStockWorkbook(
 
   // Freeze header row 3 + autofilter
   ws.views = [{ state: "frozen", ySplit: 3 }];
-  const lastColLetter = colCount === 12 ? "L" : "K";
+  const lastColLetter = colCount === 13 ? "M" : colCount === 12 ? "L" : "K";
   ws.autoFilter = { from: "A3", to: `${lastColLetter}${3 + items.length}` };
 
   /* ── Footer: generation stamp only (no item-count row) ── */
