@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { statusLabel } from "@/lib/types";
+import { BigGooseTooltip } from "@/app/reports/_components/big-goose-tooltip";
 
 export type LedgerRow = {
   empNumber: string;
@@ -356,18 +357,52 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                   }`}
               >
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{r.empNumber}</td>
-                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.picName}>{r.picName}</td>
+                <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-300">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.picName}</span>}
+                    tooltip={<span className="whitespace-normal">{r.picName}</span>}
+                  />
+                </td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">{r.gid}</td>
-                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400" title={r.email}>{r.email}</td>
+                <td className="max-w-0 px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.email}</span>}
+                    tooltip={<span className="whitespace-normal break-all">{r.email}</span>}
+                  />
+                </td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-semibold text-slate-800 dark:text-slate-200">{r.hostname}</td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">{r.serialNumber}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">
                   <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">{r.type}</span>
                 </td>
-                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.brand}>{r.brand}</td>
-                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.model}>{r.model}</td>
-                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.section}>{r.section}</td>
-                <td className="max-w-0 truncate px-4 py-3 text-xs text-slate-400 dark:text-slate-500" title={r.remarks}>{r.remarks || "—"}</td>
+                <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-300">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.brand}</span>}
+                    tooltip={<span>{r.brand}</span>}
+                  />
+                </td>
+                <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-300">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.model}</span>}
+                    tooltip={<span>{r.model}</span>}
+                  />
+                </td>
+                <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-300">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.section}</span>}
+                    tooltip={<span className="whitespace-normal">{r.section}</span>}
+                  />
+                </td>
+                <td className="max-w-0 px-4 py-3 text-xs text-slate-400 dark:text-slate-500">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.remarks || "—"}</span>}
+                    tooltip={
+                      <span className="whitespace-normal">
+                        {r.remarks || "No remarks"}
+                      </span>
+                    }
+                  />
+                </td>
                 <td className="whitespace-nowrap px-4 py-3">
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_TONE[r.status] ?? ""}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.status === "AVAILABLE" ? "bg-emerald-500" :
