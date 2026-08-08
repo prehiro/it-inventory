@@ -60,7 +60,7 @@ export function Topbar({ name, role }: { name: string; role: string }) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-16 items-center border-b border-slate-200 bg-white/90 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/90">
+      <header className="sticky top-0 z-40 flex h-16 items-center border-b border-slate-200 bg-white/90 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/90">
         <div className="flex w-full px-6">
           <div
             style={innerStyle}

@@ -240,10 +240,10 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
               )}
             </button>
 
-            {/* Hover tooltip — spring bounce pop */}
-            <div className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2.5 -translate-x-1/2">
+            {/* Hover tooltip — spring bounce pop (below button) */}
+            <div className="pointer-events-none absolute top-full right-0 z-30 mt-2">
               <div
-                className="relative origin-bottom translate-y-1.5 scale-90 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
+                className="relative origin-top-right translate-y-1.5 scale-90 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
                 style={{ transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)" }}
               >
                 <div className="flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-xl ring-1 ring-slate-700/60 dark:bg-slate-800 dark:ring-slate-600/50">
@@ -254,7 +254,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                   </svg>
                   {busy === "xlsx" ? "Exporting…" : "Export to Excel"}
                 </div>
-                <div className="absolute left-1/2 top-full -mt-1 h-2 w-2 -translate-x-1/2 rotate-45 rounded-[2px] bg-slate-900 ring-1 ring-slate-700/60 dark:bg-slate-800 dark:ring-slate-600/50" />
+                <div className="absolute right-4 bottom-full -mb-1 h-2 w-2 -translate-x-1/2 rotate-45 rounded-[2px] bg-slate-900 ring-1 ring-slate-700/60 dark:bg-slate-800 dark:ring-slate-600/50" />
               </div>
             </div>
           </div>
