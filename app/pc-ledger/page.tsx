@@ -50,7 +50,7 @@ export default async function PcLedgerPage() {
   });
 
   return (
-    <div>
+    <div className="pc-ledger-full">
       <PageHeader
         title="PC Ledger"
         subtitle="PC, Laptop & Tablet inventory with PIC, hostname and deployment info"

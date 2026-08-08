@@ -188,7 +188,22 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
 
       {/* ── Table ── */}
       <div className="overflow-auto custom-scrollbar" style={{ maxHeight: "calc(100vh - 13.5rem)" }}>
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
+          {/* Col widths (percent of container, sum 100%) — table-fixed keeps them exact */}
+          <colgroup>
+            <col className="w-[8%]" />
+            <col className="w-[10%]" />
+            <col className="w-[6%]" />
+            <col className="w-[11%]" />
+            <col className="w-[9%]" />
+            <col className="w-[7%]" />
+            <col className="w-[5%]" />
+            <col className="w-[7%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
+            <col className="w-[6%]" />
+            <col className="w-[15%]" />
+          </colgroup>
           {/* Header row */}
           <thead className="sticky top-0 z-20">
             <tr className="border-b border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-800/60">
@@ -268,21 +283,21 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                 }`}
               >
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{r.empNumber}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">{r.picName}</td>
+                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.picName}>{r.picName}</td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">{r.gid}</td>
-                <td className="max-w-[180px] truncate whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400" title={r.email}>{r.email}</td>
+                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400" title={r.email}>{r.email}</td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-semibold text-slate-800 dark:text-slate-200">{r.hostname}</td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">{r.serialNumber}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">
                   <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">{r.type}</span>
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">{r.brand}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">{r.model}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">{r.section}</td>
-                <td className="max-w-[180px] truncate px-4 py-3 text-xs text-slate-400 dark:text-slate-500" title={r.remarks}>{r.remarks || "—"}</td>
+                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.brand}>{r.brand}</td>
+                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.model}>{r.model}</td>
+                <td className="max-w-0 truncate whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300" title={r.section}>{r.section}</td>
+                <td className="max-w-0 truncate px-4 py-3 text-xs text-slate-400 dark:text-slate-500" title={r.remarks}>{r.remarks || "—"}</td>
                 <td className="whitespace-nowrap px-4 py-3">
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_TONE[r.status] ?? ""}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                       r.status === "AVAILABLE" ? "bg-emerald-500" :
                       r.status === "DEPLOYED" ? "bg-indigo-500" :
                       r.status === "RETURNED_KEEP" ? "bg-blue-500" :

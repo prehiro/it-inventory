@@ -109,6 +109,17 @@ html {
   min-height: 0;
 }
 
+/* ── PC Ledger full-width page (scoped — only stretches main when the
+   pc-ledger-full marker is present; other pages keep max-w-6xl) ── */
+main:has(.pc-ledger-full) {
+  max-width: none;
+}
+main:has(.pc-ledger-full) > .pc-ledger-full {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px) scale(0.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -153,7 +164,7 @@ html {
   animation: icon-bounce 1s ease-in-out infinite;
 }
 
-/* ── Slide animation for Return page icon ── */
+/* ── Slide animation for Return page icon (shared by Return Items page & Returned Item report) ── */
 @keyframes return-nudge {
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(-3px); }
