@@ -113,11 +113,39 @@ html {
    pc-ledger-full marker is present; other pages keep max-w-6xl) ── */
 main:has(.pc-ledger-full) {
   max-width: none;
+  padding-top: 0.5rem;
+  padding-bottom: 0;
 }
 main:has(.pc-ledger-full) > .pc-ledger-full {
   max-width: 72rem;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* ── PC Ledger fill-viewport: card stretches to bottom, table scrolls inside ── */
+main:has(.pc-ledger-full) > .animate-page-enter {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 5rem);
+  height: calc(100dvh - 5rem);
+}
+main:has(.pc-ledger-full) .pc-ledger-full {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+main:has(.pc-ledger-full) .pc-ledger-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+main:has(.pc-ledger-full) .pc-ledger-card > .pc-ledger-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
 }
 
 @keyframes fade-in {
