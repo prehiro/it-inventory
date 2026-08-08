@@ -152,6 +152,24 @@ main:has(.pc-ledger-full) .pc-ledger-card > .pc-ledger-scroll {
   from { opacity: 0; transform: translateY(6px) scale(0.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ── Topbar shift bounce: overshoot slide when entering/leaving PC Ledger ── */
+@keyframes topbar-bounce-left {
+  0% { transform: translateX(0); }
+  60% { transform: translateX(-14px); }
+  100% { transform: translateX(0); }
+}
+@keyframes topbar-bounce-right {
+  0% { transform: translateX(0); }
+  60% { transform: translateX(14px); }
+  100% { transform: translateX(0); }
+}
+.animate-topbar-bounce-left {
+  animation: topbar-bounce-left 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.animate-topbar-bounce-right {
+  animation: topbar-bounce-right 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 .animate-fade-in { animation: fade-in 0.28s ease-out; }
 
 /* ── Route transition — runs on every page mount (template.tsx) ── */
