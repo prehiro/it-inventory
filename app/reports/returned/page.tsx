@@ -180,8 +180,8 @@ export default async function ReturnedItemPage({
         align="center"
         icon={
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 14l-4-4 4-4" className="animate-icon-bounce" style={{ transformOrigin: "12px 12px" }} />
-            <path d="M5 10h11a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4H3" className="animate-icon-bounce" style={{ transformOrigin: "12px 12px" }} />
+            <path d="M9 14l-4-4 4-4" className="animate-return-nudge" style={{ transformOrigin: "7px 12px" }} />
+            <path d="M5 10h11a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4H3" />
           </svg>
         }
       />
