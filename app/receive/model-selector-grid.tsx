@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef } from "react";
 
 type Model = { id: string; type: string; model: string; brand: string; category: string };
-
-type ModelWithCount = Model & { count?: number; available?: number };
 
 const CAT_STYLE: Record<string, { accent: string; bg: string; border: string; badge: string; iconBg: string; neon: string; ring: string }> = {
   NCA: {
@@ -40,7 +38,7 @@ const CATEGORIES = ["NCA", "GENERAL", "FA"];
 
 /* ─── Icon ─── */
 
-export function TypeIcon({ type, className, neon }: { type: string; className?: string; neon?: string }) {
+export function TypeIcon({ type, className }: { type: string; className?: string }) {
   const cls = className ?? "h-6 w-6";
   switch (type.toUpperCase()) {
     case "PC":
@@ -80,11 +78,9 @@ export function TypeIcon({ type, className, neon }: { type: string; className?: 
 export function ModelSearchBar({
   value,
   onChange,
-  resultCount,
 }: {
   value: string;
   onChange: (val: string) => void;
-  resultCount: number;
 }) {
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -191,7 +187,7 @@ export function ModelCardList({
                     <div className="flex items-start gap-3 p-4">
                       {/* Icon */}
                       <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${s.iconBg} transition-transform duration-200 group-hover:scale-105`}>
-                        <TypeIcon type={m.type} className="h-6 w-6" neon={s.neon} />
+                        <TypeIcon type={m.type} className="h-6 w-6" />
                       </div>
 
                       {/* Text */}

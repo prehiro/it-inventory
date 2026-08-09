@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { exportExcelAction } from "@/app/actions/export";
 import { DatePicker } from "@/components/date-picker";
 
@@ -33,12 +33,10 @@ function FilterSelect({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  useEffect(() => {
-    if (open) {
-      const idx = options.findIndex((o) => o.value === value);
-      setActive(idx === -1 ? 0 : idx);
-    }
-  }, [open, options, value]);
+  function resetActive() {
+    const idx = options.findIndex((o) => o.value === value);
+    setActive(idx === -1 ? 0 : idx);
+  }
 
   // Scroll active option into view
   useEffect(() => {
@@ -51,6 +49,7 @@ function FilterSelect({
     if (!open) {
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
+        resetActive();
         setOpen(true);
       }
       return;
@@ -78,7 +77,10 @@ function FilterSelect({
     <div className="relative" ref={wrapRef}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (!open) resetActive();
+          setOpen((o) => !o);
+        }}
         onKeyDown={onKey}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -169,7 +171,6 @@ export function ReportsFilter({
   const [status, setStatus] = useState(initial.status);
   const [from, setFrom] = useState(initial.from);
   const [to, setTo] = useState(initial.to);
-  const [, startTransition] = useTransition();
   const [busy, setBusy] = useState<"" | "xlsx">("");
   const firstRun = useRef(true);
 
@@ -216,7 +217,9 @@ export function ReportsFilter({
   // If current status is impossible for the selected type, clear it
   useEffect(() => {
     const valid = getStatusOptions(type).map((o) => o.value);
-    if (status && !valid.includes(status)) setStatus("");
+    if (status && !valid.includes(status))
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setStatus("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
@@ -224,7 +227,9 @@ export function ReportsFilter({
   useEffect(() => {
     if (!type || !status) return;
     const valid = getStatusOptions(type).map((o) => o.value);
-    if (!valid.includes(status)) setType("");
+    if (!valid.includes(status))
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setType("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 

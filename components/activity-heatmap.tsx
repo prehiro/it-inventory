@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo, useCallback } from "react";
+import type { ApexChartEventOpts, ApexTooltipCustomOpts } from "apexcharts";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -19,11 +20,18 @@ export function ActivityHeatmap({
   items: { id: string; action: string; details: string; timestamp: Date; userName: string }[];
 }) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleCellClick = useCallback(
-    (_event: any, _chartContext: any, config: any) => {
-      const pt = config?.w?.config?.series?.[config.seriesIndex]?.data?.[config.dataPointIndex];
+    (_event: MouseEvent, _chartContext: unknown, config?: ApexChartEventOpts) => {
+      const idx = config?.seriesIndex ?? 0;
+      const dpi = config?.dataPointIndex ?? 0;
+      const series = config?.w?.config?.series as unknown as { data?: { date?: string }[] }[] | undefined;
+      const pt = series?.[idx]?.data?.[dpi];
       if (!pt?.date) return;
       const date = new Date(pt.date);
       const ymd = date.toISOString().slice(0, 10);
@@ -117,9 +125,11 @@ export function ActivityHeatmap({
     },
     grid: { yaxis: { lines: { show: false } } },
     tooltip: {
-      custom: ({ seriesIndex, dataPointIndex, w }: any) => {
-        const pt = w.config.series[seriesIndex].data[dataPointIndex];
-        const n = pt.y;
+      custom: ({ seriesIndex, dataPointIndex, w }: ApexTooltipCustomOpts) => {
+        const series = w.config.series as unknown as { data?: { y?: number; date?: string }[] }[];
+        const pt = series[seriesIndex]?.data?.[dataPointIndex];
+        if (!pt?.date) return "";
+        const n = pt.y ?? 0;
         const when = new Date(pt.date).toLocaleDateString("en-US", {
           weekday: "long",
           year: "numeric",

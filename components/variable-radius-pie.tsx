@@ -29,10 +29,8 @@ function resolveColor(name: string, i: number): string {
 
 export function VariableRadiusPie({
   data,
-  total,
 }: {
   data: SliceDatum[];
-  total: number;
 }) {
   const chartRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<am5.Root | null>(null);
@@ -78,7 +76,7 @@ export function VariableRadiusPie({
       const dataItem = target.dataItem;
       const high = series.getPrivate("valueHigh");
       if (dataItem && high && radius != null) {
-        const value = (dataItem.get("valueWorking" as any) as number) ?? 0;
+        const value = ((dataItem as unknown as { get: (key: string) => unknown }).get("valueWorking") as number) ?? 0;
         const ratio = value / high;
         // Clamp ratio so smallest slice is at least 0.35 of max
         const clamped = Math.max(0.35, ratio);

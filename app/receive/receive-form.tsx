@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState, useRef, useMemo } from "react";
+import { useActionState, useEffect, useState, useRef } from "react";
 import { receiveAction, type ActionResult, type RepairRestoreResult } from "@/app/actions/inventory";
 import { ModelSearchBar, ModelCardList } from "./model-selector-grid";
 import { TypeIcon } from "./model-selector-grid";
@@ -12,18 +12,6 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
   const [searchQuery, setSearchQuery] = useState("");
 
   const selectedModel = models.find((m) => m.id === modelId);
-
-  const filteredCount = useMemo(() => {
-    if (!searchQuery.trim()) return models.length;
-    const q = searchQuery.toLowerCase();
-    return models.filter(
-      (m) =>
-        m.type.toLowerCase().includes(q) ||
-        m.brand.toLowerCase().includes(q) ||
-        m.model.toLowerCase().includes(q) ||
-        m.category.toLowerCase().includes(q)
-    ).length;
-  }, [models, searchQuery]);
 
   function handleSelect(id: string) {
     setModelId(id);
@@ -53,7 +41,6 @@ export function ReceiveForm({ models }: { models: { id: string; type: string; mo
               <ModelSearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
-                resultCount={filteredCount}
               />
             </div>
           </div>
@@ -198,6 +185,8 @@ function ReceiveFormInner({
   useEffect(() => {
     if (state?.ok) {
       const label = modelLabel.toUpperCase();
+      // Success reset after server action completes (same pattern as release-form)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setToast(label);
       setSnValue("");
       setSnExists(false);

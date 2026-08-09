@@ -127,10 +127,13 @@ export default function AuditTrailPage() {
   }, [page, filterAction, search, dateFilter]);
 
   useEffect(() => {
-    fetchLogs();
+    const t = setTimeout(fetchLogs, 0);
+    return () => clearTimeout(t);
   }, [fetchLogs]);
 
   useEffect(() => {
+    // Reset pagination when filters change (state reconciliation on prop change)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
   }, [filterAction, search]);
 

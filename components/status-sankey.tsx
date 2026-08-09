@@ -40,27 +40,21 @@ export function StatusSankey({
   const gaps = (sorted.length - 1) * 6;
   const share = (availH - gaps) / sumV;
 
-  let cursorY = padY;
-  const targets = sorted.map((d) => {
+  const targets = sorted.reduce<Array<SankeyDatum & { y: number; h: number }>>((acc, d) => {
     const h = Math.max(18, d.value * share);
-    const y = cursorY;
-    cursorY += h + 6;
-    return { ...d, y, h };
-  });
+    const y = acc.length === 0 ? padY : acc[acc.length - 1].y + acc[acc.length - 1].h + 6;
+    acc.push({ ...d, y, h });
+    return acc;
+  }, []);
 
-  // Source node segments: each link occupies a slice of the source node
-  let srcCursor = padY;
-  const streams = targets.map((t) => {
-    const segH = Math.max(18, t.value * share);
-    const srcY = srcCursor;
-    srcCursor += segH + 6;
-    return {
-      ...t,
-      srcY,
-      segH,
-      pct: Math.round((t.value / totalVal) * 100),
-    };
-  });
+  // Source node segments: each link occupies a slice of the source node.
+  // srcY equals the cumulative y already computed on `targets` (same formula).
+  const streams = targets.map((t) => ({
+    ...t,
+    srcY: t.y,
+    segH: t.h,
+    pct: Math.round((t.value / totalVal) * 100),
+  }));
 
   return (
     <svg

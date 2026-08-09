@@ -58,8 +58,9 @@ export function ReturnForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
   // Auto-fill PIC details from GID lookup
-  const { data: gidData, loading: gidLoading } = useGidLookup(picEmp);
+  const { data: gidData } = useGidLookup(picEmp);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPicName(gidData?.name ?? "");
     setPicGid(gidData?.globalId ?? "");
     setPicEmail(gidData?.email ?? "");
@@ -69,17 +70,11 @@ export function ReturnForm() {
     if (state?.ok && lookup) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReturnedItem({ ...lookup, returnedAt: state.txnAt ?? new Date().toISOString() });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReturnedDisposition(disposition);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReturned(true);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSerial("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisposition("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
       formRef.current?.reset();
       setToast("Item returned");

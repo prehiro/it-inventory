@@ -16,4 +16,4 @@ export default defineConfig({
     const factory = new PrismaMssql(env.DATABASE_URL!);
     return factory.connect();
   },
-} as any);
+} as unknown as Parameters<typeof defineConfig>[0]);

@@ -9,7 +9,7 @@ import { TopbarLowStock } from "@/components/topbar-low-stock";
 export function Topbar({ name, role }: { name: string; role: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);

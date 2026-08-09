@@ -56,13 +56,12 @@ const ACCENT_BAR: Record<string, string> = {
    ───────────────────────────────────── */
 export function DashboardClient({ data }: { data: DashboardData }) {
   const greeting = getGreeting();
-  const hasLowStock = data.lowStock.length > 0;
   const utilization = data.total > 0 ? Math.round((data.released / data.total) * 100) : 0;
-  const health = data.total > 0 ? Math.round(((data.available + data.released) / data.total) * 100) : 0;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   return (
@@ -157,7 +156,8 @@ function Card({ title, children, index = 0 }: { title: string; children: React.R
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   const delay = 0.3 + index * 0.1;
@@ -257,7 +257,8 @@ function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   if (total === 0)
@@ -289,7 +290,7 @@ function CategoryDonut({ data }: { data: { name: string; value: number }[] }) {
               outerRadius={85}
               paddingAngle={2}
               strokeWidth={0}
-              onMouseEnter={(_: any, index: number) => setActiveIndex(index)}
+              onMouseEnter={(_, index) => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
             >
               {data.map((d, i) => (
@@ -356,7 +357,8 @@ function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   if (data.length === 0) return <p className="py-6 text-center text-sm text-slate-400">No released items</p>;
@@ -405,7 +407,7 @@ function DepartmentBar({ data }: { data: { dept: string; count: number }[] }) {
             dataKey="count"
             radius={[0, 4, 4, 0]}
             maxBarSize={20}
-            onMouseEnter={(d: any) => setActiveBar(d.dept)}
+            onMouseEnter={(d) => setActiveBar((d as unknown as { dept: string }).dept)}
             onMouseLeave={() => setActiveBar(null)}
           >
             {data.map((d, i) => (
@@ -430,7 +432,8 @@ function ModelTypeBar({ data }: { data: { type: string; count: number }[] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   if (data.length === 0) return <p className="py-6 text-center text-sm text-slate-400">No items</p>;
@@ -485,15 +488,17 @@ function ModelTypeBar({ data }: { data: { type: string; count: number }[] }) {
    Low stock alert
    ───────────────────────────────────── */
 function LowStockAlert({ items }: { items: { model: string; brand: string; available: number }[] }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
+
   if (items.length === 0) return null;
 
   const critical = items.filter((m) => m.available === 0);
   const warning = items.filter((m) => m.available > 0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <div

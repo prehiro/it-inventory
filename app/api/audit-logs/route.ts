@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -33,15 +34,17 @@ export async function GET(req: NextRequest) {
     where.timestamp = tsWhere;
   }
 
+  const whereInput = where as Prisma.AuditLogWhereInput;
+
   const [logs, total] = await Promise.all([
     prisma.auditLog.findMany({
-      where: where as any,
+      where: whereInput,
       orderBy: { timestamp: "desc" },
       skip: (page - 1) * limit,
       take: limit,
       include: { user: { select: { name: true } } },
     }),
-    prisma.auditLog.count({ where: where as any }),
+    prisma.auditLog.count({ where: whereInput }),
   ]);
 
   // Gather distinct actions for the filter UI.
@@ -52,11 +55,11 @@ export async function GET(req: NextRequest) {
   const [actions, allTotal] = await Promise.all([
     prisma.auditLog.groupBy({
       by: ["action"],
-      where: pillWhere as any,
+      where: pillWhere as Prisma.AuditLogWhereInput,
       _count: { action: true },
       orderBy: { _count: { action: "desc" } },
     }),
-    prisma.auditLog.count({ where: pillWhere as any }),
+    prisma.auditLog.count({ where: pillWhere as Prisma.AuditLogWhereInput }),
   ]);
 
   return NextResponse.json({

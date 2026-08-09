@@ -117,7 +117,6 @@ export default async function MovementHistoryPage({
     },
   ];
 
-  const typeLabel: Record<string, string> = { RECEIVE: "Received", RELEASE: "Released", RETURN: "Returned" };
   const filter = { type: sp.type ?? "", status: sp.status ?? "", from: sp.from ?? "", to: sp.to ?? "" };
   const query = new URLSearchParams();
   if (filter.type) query.set("type", filter.type);

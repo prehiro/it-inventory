@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useActionState } from "react";
-import { useRouter } from "next/navigation";
 import { createUserAction, updateUserRoleAction, deleteUserAction, type UserActionResult } from "@/app/actions/users";
-import type { Role } from "@/lib/types";
 
 /* ──────────────────────────────────────────
    Types
@@ -50,7 +48,6 @@ const ROLE_STYLE: Record<string, { label: string; bg: string; text: string; ring
    Main page component
    ────────────────────────────────────────── */
 export function UsersPageClient({ initialUsers }: { initialUsers: UserRow[] }) {
-  const router = useRouter();
   const [users, setUsers] = useState<UserRow[]>(initialUsers);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");

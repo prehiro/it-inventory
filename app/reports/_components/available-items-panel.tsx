@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { StatusBadge } from "@/components/status-badge";
 import { DatePicker } from "@/components/date-picker";
 import { exportAvailableStockAction } from "@/app/actions/export";
 

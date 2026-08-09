@@ -96,7 +96,8 @@ export function PackedBubbleChart({
 
   // Mount only on client to avoid hydration mismatch
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   // Resize observer

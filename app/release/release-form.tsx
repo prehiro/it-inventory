@@ -63,13 +63,6 @@ export function ReleaseForm() {
 
   // Auto-fill assignee details from GID lookup
   const { data: gidData } = useGidLookup(empNumber);
-  useEffect(() => {
-    setAssigneeName(gidData?.name ?? "");
-    setSingleGid(gidData?.globalId ?? "");
-    setSingleEmail(gidData?.email ?? "");
-    setBatchGid(gidData?.globalId ?? "");
-    setBatchEmail(gidData?.email ?? "");
-  }, [gidData]);
 
   const BLOCKED_STATUSES = ["RELEASED", "PLAN_DISPOSE", "IN_REPAIR"];
   const blockedStatus = lookup && BLOCKED_STATUSES.includes(lookup.status) ? lookup.status : null;
@@ -80,7 +73,7 @@ export function ReleaseForm() {
   const [batchLookups, setBatchLookups] = useState<BatchLookup[]>([]);
   const [batchPending, setBatchPending] = useState(false);
   const [batchWarnings, setBatchWarnings] = useState<string[]>([]);
-  const [batchResults, setBatchResults] = useState<BatchActionResult | null>(null);
+  const [, setBatchResults] = useState<BatchActionResult | null>(null);
   const [batchRunId, setBatchRunId] = useState(0);
   const [toast, setToast] = useState<{ ok: number; fail: number } | null>(null);
   const [singleToast, setSingleToast] = useState(false);
@@ -89,6 +82,16 @@ export function ReleaseForm() {
   const [batchEmail, setBatchEmail] = useState("");
   const [batchErr, setBatchErr] = useState<string | null>(null);
   const batchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-fill assignee details from GID lookup (async result → sync into form)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAssigneeName(gidData?.name ?? "");
+    setSingleGid(gidData?.globalId ?? "");
+    setSingleEmail(gidData?.email ?? "");
+    setBatchGid(gidData?.globalId ?? "");
+    setBatchEmail(gidData?.email ?? "");
+  }, [gidData]);
 
   const [batchCompleted, setBatchCompleted] = useState<{
     results: BatchLookup[];
@@ -101,10 +104,10 @@ export function ReleaseForm() {
   useEffect(() => {
     if (!batchMode) return;
     const list = batchSerials.split("\n").map((s) => s.trim()).filter(Boolean);
-    if (list.length === 0) { setBatchLookups([]); setBatchWarnings([]); return; }
 
     if (batchDebounce.current) clearTimeout(batchDebounce.current);
     batchDebounce.current = setTimeout(async () => {
+      if (list.length === 0) { setBatchLookups([]); setBatchWarnings([]); return; }
       const results: BatchLookup[] = [];
       const warns: string[] = [];
       for (const s of list) {
@@ -132,24 +135,15 @@ export function ReleaseForm() {
     if (state?.ok && lookup) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReleasedItem({ ...lookup, releasedAt: state.releasedAt ?? new Date().toISOString() });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReleasedSnapshot({ emp: empNumber, name: assigneeName, section: dept, hostname: hostname });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReleased(true);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSerial("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookup(null);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLookupErr(null);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEmpNumber("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAssigneeName("");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDept("");
       formRef.current?.reset();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSingleToast(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,6 +152,7 @@ export function ReleaseForm() {
   // Auto-uppercase hostname when item category is NCA
   useEffect(() => {
     if (lookup && lookup.category === "NCA") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHostname((prev) => prev.toUpperCase());
     }
   }, [lookup]);

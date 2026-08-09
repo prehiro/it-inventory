@@ -37,7 +37,8 @@ export function usePopoverPosition({
 
   // Mount once (after hydration) so portal has document.body
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   useLayoutEffect(() => {

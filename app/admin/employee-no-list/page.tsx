@@ -160,7 +160,6 @@ function ListSection() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    setBusy(true);
     fetch("/api/gid-list")
       .then((r) => r.json())
       .then((d) => { if (d.ok) setRecords(d.records); })

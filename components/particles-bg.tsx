@@ -135,7 +135,7 @@ export function ParticlesBg({
     return () => {
       cancelAnimationFrame(animRef.current);
     };
-  }, []);
+  }, [contained]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

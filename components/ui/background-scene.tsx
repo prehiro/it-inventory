@@ -16,6 +16,8 @@ const BackgroundScene: React.FC<BackgroundSceneProps> = ({
 }) => {
   const [beams, setBeams] = useState<Array<{ id: number; style: CSSProperties }>>([]);
 
+  // Randomized decorative beams — deliberately generated in an effect, not
+  // during render (Math.random would violate the render-purity rule).
   useEffect(() => {
     const generated = Array.from({ length: beamCount }).map((_, i) => {
       const fallDur = Math.random() * 3 + 3;   // 3–6s fall
@@ -31,6 +33,7 @@ const BackgroundScene: React.FC<BackgroundSceneProps> = ({
         } as CSSProperties,
       };
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBeams(generated);
   }, [beamCount]);
 

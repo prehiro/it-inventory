@@ -9,7 +9,7 @@ export default async function DashboardPage() {
 
   const [
     total, available, deployed, returned, inRepair, disposed, models,
-    byCategory, byDeptAgg, recentRaw, lowStockRaw, byType, byStatus,
+    byCategory, byDeptAgg, recentRaw, lowStockRaw,
   ] = await Promise.all([
     prisma.item.count({ where: { isDeleted: false } }),
     prisma.item.count({ where: { isDeleted: false, status: "AVAILABLE" } }),
