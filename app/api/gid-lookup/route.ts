@@ -8,13 +8,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ found: false, reason: "Unauthorized" }, { status: 401 });
 
   const emp = req.nextUrl.searchParams.get("emp");
-  if (!emp || emp.length < 3)
+  const gid = req.nextUrl.searchParams.get("gid");
+  const q = emp ?? gid;
+  if (!q || q.length < 3)
     return NextResponse.json({ found: false });
 
   const employee = await prisma.gidList.findFirst({
     where: {
-      employeeNo: { contains: emp },
       isDeleted: false,
+      ...(emp !== null
+        ? { employeeNo: { contains: emp } }
+        : { globalId: { contains: gid ?? "" } }),
     },
     select: {
       employeeNo: true,

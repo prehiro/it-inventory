@@ -24,6 +24,16 @@ export default async function PcLedgerPage() {
     },
   });
 
+  // Existing sections for the edit-row dropdown (distinct assigneeDept on RELEASE txns)
+  const sectionRows = await prisma.itemTxn.findMany({
+    where: { type: "RELEASE", assigneeDept: { not: null } },
+    select: { assigneeDept: true },
+    distinct: ["assigneeDept"],
+  });
+  const sections = sectionRows
+    .map((s) => s.assigneeDept as string)
+    .sort((a, b) => a.localeCompare(b));
+
   const rows = items.map((it) => {
     const txn = it.transactions[0] ?? null;
     const isAvailable = it.status === "AVAILABLE";
@@ -53,7 +63,7 @@ export default async function PcLedgerPage() {
 
   return (
     <div className="pc-ledger-full">
-      <LedgerTable rows={rows} isAdmin={isAdmin} />
+      <LedgerTable rows={rows} isAdmin={isAdmin} sections={sections} />
     </div>
   );
 }

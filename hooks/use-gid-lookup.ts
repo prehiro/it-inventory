@@ -13,23 +13,35 @@ type GidResult =
   | { found: false }
   | { found: true; data: GidData };
 
-export function useGidLookup(empNumber: string) {
+/**
+ * Debounced GID-list lookup. Looks up by employee number (default) or by
+ * GID (`mode: "gid"`). Returns `data` only while the query is still current
+ * (stale in-flight responses are dropped).
+ */
+export function useGidLookup(value: string, mode: "emp" | "gid" = "emp") {
   const [data, setData] = useState<GidData | null>(null);
   const [loading, setLoading] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const valueRef = useRef(value);
 
   useEffect(() => {
-    const q = empNumber.trim();
-    setData(null);
-    if (q.length < 3) return;
+    valueRef.current = value;
+  }, [value]);
 
+  useEffect(() => {
+    const q = value.trim();
     if (debounce.current) clearTimeout(debounce.current);
+
     debounce.current = setTimeout(async () => {
-      setLoading(true);
+      setData(null);
+      setLoading(q.length >= 3);
+      if (q.length < 3) return;
       try {
-        const res = await fetch(`/api/gid-lookup?emp=${encodeURIComponent(q)}`);
+        const param =
+          mode === "gid" ? `gid=${encodeURIComponent(q)}` : `emp=${encodeURIComponent(q)}`;
+        const res = await fetch(`/api/gid-lookup?${param}`);
         const result: GidResult = await res.json();
-        if (result.found) setData(result.data);
+        if (result.found && valueRef.current.trim() === q) setData(result.data);
       } catch {
         // silent fail
       } finally {
@@ -40,7 +52,7 @@ export function useGidLookup(empNumber: string) {
     return () => {
       if (debounce.current) clearTimeout(debounce.current);
     };
-  }, [empNumber]);
+  }, [value, mode]);
 
   return { data, loading };
 }
