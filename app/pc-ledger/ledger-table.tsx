@@ -262,23 +262,31 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
   useEffect(() => {
     if (!empDirty || !empLookup) return;
     // Async lookup result → sync into form. Same pattern as release-form.
+    // Only apply when the resolved record EXACTLY matches the current field
+    // (the hook may still hold data from the modal's pre-filled value while a
+    // new lookup is debouncing — applying it would revert the user's typing).
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setForm((f) =>
-      f.picName === empLookup.name && f.email === empLookup.email
+    setForm((f) => {
+      if (empLookup.employeeNo.toUpperCase() !== f.empNumber.trim().toUpperCase()) return f;
+      return f.gid === empLookup.globalId && f.picName === empLookup.name && f.email === empLookup.email
         ? f
-        : { ...f, picName: empLookup.name, email: empLookup.email }
-    );
+        : { ...f, gid: empLookup.globalId, picName: empLookup.name, email: empLookup.email };
+    });
   }, [empDirty, empLookup]);
 
   useEffect(() => {
     if (!gidDirty || !gidLookup) return;
     // Async lookup result → sync into form. Same pattern as release-form.
+    // Same exact-match guard as the Emp # effect (stale pre-filled data).
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setForm((f) =>
-      f.picName === gidLookup.name && f.email === gidLookup.email
+    setForm((f) => {
+      if (gidLookup.globalId.toUpperCase() !== f.gid.trim().toUpperCase()) return f;
+      return f.empNumber === gidLookup.employeeNo &&
+        f.picName === gidLookup.name &&
+        f.email === gidLookup.email
         ? f
-        : { ...f, picName: gidLookup.name, email: gidLookup.email }
-    );
+        : { ...f, empNumber: gidLookup.employeeNo, picName: gidLookup.name, email: gidLookup.email };
+    });
   }, [gidDirty, gidLookup]);
 
   const openEdit = (r: LedgerRow) => {
@@ -735,8 +743,14 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
 
       {/* ── Edit row modal (admin only) ── */}
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/60">
-          <div className="w-full max-w-lg animate-fade-in rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-800">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/60"
+          onClick={() => setEditing(null)}
+        >
+          <div
+            className="w-full max-w-lg animate-fade-in rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-800"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
