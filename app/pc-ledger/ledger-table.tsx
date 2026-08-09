@@ -371,7 +371,12 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                   />
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-semibold text-slate-800 dark:text-slate-200">{r.hostname}</td>
-                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">{r.serialNumber}</td>
+                <td className="max-w-0 px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+                  <BigGooseTooltip
+                    label={<span className="block truncate">{r.serialNumber}</span>}
+                    tooltip={<span className="font-mono text-[11px] leading-relaxed">{r.serialNumber}</span>}
+                  />
+                </td>
                 <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">
                   <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">{r.type}</span>
                 </td>
