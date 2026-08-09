@@ -6,7 +6,8 @@ import { LedgerTable } from "./ledger-table";
 export const dynamic = "force-dynamic";
 
 export default async function PcLedgerPage() {
-  await requireAuth();
+  const session = await requireAuth();
+  const isAdmin = session.user.role === "ADMIN";
 
   const items = await prisma.item.findMany({
     where: {
@@ -28,6 +29,7 @@ export default async function PcLedgerPage() {
     const isAvailable = it.status === "AVAILABLE";
     const section = isAvailable ? "Unassigned" : (txn?.assigneeDept || "Unassigned");
     return {
+      id: it.id,
       empNumber: isAvailable ? "Unassigned" : (txn?.assigneeEmpNumber ?? "N/A"),
       picName: isAvailable ? "Unassigned" : (txn?.assigneeName ?? "N/A"),
       gid: txn?.gid ?? "—",
@@ -51,7 +53,7 @@ export default async function PcLedgerPage() {
 
   return (
     <div className="pc-ledger-full">
-      <LedgerTable rows={rows} />
+      <LedgerTable rows={rows} isAdmin={isAdmin} />
     </div>
   );
 }

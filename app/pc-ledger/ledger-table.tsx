@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { statusLabel } from "@/lib/types";
+import { statusLabel, ITEM_STATUSES } from "@/lib/types";
 import { BigGooseTooltip } from "@/app/reports/_components/big-goose-tooltip";
+import { updateLedgerRow } from "@/app/actions/pc-ledger";
 
 export type LedgerRow = {
+  id: string;
   empNumber: string;
   picName: string;
   gid: string;
@@ -51,6 +53,9 @@ const COLUMNS = [
   { key: "status", label: "Status" },
 ] as const;
 
+/* Edit (pencil) column appended only for admins — no key, renders fixed width */
+const ACTION_COL = { key: "__action", label: "" } as const;
+
 type ColKey = (typeof COLUMNS)[number]["key"];
 
 type Filters = Record<string, string>;
@@ -72,11 +77,54 @@ function getUniqueValues(rows: LedgerRow[], key: ColKey): string[] {
 const FILTER_INPUT_CLASS =
   "w-full rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#2563eb] focus:ring-0 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:placeholder:text-slate-500";
 
-export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
+export function LedgerTable({ rows, isAdmin = false }: { rows: LedgerRow[]; isAdmin?: boolean }) {
   const [q, setQ] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>({});
   const [busy, setBusy] = useState("");
+  const [editing, setEditing] = useState<LedgerRow | null>(null);
+  const [form, setForm] = useState({
+    empNumber: "",
+    picName: "",
+    gid: "",
+    email: "",
+    hostname: "",
+    section: "",
+    remarks: "",
+    status: "AVAILABLE",
+  });
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const openEdit = (r: LedgerRow) => {
+    setForm({
+      empNumber: r.empNumber === "Unassigned" || r.empNumber === "N/A" ? "" : r.empNumber,
+      picName: r.picName === "Unassigned" || r.picName === "N/A" ? "" : r.picName,
+      gid: r.gid === "—" || r.gid === "N/A" ? "" : r.gid,
+      email: r.email === "—" || r.email === "N/A" ? "" : r.email,
+      hostname: r.hostname === "N/A" ? "" : r.hostname,
+      section: r.section === "Unassigned" || r.section === "N/A" ? "" : r.section,
+      remarks: r.remarks === "—" ? "" : r.remarks,
+      status: r.status,
+    });
+    setSaveError(null);
+    setEditing(r);
+  };
+
+  const submitEdit = async () => {
+    if (!editing) return;
+    setSaving(true);
+    setSaveError(null);
+    const res = await updateLedgerRow(editing.id, form);
+    setSaving(false);
+    if (!res.ok) {
+      setSaveError(res.error);
+      return;
+    }
+    setEditing(null);
+    // Server action revalidates; also refresh the view (router.refresh pulls new server data)
+    window.location.reload();
+  };
 
   const types = useMemo(() => getUniqueValues(rows, "type"), [rows]);
   const statuses = useMemo(() => getUniqueValues(rows, "status"), [rows]);
@@ -279,6 +327,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
             <col className="w-[10%]" />
             <col className="w-[6%]" />
             <col className="w-[15%]" />
+            {isAdmin && <col className="w-[3%]" />}
           </colgroup>
           {/* Header row */}
           <thead className="sticky top-0 z-20">
@@ -304,6 +353,11 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                   </th>
                 );
               })}
+              {isAdmin && (
+                <th className="px-2 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <span className="sr-only">Actions</span>
+                </th>
+              )}
             </tr>
 
             {/* Filter row */}
@@ -344,6 +398,7 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                     </th>
                   );
                 })}
+                {isAdmin && <th className="px-2 py-2" />}
               </tr>
             )}
           </thead>
@@ -419,11 +474,58 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
                     {statusLabel(r.status)}
                   </span>
                 </td>
+                {isAdmin && (
+                  <td className="whitespace-nowrap px-2 py-3 text-right">
+                    <div className="group/edit relative inline-flex">
+                      <button
+                        onClick={() => openEdit(r)}
+                        aria-label={`Edit ${r.serialNumber}`}
+                        className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white shadow-md shadow-blue-600/25 ring-1 ring-inset ring-white/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-600/30 hover:brightness-110 active:scale-90"
+                      >
+                        {/* Shine sweep on hover */}
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-y-0 left-0 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 transition-all duration-500 ease-out -translate-x-[250%] group-hover/edit:translate-x-[250%] group-hover/edit:opacity-100"
+                        />
+                        {/* Pencil icon with subtle bounce on hover */}
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4 transition-transform duration-200 group-hover/edit:-rotate-6 group-hover/edit:scale-110"
+                        >
+                          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                          <path d="m15 5 4 4" />
+                        </svg>
+                      </button>
+
+                      {/* Hover tooltip — spring bounce pop (below button, right-aligned) */}
+                      <div className="pointer-events-none absolute top-full right-0 z-30 mt-2">
+                        <div
+                          className="relative origin-top-right translate-y-1.5 scale-90 opacity-0 transition-all duration-300 group-hover/edit:translate-y-0 group-hover/edit:scale-100 group-hover/edit:opacity-100"
+                          style={{ transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+                        >
+                          <div className="flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-xl ring-1 ring-slate-700/60 dark:bg-slate-800 dark:ring-slate-600/50">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-3.5 w-3.5 text-blue-400" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                              <path d="m15 5 4 4" />
+                            </svg>
+                            Edit row
+                          </div>
+                          <div className="absolute right-4 bottom-full -mb-1 h-2 w-2 -translate-x-1/2 rotate-45 rounded-[2px] bg-slate-900 ring-1 ring-slate-700/60 dark:bg-slate-800 dark:ring-slate-600/50" />
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length} className="px-4 py-12 text-center">
+                <td colSpan={COLUMNS.length + (isAdmin ? 1 : 0)} className="px-4 py-12 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8 text-slate-300 dark:text-slate-600" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -443,6 +545,137 @@ export function LedgerTable({ rows }: { rows: LedgerRow[] }) {
           </tbody>
         </table>
       </div>
+
+      {/* ── Edit row modal (admin only) ── */}
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/60">
+          <div className="w-full max-w-lg animate-fade-in rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-800">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                  Edit Row — {editing.serialNumber}
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                  {editing.type} · {editing.brand} {editing.model}
+                </p>
+              </div>
+              <button
+                onClick={() => setEditing(null)}
+                aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Emp #</label>
+                <input
+                  value={form.empNumber}
+                  onChange={(e) => setForm({ ...form, empNumber: e.target.value.toUpperCase() })}
+                  placeholder="N/A"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">PIC Name</label>
+                <input
+                  value={form.picName}
+                  onChange={(e) => setForm({ ...form, picName: e.target.value })}
+                  placeholder="N/A"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">GID</label>
+                <input
+                  value={form.gid}
+                  onChange={(e) => setForm({ ...form, gid: e.target.value.toUpperCase() })}
+                  placeholder="N/A"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Email</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="N/A"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Hostname</label>
+                <input
+                  value={form.hostname}
+                  onChange={(e) => setForm({ ...form, hostname: e.target.value })}
+                  placeholder="N/A"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Section</label>
+                <input
+                  value={form.section}
+                  onChange={(e) => setForm({ ...form, section: e.target.value })}
+                  placeholder="N/A"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Status</label>
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                >
+                  {ITEM_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {statusLabel(s)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Remarks</label>
+                <input
+                  value={form.remarks}
+                  onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+                  placeholder="—"
+                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                />
+              </div>
+            </div>
+
+            {saveError && (
+              <p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+                {saveError}
+              </p>
+            )}
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => setEditing(null)}
+                disabled={saving}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitEdit}
+                disabled={saving}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
+              >
+                {saving ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

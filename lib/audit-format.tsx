@@ -41,6 +41,12 @@ const ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
       <path d="M7 7h11l-3-3M17 17H6l3 3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  pencil: (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+      <path d="m15 5 4 4" />
+    </svg>
+  ),
   trash: (p) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
       <path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" strokeLinecap="round" strokeLinejoin="round" />
@@ -85,6 +91,16 @@ export function auditView(action: string, details: string): AuditView {
       return { label: "Role changed", tone: "amber", icon: ICONS.swap, summary: d.employeeNumber ? `${d.employeeNumber} → ${d.role ?? ""}` : "—" };
     case "DELETED_USER":
       return { label: "User deleted", tone: "rose", icon: ICONS.trash, summary: d.employeeNumber ?? "—" };
+    case "EDIT_PC_LEDGER": {
+      const changes = (d.changes ?? {}) as unknown as Record<string, { old: string | null; new: string | null }>;
+      const count = Object.keys(changes).length;
+      return {
+        label: "Ledger edited",
+        tone: "amber",
+        icon: ICONS.pencil,
+        summary: d.serialNumber ? `${d.serialNumber} · ${count} change${count === 1 ? "" : "s"}` : `${count} change${count === 1 ? "" : "s"}`,
+      };
+    }
     default:
       return { label: action, tone: "slate", icon: ICONS.swap, summary: details || "—" };
   }
