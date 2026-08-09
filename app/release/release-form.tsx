@@ -347,21 +347,21 @@ export function ReleaseForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Emp #</label>
-                  <input name="assigneeEmpNumber" value={empNumber} required onChange={(e) => setEmpNumber(e.target.value.toUpperCase())} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="assigneeEmpNumber" value={empNumber} onChange={(e) => setEmpNumber(e.target.value.toUpperCase())} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Name</label>
-                  <input name="assigneeName" value={assigneeName} required onChange={(e) => { setAssigneeName(titleCase(e.target.value)); }} className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="assigneeName" value={assigneeName} onChange={(e) => { setAssigneeName(titleCase(e.target.value)); }} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">GID</label>
-                  <input name="gid" value={singleGid} onChange={(e) => { e.target.value = e.target.value.toUpperCase(); setSingleGid(e.target.value.toUpperCase()); }} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="gid" value={singleGid} onChange={(e) => { e.target.value = e.target.value.toUpperCase(); setSingleGid(e.target.value.toUpperCase()); }} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
-                  <input name="email" type="email" value={singleEmail} onChange={(e) => setSingleEmail(e.target.value)} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input name="email" type="email" value={singleEmail} onChange={(e) => setSingleEmail(e.target.value)} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
               <div>
@@ -405,21 +405,21 @@ export function ReleaseForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Emp #</label>
-                  <input value={empNumber} onChange={(e) => setEmpNumber(e.target.value.toUpperCase())} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input value={empNumber} onChange={(e) => setEmpNumber(e.target.value.toUpperCase())} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee Name</label>
-                  <input value={assigneeName} onChange={(e) => setAssigneeName(titleCase(e.target.value))} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input value={assigneeName} onChange={(e) => setAssigneeName(titleCase(e.target.value))} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">GID</label>
-                  <input value={batchGid} onChange={(e) => setBatchGid(e.target.value.toUpperCase())} required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input value={batchGid} onChange={(e) => setBatchGid(e.target.value.toUpperCase())} placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
-                  <input value={batchEmail} onChange={(e) => setBatchEmail(e.target.value)} type="email" required className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+                  <input value={batchEmail} onChange={(e) => setBatchEmail(e.target.value)} type="email" placeholder="N/A" className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#2563eb] focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
                 </div>
               </div>
               <div>

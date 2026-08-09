@@ -25,12 +25,13 @@ export default async function PcLedgerPage() {
 
   const rows = items.map((it) => {
     const txn = it.transactions[0] ?? null;
-    const section = it.status === "AVAILABLE" ? "Unassigned" : (txn?.assigneeDept || "Unassigned");
+    const isAvailable = it.status === "AVAILABLE";
+    const section = isAvailable ? "Unassigned" : (txn?.assigneeDept || "Unassigned");
     return {
-      empNumber: it.status === "AVAILABLE" ? "Unassigned" : (txn?.assigneeEmpNumber ?? "Unassigned"),
-      picName: it.status === "AVAILABLE" ? "Unassigned" : (txn?.assigneeName ?? "Unassigned"),
+      empNumber: isAvailable ? "Unassigned" : (txn?.assigneeEmpNumber ?? "N/A"),
+      picName: isAvailable ? "Unassigned" : (txn?.assigneeName ?? "N/A"),
       gid: txn?.gid ?? "—",
-      email: txn?.email ?? "—",
+      email: isAvailable ? "—" : (txn?.email ?? "N/A"),
       hostname: it.hostname,
       serialNumber: it.serialNumber,
       type: it.model.type,

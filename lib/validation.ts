@@ -31,13 +31,19 @@ export const batchReceiveSchema = z.object({
 export type BatchReceiveInput = z.infer<typeof batchReceiveSchema>;
 
 // Release (deploy an item to an assignee)
+const optionalStr = (max: number) =>
+  z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? null : v),
+    z.string().max(max).nullable()
+  );
+
 export const releaseSchema = z.object({
   itemId: z.string().uuid("Invalid item"),
-  assigneeEmpNumber: z.string().min(1).max(50),
-  assigneeName: z.string().min(1).max(200),
+  assigneeEmpNumber: optionalStr(50),
+  assigneeName: optionalStr(200),
   assigneeDept: z.string().max(200).optional().or(z.literal("")),
-  gid: z.string().min(1, "GID required").max(100),
-  email: z.string().email("Invalid email").max(200),
+  gid: optionalStr(100),
+  email: optionalStr(200),
   hostname: z.string().max(200).optional().or(z.literal("")),
   remarks: z.string().max(500).optional().or(z.literal("")),
 });
@@ -46,11 +52,11 @@ export type ReleaseInput = z.infer<typeof releaseSchema>;
 // Batch Release (multiple serials, shared assignee)
 export const batchReleaseSchema = z.object({
   serials: z.array(z.string().min(1).max(200)),
-  assigneeEmpNumber: z.string().min(1).max(50),
-  assigneeName: z.string().min(1).max(200),
+  assigneeEmpNumber: optionalStr(50),
+  assigneeName: optionalStr(200),
   assigneeDept: z.string().max(200).optional().or(z.literal("")),
-  gid: z.string().min(1, "GID required").max(100),
-  email: z.string().email("Invalid email").max(200),
+  gid: optionalStr(100),
+  email: optionalStr(200),
   hostname: z.string().max(200).optional().or(z.literal("")),
   remarks: z.string().max(500).optional().or(z.literal("")),
 });
