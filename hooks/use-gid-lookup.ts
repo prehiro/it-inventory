@@ -20,6 +20,7 @@ type GidResult =
  */
 export function useGidLookup(value: string, mode: "emp" | "gid" = "emp") {
   const [data, setData] = useState<GidData | null>(null);
+  const [query, setQuery] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const valueRef = useRef(value);
@@ -34,6 +35,7 @@ export function useGidLookup(value: string, mode: "emp" | "gid" = "emp") {
 
     debounce.current = setTimeout(async () => {
       setData(null);
+      setQuery(null);
       setLoading(q.length >= 3);
       if (q.length < 3) return;
       try {
@@ -41,7 +43,10 @@ export function useGidLookup(value: string, mode: "emp" | "gid" = "emp") {
           mode === "gid" ? `gid=${encodeURIComponent(q)}` : `emp=${encodeURIComponent(q)}`;
         const res = await fetch(`/api/gid-lookup?${param}`);
         const result: GidResult = await res.json();
-        if (result.found && valueRef.current.trim() === q) setData(result.data);
+        if (result.found && valueRef.current.trim() === q) {
+          setData(result.data);
+          setQuery(q);
+        }
       } catch {
         // silent fail
       } finally {
@@ -54,5 +59,7 @@ export function useGidLookup(value: string, mode: "emp" | "gid" = "emp") {
     };
   }, [value, mode]);
 
-  return { data, loading };
+  // `query` = the value the current `data` was resolved for (null when none).
+  // Consumers use it to ignore results that no longer match the input.
+  return { data, loading, query };
 }

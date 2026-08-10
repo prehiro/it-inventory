@@ -5,7 +5,8 @@ import { LedgerTable } from "./ledger-table";
 
 export const dynamic = "force-dynamic";
 
-export default async function PcLedgerPage() {
+export default async function PcLedgerPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const sp = await searchParams;
   const session = await requireAuth();
   const isAdmin = session.user.role === "ADMIN";
 
@@ -63,7 +64,7 @@ export default async function PcLedgerPage() {
 
   return (
     <div className="pc-ledger-full">
-      <LedgerTable rows={rows} isAdmin={isAdmin} sections={sections} />
+      <LedgerTable rows={rows} isAdmin={isAdmin} sections={sections} savedSerial={sp.saved} />
     </div>
   );
 }

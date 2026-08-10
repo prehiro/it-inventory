@@ -232,7 +232,7 @@ function SectionDropdown({
   );
 }
 
-export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: LedgerRow[]; isAdmin?: boolean; sections?: string[] }) {
+export function LedgerTable({ rows, isAdmin = false, sections = [], savedSerial }: { rows: LedgerRow[]; isAdmin?: boolean; sections?: string[]; savedSerial?: string }) {
   const [q, setQ] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>({});
@@ -250,44 +250,44 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
   });
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
   // Auto-fill guards: only apply GID lookup results when the user actually
   // typed in the Emp # / GID fields (not on modal open with pre-filled values).
   const [empDirty, setEmpDirty] = useState(false);
   const [gidDirty, setGidDirty] = useState(false);
 
-  // Auto-fill PIC Name + Email when the user enters Emp # or GID.
-  const { data: empLookup } = useGidLookup(form.empNumber);
-  const { data: gidLookup } = useGidLookup(form.gid, "gid");
+  // Auto-fill PIC/GID/Email when the user enters Emp # or GID. The lookup result
+  // is only applied while its `query` still matches the current field value —
+  // the hook may hold data from the modal's pre-filled value while a new lookup
+  // is debouncing, and applying it would revert the user's typing.
+  const { data: empLookup, query: empLookupQuery } = useGidLookup(form.empNumber);
+  const { data: gidLookup, query: gidLookupQuery } = useGidLookup(form.gid, "gid");
 
   useEffect(() => {
-    if (!empDirty || !empLookup) return;
+    if (!empDirty || !empLookup || !empLookupQuery) return;
     // Async lookup result → sync into form. Same pattern as release-form.
-    // Only apply when the resolved record EXACTLY matches the current field
-    // (the hook may still hold data from the modal's pre-filled value while a
-    // new lookup is debouncing — applying it would revert the user's typing).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm((f) => {
-      if (empLookup.employeeNo.toUpperCase() !== f.empNumber.trim().toUpperCase()) return f;
+      if (empLookupQuery !== f.empNumber.trim()) return f;
       return f.gid === empLookup.globalId && f.picName === empLookup.name && f.email === empLookup.email
         ? f
         : { ...f, gid: empLookup.globalId, picName: empLookup.name, email: empLookup.email };
     });
-  }, [empDirty, empLookup]);
+  }, [empDirty, empLookup, empLookupQuery]);
 
   useEffect(() => {
-    if (!gidDirty || !gidLookup) return;
+    if (!gidDirty || !gidLookup || !gidLookupQuery) return;
     // Async lookup result → sync into form. Same pattern as release-form.
-    // Same exact-match guard as the Emp # effect (stale pre-filled data).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm((f) => {
-      if (gidLookup.globalId.toUpperCase() !== f.gid.trim().toUpperCase()) return f;
+      if (gidLookupQuery !== f.gid.trim()) return f;
       return f.empNumber === gidLookup.employeeNo &&
         f.picName === gidLookup.name &&
         f.email === gidLookup.email
         ? f
         : { ...f, empNumber: gidLookup.employeeNo, picName: gidLookup.name, email: gidLookup.email };
     });
-  }, [gidDirty, gidLookup]);
+  }, [gidDirty, gidLookup, gidLookupQuery]);
 
   const openEdit = (r: LedgerRow) => {
     setForm({
@@ -303,11 +303,13 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
     setEmpDirty(false);
     setGidDirty(false);
     setSaveError(null);
+    setSaved(false);
     setEditing(r);
   };
 
   const submitEdit = async () => {
     if (!editing) return;
+    const serial = editing.serialNumber;
     setSaving(true);
     setSaveError(null);
     const res = await updateLedgerRow(editing.id, form);
@@ -316,10 +318,22 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
       setSaveError(res.error);
       return;
     }
-    setEditing(null);
-    // Server action revalidates; also refresh the view (router.refresh pulls new server data)
-    window.location.reload();
+    // Success: play the checkmark confirmation, then reload and flash the row
+    setSaved(true);
+    setTimeout(() => {
+      setEditing(null);
+      window.location.href = `/pc-ledger?saved=${encodeURIComponent(serial)}`;
+    }, 1200);
   };
+
+  // Clear the ?saved= highlight param once the row flash has played
+  useEffect(() => {
+    if (!savedSerial) return;
+    const t = setTimeout(() => {
+      window.history.replaceState(null, "", "/pc-ledger");
+    }, 2400);
+    return () => clearTimeout(t);
+  }, [savedSerial]);
 
   const types = useMemo(() => getUniqueValues(rows, "type"), [rows]);
   const statuses = useMemo(() => getUniqueValues(rows, "status"), [rows]);
@@ -604,7 +618,7 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
               <tr
                 key={r.serialNumber}
                 className={`border-b border-slate-50 transition hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-slate-800/40 ${i % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/40 dark:bg-slate-800/20"
-                  }`}
+                  }${r.serialNumber === savedSerial ? " animate-row-saved" : ""}`}
               >
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-medium text-slate-800 dark:text-slate-200">{r.empNumber}</td>
                 <td className="max-w-0 px-4 py-3 text-slate-700 dark:text-slate-300">
@@ -745,12 +759,26 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
       {editing && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-black/60"
-          onClick={() => setEditing(null)}
+          onClick={saved ? undefined : () => setEditing(null)}
         >
           <div
             className="w-full max-w-lg animate-fade-in rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-800"
             onClick={(e) => e.stopPropagation()}
           >
+            {saved ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 animate-check-pop items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-7 w-7" strokeLinecap="round" strokeLinejoin="round">
+                    <path className="animate-check-draw" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Changes Saved</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  {editing.hostname || "—"} · <span className="font-mono">{editing.serialNumber}</span>
+                </p>
+              </div>
+            ) : (
+              <>
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
@@ -832,7 +860,15 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
                 <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Status</label>
                 <select
                   value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    // Back to stock → the assignment is void: clear assignee fields.
+                    setForm((f) =>
+                      v === "AVAILABLE"
+                        ? { ...f, status: v, empNumber: "", picName: "", gid: "", email: "", section: "" }
+                        : { ...f, status: v }
+                    );
+                  }}
                   className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                 >
                   {ITEM_STATUSES.map((s) => (
@@ -875,6 +911,8 @@ export function LedgerTable({ rows, isAdmin = false, sections = [] }: { rows: Le
                 {saving ? "Saving…" : "Save Changes"}
               </button>
             </div>
+              </>
+            )}
           </div>
         </div>
       )}

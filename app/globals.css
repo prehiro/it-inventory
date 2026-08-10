@@ -41,6 +41,13 @@ body {
   animation: check-draw 0.7s ease-out 0.35s forwards;
 }
 
+/* ── PC Ledger: row flash after edit-row save (via ?saved= param) ── */
+@keyframes row-saved {
+  0% { background-color: rgba(16, 185, 129, 0.22); }
+  100% { background-color: transparent; }
+}
+.animate-row-saved { animation: row-saved 1.6s ease-out; }
+
 /* Rotating gradient border for Batch SN toggle — wrapper approach */
 @property --rotate-angle {
   syntax: "<angle>";
