@@ -134,7 +134,7 @@ export function Sidebar({ role }: { role: Role }) {
     children: [
       { href: "/admin/users", label: "User Management", icon: I.users },
       { href: "/admin/master-data", label: "Master Data Item", icon: I.master },
-      { href: "/admin/employee-no-list", label: "Employee No List", icon: I.employee },
+      { href: "/admin/employee-no-list", label: "Emp No / GID List", icon: I.employee },
       { href: "/admin/audit-trail", label: "Audit Trail", icon: I.audit },
     ],
   };
