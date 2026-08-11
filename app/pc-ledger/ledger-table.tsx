@@ -158,9 +158,8 @@ function SectionDropdown({
         onKeyDown={onKey}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 ${
-          open ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-300"
-        }`}
+        className={`flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 ${open ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-300"
+          }`}
       >
         <span className={selected && selected.value ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"}>
           {selected ? selected.label : "N/A"}
@@ -198,13 +197,12 @@ function SectionDropdown({
                     onChange(o.value);
                     setOpen(false);
                   }}
-                  className={`flex w-full items-center justify-between gap-3 px-3.5 py-2 text-left text-sm transition-colors ${
-                    isActive
-                      ? "bg-blue-50 font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
-                      : isSelected
-                        ? "font-medium text-blue-600 dark:text-blue-400"
-                        : "text-slate-700 hover:bg-blue-50 hover:font-semibold hover:text-blue-700 dark:text-slate-200 dark:hover:bg-blue-500/15 dark:hover:text-blue-300"
-                  }`}
+                  className={`flex w-full items-center justify-between gap-3 px-3.5 py-2 text-left text-sm transition-colors ${isActive
+                    ? "bg-blue-50 font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+                    : isSelected
+                      ? "font-medium text-blue-600 dark:text-blue-400"
+                      : "text-slate-700 hover:bg-blue-50 hover:font-semibold hover:text-blue-700 dark:text-slate-200 dark:hover:bg-blue-500/15 dark:hover:text-blue-300"
+                    }`}
                 >
                   <span className={o.value === "" && !isActive && !isSelected ? "text-slate-400 dark:text-slate-500" : ""}>
                     {o.label}
@@ -443,8 +441,8 @@ export function LedgerTable({ rows, isAdmin = false, sections = [], savedSerial 
           <button
             onClick={() => setShowFilters((v) => !v)}
             className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${showFilters || hasActiveFilters
-                ? "border-[#2563eb] bg-[#2563eb]/10 text-[#2563eb]"
-                : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+              ? "border-[#2563eb] bg-[#2563eb]/10 text-[#2563eb]"
+              : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
               }`}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" strokeLinecap="round" strokeLinejoin="round">
@@ -524,31 +522,31 @@ export function LedgerTable({ rows, isAdmin = false, sections = [], savedSerial 
         <table className="w-full table-fixed border-collapse text-sm">
           {/* Col widths (percent of container, sum 100%) — table-fixed keeps them exact */}
           <colgroup>
-            <col className="w-[8%]" />
-            <col className="w-[10%]" />
-            <col className="w-[6%]" />
-            <col className="w-[11%]" />
+            <col className="w-[7%]" />
             <col className="w-[9%]" />
-            <col className="w-[7%]" />
             <col className="w-[5%]" />
-            <col className="w-[7%]" />
             <col className="w-[10%]" />
-            <col className="w-[10%]" />
+            <col className="w-[8%]" />
             <col className="w-[6%]" />
-            <col className="w-[15%]" />
-            {isAdmin && <col className="w-[3%]" />}
+            <col className="w-[5%]" />
+            <col className="w-[6%]" />
+            <col className="w-[9%]" />
+            <col className="w-[9%]" />
+            <col className="w-[5%]" />
+            <col className="w-[13%]" />
+            {isAdmin && <col className="w-[8%]" />}
           </colgroup>
           {/* Header row */}
           <thead className="sticky top-0 z-20">
-            <tr className="border-b border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-800/60">
+            <tr className="border-b border-slate-200 bg-slate-50/95 dark:border-slate-700 dark:bg-slate-800/30">
               {COLUMNS.map((col) => {
                 const isActive = !!filters[col.key];
                 return (
                   <th
                     key={col.key}
                     className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${isActive
-                        ? "text-[#2563eb]"
-                        : "text-slate-500 dark:text-slate-400"
+                      ? "text-[#2563eb]"
+                      : "text-slate-500 dark:text-slate-400"
                       }`}
                   >
                     <div className="flex items-center gap-1">
@@ -564,7 +562,7 @@ export function LedgerTable({ rows, isAdmin = false, sections = [], savedSerial 
               })}
               {isAdmin && (
                 <th className="px-2 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <span className="sr-only">Actions</span>
+                  Action
                 </th>
               )}
             </tr>
@@ -675,10 +673,10 @@ export function LedgerTable({ rows, isAdmin = false, sections = [], savedSerial 
                 <td className="whitespace-nowrap px-4 py-3">
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_TONE[r.status] ?? ""}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.status === "AVAILABLE" ? "bg-emerald-500" :
-                        r.status === "RELEASED" ? "bg-indigo-500" :
-                          r.status === "RETURNED_KEEP" ? "bg-blue-500" :
-                            r.status === "IN_REPAIR" ? "bg-amber-500" :
-                              "bg-rose-500"
+                      r.status === "RELEASED" ? "bg-indigo-500" :
+                        r.status === "RETURNED_KEEP" ? "bg-blue-500" :
+                          r.status === "IN_REPAIR" ? "bg-amber-500" :
+                            "bg-rose-500"
                       }`} />
                     {statusLabel(r.status)}
                   </span>
@@ -779,138 +777,138 @@ export function LedgerTable({ rows, isAdmin = false, sections = [], savedSerial 
               </div>
             ) : (
               <>
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                  Edit Row — {editing.serialNumber}
-                </h3>
-                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                  {editing.type} · {editing.brand} {editing.model}
-                </p>
-              </div>
-              <button
-                onClick={() => setEditing(null)}
-                aria-label="Close"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" strokeLinecap="round">
-                  <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Edit Row — {editing.serialNumber}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                      {editing.type} · {editing.brand} {editing.model}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setEditing(null)}
+                    aria-label="Close"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" strokeLinecap="round">
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Emp #</label>
-                <input
-                  value={form.empNumber}
-                  onChange={(e) => {
-                    setForm({ ...form, empNumber: e.target.value.toUpperCase() });
-                    setEmpDirty(true);
-                  }}
-                  placeholder="N/A"
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">PIC Name</label>
-                <input
-                  value={form.picName}
-                  onChange={(e) => setForm({ ...form, picName: e.target.value })}
-                  placeholder="N/A"
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">GID</label>
-                <input
-                  value={form.gid}
-                  onChange={(e) => {
-                    setForm({ ...form, gid: e.target.value.toUpperCase() });
-                    setGidDirty(true);
-                  }}
-                  placeholder="N/A"
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Email</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="N/A"
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Hostname</label>
-                <input
-                  value={form.hostname}
-                  onChange={(e) => setForm({ ...form, hostname: e.target.value })}
-                  placeholder="N/A"
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Section</label>
-                <SectionDropdown value={form.section} onChange={(v) => setForm({ ...form, section: v })} sections={sections} />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Status</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    // Back to stock → the assignment is void: clear assignee fields.
-                    setForm((f) =>
-                      v === "AVAILABLE"
-                        ? { ...f, status: v, empNumber: "", picName: "", gid: "", email: "", section: "" }
-                        : { ...f, status: v }
-                    );
-                  }}
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                >
-                  {ITEM_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {statusLabel(s)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Remarks</label>
-                <input
-                  value={form.remarks}
-                  onChange={(e) => setForm({ ...form, remarks: e.target.value })}
-                  placeholder="—"
-                  className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Emp #</label>
+                    <input
+                      value={form.empNumber}
+                      onChange={(e) => {
+                        setForm({ ...form, empNumber: e.target.value.toUpperCase() });
+                        setEmpDirty(true);
+                      }}
+                      placeholder="N/A"
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">PIC Name</label>
+                    <input
+                      value={form.picName}
+                      onChange={(e) => setForm({ ...form, picName: e.target.value })}
+                      placeholder="N/A"
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">GID</label>
+                    <input
+                      value={form.gid}
+                      onChange={(e) => {
+                        setForm({ ...form, gid: e.target.value.toUpperCase() });
+                        setGidDirty(true);
+                      }}
+                      placeholder="N/A"
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Email</label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      placeholder="N/A"
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Hostname</label>
+                    <input
+                      value={form.hostname}
+                      onChange={(e) => setForm({ ...form, hostname: e.target.value })}
+                      placeholder="N/A"
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Section</label>
+                    <SectionDropdown value={form.section} onChange={(v) => setForm({ ...form, section: v })} sections={sections} />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Status</label>
+                    <select
+                      value={form.status}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        // Back to stock → the assignment is void: clear assignee fields.
+                        setForm((f) =>
+                          v === "AVAILABLE"
+                            ? { ...f, status: v, empNumber: "", picName: "", gid: "", email: "", section: "" }
+                            : { ...f, status: v }
+                        );
+                      }}
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    >
+                      {ITEM_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {statusLabel(s)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Remarks</label>
+                    <input
+                      value={form.remarks}
+                      onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+                      placeholder="—"
+                      className="input-glow w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#2563eb] dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                </div>
 
-            {saveError && (
-              <p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
-                {saveError}
-              </p>
-            )}
+                {saveError && (
+                  <p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+                    {saveError}
+                  </p>
+                )}
 
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setEditing(null)}
-                disabled={saving}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitEdit}
-                disabled={saving}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
-              >
-                {saving ? "Saving…" : "Save Changes"}
-              </button>
-            </div>
+                <div className="mt-5 flex justify-end gap-2">
+                  <button
+                    onClick={() => setEditing(null)}
+                    disabled={saving}
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={submitEdit}
+                    disabled={saving}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 disabled:opacity-60"
+                  >
+                    {saving ? "Saving…" : "Save Changes"}
+                  </button>
+                </div>
               </>
             )}
           </div>
